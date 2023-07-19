@@ -1,2 +1,7 @@
-package com.example.auction_server.enums;public class UserType {
+package com.example.auction_server.enums;
+
+public enum UserType {
+    SELLER,
+    BUYER,
+    ADMIN
 }
