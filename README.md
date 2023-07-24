@@ -65,3 +65,4 @@
     - 상품의 경매 기록 확인
 ---
 # ERD(Entity Relationship Diagram)
+![img.png](img.png)
