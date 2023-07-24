@@ -2,12 +2,13 @@ package com.example.auction_server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /***
  * @SpringBootAplication (@Configuration + @EnableAutoConfiguration + @ComponentScan)
  * 스프링 부트 애플리케이션의 구성 요소를 간편하게 설정하고, 자동 구성과 컴포넌트 스캔과 같은 중요한 기능을 활성화하는 역할을 수행
  *
- *  @ComponentScan
+ *  @Configuration
  * 	- 해당 클래스가 스프링의 구성 요소를 정의하는 구성 클래스
  * 	- 어노테이션이 지정된 클래스는 스프링 빈(bean)의 정의나 설정을 담당
  *
@@ -19,6 +20,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 	-  스프링이 애플리케이션 컨텍스트에서 구성 요소를 검색하고 등록
  */
 @SpringBootApplication
+@EnableAspectJAutoProxy
 public class AuctionServerApplication {
 
 	public static void main(String[] args) {
