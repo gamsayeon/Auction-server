@@ -19,8 +19,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long id);
-    Optional<User> findByUserId(String userId);
-    Optional<User> findByEmail(String email);
     Optional<User> findByUserIdAndPassword(String userId, String password);
     @Modifying
     @Query("UPDATE user u SET u.deleteTime = :deleteTime WHERE u.id = :id")
