@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface LoginCheck {
     public static enum LoginType {
-        LOGIN_SELLER, LOGIN_BUYER, LOGIN_ADMIN, WAITING_EMAIL
+        USER, ADMIN, UNAUTHORIZED_USER
     }
     LoginType[] types() default {};
 }

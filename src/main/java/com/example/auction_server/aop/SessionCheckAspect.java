@@ -37,20 +37,19 @@ public class SessionCheckAspect {
         String loginType = SessionUtil.getLoginUserType(session);
         for (int i = 0; i < loginCheck.types().length; i++) {
             switch (loginCheck.types()[i].toString()) {
-                case "LOGIN_SELLER":
-                    if (loginType == UserType.SELLER.name())
+                case "USER":
+                    if (loginType == UserType.USER.name())
                         isPresent = true;
                     break;
-                case "LOGIN_BUYER":
-                    if (loginType == UserType.BUYER.name())
-                        break;
-                case "LOGIN_ADMIN":
+                case "ADMIN":
                     if (loginType == UserType.ADMIN.name())
                         isPresent = true;
                     break;
-                default:
-                    if (loginType == UserType.WAITING_EMAIL.name())
+                case "UNAUTHORIZED_USER":
+                    if (loginType == UserType.UNAUTHORIZED_USER.name())
                         isPresent = true;
+                    break;
+                default:
                     break;
             }
         }

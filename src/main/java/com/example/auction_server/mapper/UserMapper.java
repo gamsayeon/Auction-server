@@ -3,6 +3,7 @@ package com.example.auction_server.mapper;
 import com.example.auction_server.dto.UserDTO;
 import com.example.auction_server.enums.UserType;
 import com.example.auction_server.model.User;
+import com.example.auction_server.util.Sha256Encrypt;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -34,9 +35,8 @@ public class UserMapper {
      */
     public User convertToEntity(UserDTO userDTO) {
         User user = modelMapper.map(userDTO, User.class);
-        if (userDTO.getUserType() == null) {
-            user.setUserType(UserType.SELLER);
-        }
+        user.setPassword(Sha256Encrypt.encrypt(userDTO.getPassword()));
+        user.setUserType(UserType.UNAUTHORIZED_USER);
         return user;
     }
 

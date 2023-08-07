@@ -2,6 +2,7 @@ package com.example.auction_server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /***
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  */
 @SpringBootApplication
 @EnableAspectJAutoProxy
+@EnableCaching
 public class AuctionServerApplication {
 
 	public static void main(String[] args) {
