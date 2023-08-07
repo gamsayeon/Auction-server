@@ -68,7 +68,11 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createTime;
 
-    @Column(name = "delete_time")
+    @Column(name = "update_time")
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime deleteTime;
+    private LocalDateTime updateTime;
+
+    @Column(name = "last_login_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime lastLoginTime;
 }
