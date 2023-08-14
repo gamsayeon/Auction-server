@@ -1,12 +1,7 @@
 package com.example.auction_server.exception;
 
-public class AddException extends RuntimeException {
-    private Object responseBody;
+public class AddException extends AuctionCommonException {
     public AddException(String code, Object responseBody) {
-        super(code);
-        this.responseBody = responseBody;
-    }
-    public Object getResponseBody() {
-        return responseBody;
+        super(code, responseBody);
     }
 }

@@ -35,14 +35,13 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryMapper.convertToEntity(categoryDTO);
         boolean isDuplicateCategory = this.checkDuplicationCategoryName(category.getCategoryName());
 
-        if(isDuplicateCategory) {
+        if (isDuplicateCategory) {
             logger.warn("중복된 category 입니다.");
             throw new DuplicateException("ERR_2004", categoryDTO);
-        }
-        else {
-            if(category.getBidMinPrice() >= category.getBidMaxPrice()){
+        } else {
+            if (category.getBidMinPrice() >= category.getBidMaxPrice()) {
                 logger.warn("금액을 잘못설정했습니다.");
-                throw new InputSettingException("ERR_10000");
+                throw new InputSettingException("ERR_10000", categoryDTO);
             }
             Category resultCategory = categoryRepository.save(category);
             if (resultCategory != null) {
@@ -61,10 +60,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-//    @Override
-//    public CategoryDTO updateCategory(CategoryDTO categoryDTO, Long categoryId){
-//        Category category = categoryMapper.convertToEntity(categoryDTO);
-//    }
 
     @Override
     public boolean checkDuplicationCategoryName(String categoryName) {
@@ -74,16 +69,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public String deleteCategory(Long categoryId){
+    public String deleteCategory(Long categoryId) {
         Optional<Category> optionalCategory = categoryRepository.findByCategoryId(categoryId);
-        if(categoryRepository.deleteByCategoryId(categoryId) == DELETE_SUCCESS){
+        if (categoryRepository.deleteByCategoryId(categoryId) == DELETE_SUCCESS) {
             String categoryName = optionalCategory.get().getCategoryName();
-            logger.info(categoryName+ "을 카테고리 삭제에 성공했습니다.");
+            logger.info(categoryName + "을 카테고리 삭제에 성공했습니다.");
             return categoryName;
-        }
-        else{
+        } else {
             logger.warn("category 실패 오류. 재시도 해주세요.");
-            throw new DeleteException("ERR_11000");
+            throw new DeleteException("ERR_11000", categoryId);
         }
     }
 
