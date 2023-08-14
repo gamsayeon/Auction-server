@@ -33,21 +33,21 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO registerUser(UserDTO userDTO) {
-        boolean isDuplicationUserId = this.checkDuplicationUserId(userDTO.getUserId());
-        boolean isDuplicationEmail = this.checkDuplicationEmail(userDTO.getEmail());
+        User user = userMapper.convertToEntity(userDTO);
+        boolean isDuplicationUserId = this.checkDuplicationUserId(user.getUserId());
+        boolean isDuplicationEmail = this.checkDuplicationEmail(user.getEmail());
 
         if (isDuplicationUserId && isDuplicationEmail) {
             logger.warn("Id와 Email이 중복되었습니다.");
-            throw new DuplicateException("ERR_2000");
+            throw new DuplicateException("ERR_2000", user);
         } else if (isDuplicationUserId) {
             logger.warn("중복된 ID 입니다.");
-            throw new DuplicateException("ERR_2001");
+            throw new DuplicateException("ERR_2001", user);
         } else if (isDuplicationEmail) {
             logger.warn("중복된 Email 입니다.");
-            throw new DuplicateException("ERR_2002");
+            throw new DuplicateException("ERR_2002", user);
         } else {
-            if (userDTO.getUserType() != UserType.ADMIN) {
-                User user = userMapper.convertToEntity(userDTO);
+            if (user.getUserType() != UserType.ADMIN) {
                 user.setUserType(UserType.UNAUTHORIZED_USER);
                 user.setCreateTime(LocalDateTime.now());
                 User resultUser = userRepository.save(user);
@@ -55,14 +55,14 @@ public class UserServiceImpl implements UserService {
                     UserDTO resultUserDTO = userMapper.convertToDTO(resultUser);
                     if (resultUserDTO == null) {
                         logger.warn("매핑에 실패했습니다.");
-                        throw new AddException("ERR_1001");
+                        throw new AddException("ERR_1001", user);
                     } else {
                         logger.info("유저 " + resultUser.getUserId() + "을 회원가입에 성공했습니다.");
                         return resultUserDTO;
                     }
                 } else {
                     logger.warn("회원가입 오류. 재시도 해주세요.");
-                    throw new AddException("ERR_1000");
+                    throw new AddException("ERR_1000", user);
                 }
             } else {
                 logger.warn("ADMIN으로 회원가입할 수 없습니다. 재시도해주세요.");
@@ -94,13 +94,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO registerAdminUser(UserDTO userDTO) {
-        boolean isDuplicationUserId = this.checkDuplicationUserId(userDTO.getUserId());
+        User user = userMapper.convertToEntity(userDTO);
+        boolean isDuplicationUserId = this.checkDuplicationUserId(user.getUserId());
 
         if (isDuplicationUserId) {
             logger.warn("중복된 ID 입니다.");
-            throw new DuplicateException("ERR_2001");
+            throw new DuplicateException("ERR_2001", user);
         } else {
-            User user = userMapper.convertToEntity(userDTO);
             user.setUserType(UserType.ADMIN);
             user.setCreateTime(LocalDateTime.now());
             User resultUser = userRepository.save(user);
@@ -108,14 +108,14 @@ public class UserServiceImpl implements UserService {
                 UserDTO resultUserDTO = userMapper.convertToDTO(resultUser);
                 if (resultUserDTO == null) {
                     logger.warn("매핑에 실패했습니다.");
-                    throw new AddException("ERR_1001");
+                    throw new AddException("ERR_1001", user);
                 } else {
                     logger.info("ADMIN 유저 " + resultUserDTO.getUserId() + "을 회원가입에 성공했습니다.");
                     return resultUserDTO;
                 }
             } else {
                 logger.warn("회원가입 오류. 재시도 해주세요.");
-                throw new AddException("ERR_1000");
+                throw new AddException("ERR_1000", user);
             }
         }
     }
@@ -143,27 +143,32 @@ public class UserServiceImpl implements UserService {
     public UserDTO loginUser(UserDTO userDTO, HttpSession session) {
         User user = userMapper.convertToEntity(userDTO);
         Optional<User> optionalUser = userRepository.findByUserIdAndPassword(user.getUserId(), user.getPassword());
-        if (optionalUser.isEmpty()) {
-            logger.warn("로그인에 실패 했습니다. 아이디 및 비밀번호 확인 후 재시도 해주세요.");
-            throw new NotMatchingException("ERR_4000");
-        } else {
-            this.insertSession(session, optionalUser.get().getId(), optionalUser.get().getUserType());
-            User resultUser = optionalUser.get();
-            resultUser.setLastLoginTime(LocalDateTime.now());
-            resultUser = userRepository.save(resultUser);
-            if (resultUser == null) {
-                logger.warn("마지막 로그인 시간을 업데이트 하는데 실패하였습니다.");
-                throw new UpdateException("ERR_5002");
+        try {
+            if (optionalUser.isEmpty()) {
+                throw new NotMatchingException("ERR_4000");
             } else {
-                UserDTO resultUserDTO = userMapper.convertToDTO(optionalUser.get());
-                if (resultUserDTO == null) {
-                    logger.warn("매핑에 실패했습니다.");
-                    throw new AddException("ERR_1001");
+                this.insertSession(session, optionalUser.get().getId(), optionalUser.get().getUserType());
+                User resultUser = optionalUser.get();
+                resultUser.setLastLoginTime(LocalDateTime.now());
+                resultUser = userRepository.save(resultUser);
+                if (resultUser == null) {
+                    logger.warn("마지막 로그인 시간을 업데이트 하는데 실패하였습니다.");
+                    throw new UpdateException("ERR_5002");
                 } else {
-                    logger.info("로그인에 성공하엿습니다.");
-                    return resultUserDTO;
+                    UserDTO resultUserDTO = userMapper.convertToDTO(optionalUser.get());
+                    if (resultUserDTO == null) {
+                        logger.warn("매핑에 실패했습니다.");
+                        throw new AddException("ERR_1001", user);
+                    } else {
+                        logger.info("로그인에 성공하엿습니다.");
+                        return resultUserDTO;
+                    }
                 }
             }
+
+        } catch (Exception e){
+            logger.warn("로그인에 실패 했습니다. 아이디 및 비밀번호 확인 후 재시도 해주세요.");
+            throw e; // 다시 예외를 던져서 상위 핸들러가 처리하도록 함
         }
     }
 
@@ -182,7 +187,7 @@ public class UserServiceImpl implements UserService {
         UserDTO resultUserDTO = userMapper.convertToDTO(optionalUser.get());
         if (resultUserDTO == null) {
             logger.warn("매핑에 실패했습니다.");
-            throw new AddException("ERR_1001");
+            throw new AddException("ERR_1001", id);
         } else {
             logger.info("회원 조회에 성공하였습니다.");
             return resultUserDTO;
@@ -192,15 +197,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO updateUser(Long id, UserDTO userDTO) {
-        boolean isDuplicationEmail = this.checkDuplicationEmail(userDTO.getEmail());
-        boolean isEmailAndIdMatched = this.emailAndIdMatched(id, userDTO.getEmail());
+        User user = userMapper.convertToEntity(userDTO);
+        boolean isDuplicationEmail = this.checkDuplicationEmail(user.getEmail());
+        boolean isEmailAndIdMatched = this.emailAndIdMatched(id, user.getEmail());
 
         if (isEmailAndIdMatched) {
             logger.warn("현재 Email 주소입니다.");
-            throw new DuplicateException("ERR_2003");
+            throw new DuplicateException("ERR_2003", user.getEmail());
         } else if (isDuplicationEmail) {
             logger.warn("중복된 Email 주소입니다.");
-            throw new DuplicateException("ERR_2002");
+            throw new DuplicateException("ERR_2002", user.getEmail());
         } else {
             Optional<User> optionalUser = userRepository.findById(id);
             if (optionalUser.isEmpty()) {
@@ -221,7 +227,7 @@ public class UserServiceImpl implements UserService {
                         return resultUserDTO;
                     } else {
                         logger.warn("매핑에 실패했습니다.");
-                        throw new AddException("ERR_1001");
+                        throw new AddException("ERR_1001", user);
                     }
                 } else {
                     logger.warn("회원정보를 수정하지 못했습니다. 재시도 해주세요");

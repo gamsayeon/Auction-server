@@ -11,11 +11,13 @@ public class ExceptionMessage {
         //AddException
         exceptionMessages.put("ERR_1000", "회원가입에 성공하지 못했습니다. 다시 시도해주세요.");
         exceptionMessages.put("ERR_1001", "매핑에 실패했습니다. 조회해서 확인해주세요.");
+        exceptionMessages.put("ERR_1002", "category 등록 오류. 재시도 해주세요.");
         //DuplicateException
         exceptionMessages.put("ERR_2000", "Id와 Email이 중복되었습니다.");
         exceptionMessages.put("ERR_2001", "중복된 ID 입니다. 다른 ID을 입력해주세요.");
         exceptionMessages.put("ERR_2002", "중복된 Email 입니다. 다른 Email을 입력해주세요.");
         exceptionMessages.put("ERR_2003", "현재 Email 주소 입니다. 다른 Email을 입력해주세요.");
+        exceptionMessages.put("ERR_2004", "중복된 category 입니다.");
         //UserAccessDeniedException
         exceptionMessages.put("ERR_3000", "ADMIN 으로 회원가입할 수 없습니다.");
         //NotMatchingException
@@ -33,6 +35,15 @@ public class ExceptionMessage {
         exceptionMessages.put("ERR_7000", "Email 전송에 실패했습니다.");
         //CacheTTLOutException
         exceptionMessages.put("ERR_8000", "만료시간이 지났습니다.");
+        //LoginRequiredException
+        exceptionMessages.put("ERR_9000", "User login required");
+        //UserAccessDeniedException
+        exceptionMessages.put("ERR_9001", "권한 부족");
+        //InputSettingException
+        exceptionMessages.put("ERR_10000", "잘못입력하셨습니다.");
+        //DeleteException
+        exceptionMessages.put("ERR_11000", "삭제에 실패했습니다.");
+
     }
 
     public static String getExceptionMessage(String exceptionCode) {

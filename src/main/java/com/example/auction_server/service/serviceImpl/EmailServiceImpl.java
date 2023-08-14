@@ -8,7 +8,6 @@ import jakarta.mail.internet.MimeMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,7 +20,7 @@ import java.util.UUID;
 public class EmailServiceImpl implements EmailService {
 
     @Value("${expireUrl}")
-    private String url;
+    private static String url;
     private final JavaMailSender javaMailSender;
 
     private final Logger logger = LogManager.getLogger(EmailServiceImpl.class);
@@ -34,18 +33,15 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public String generateToken(){
-        return UUID.randomUUID().toString();
-    }
-    @Override
     @Cacheable(key = "#token", value ="userId")
     public String putCacheToken(String token, String userId){
-        System.out.println(token);
         return userId;
     }
 
     @Override
-    public void sendToUser(String token, String email){
+    public void sendToUser(String userId, String email){
+        String token = UUID.randomUUID().toString();
+        this.putCacheToken(token, userId);
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");

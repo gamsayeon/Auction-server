@@ -31,13 +31,10 @@ public class UserController {
     public ResponseEntity<UserDTO> registerUser(@RequestBody @Validated({UserDTO.Signup.class}) UserDTO userDTO) {
         logger.debug("회원을 가입합니다.");
         UserDTO resultUserDTO = userService.registerUser(userDTO);
-        String token = emailService.generateToken();
-        emailService.putCacheToken(token, userDTO.getUserId());
-        emailService.sendToUser(token, userDTO.getEmail());
         return ResponseEntity.ok(resultUserDTO);
     }
 
-    @GetMapping("/vilifyEmail")
+    @GetMapping("/verify-email")
     public ResponseEntity<UserDTO> verifyAccount(@RequestParam("token") String token) {
         // 토큰을 이용한 회원 가입 인증 처리
         String id = emailService.verifyEmail(token);
@@ -59,14 +56,12 @@ public class UserController {
         return ResponseEntity.ok(resultUserDTO);
     }
 
-    @PostMapping("resend")
+    @PostMapping("/send-email")
     @LoginCheck(types = LoginCheck.LoginType.UNAUTHORIZED_USER)
-    public ResponseEntity<String> reSendEmail(Long id) {
+    public ResponseEntity<String> sendEmail(Long id) {
         logger.debug("인증 이메일을 재전송 합니다.");
         UserDTO resultUserDTO = userService.selectUser(id);
-        String token = emailService.generateToken();
-        emailService.putCacheToken(token, resultUserDTO.getUserId());
-        emailService.sendToUser(token, resultUserDTO.getEmail());
+        emailService.sendToUser(resultUserDTO.getUserId(), resultUserDTO.getEmail());
         return ResponseEntity.ok("Email을 확인해주세요");
     }
 

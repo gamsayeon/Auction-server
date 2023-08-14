@@ -30,7 +30,7 @@ public class SessionCheckAspect {
 
         // 값이 없으면 로그인이 필요한 예외를 던짐
         if (id == null) {
-            throw new LoginRequiredException("User login required");
+            throw new LoginRequiredException("ERR_9000");
         }
 
         boolean isPresent = false;
@@ -54,7 +54,7 @@ public class SessionCheckAspect {
             }
         }
         if (isPresent == false) {
-            throw new UserAccessDeniedException("권한 부족");
+            throw new UserAccessDeniedException("ERR_9001");
         }
         Object[] args = joinPoint.getArgs();
         args[0] = id;
