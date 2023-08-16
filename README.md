@@ -66,6 +66,8 @@
 - 경매 이력 조회
     - 자신의 경매 기록 확인
     - 상품의 경매 기록 확인
+- 결제
+    - 토스 페이먼츠 API 이용
 ---
 # ERD(Entity Relationship Diagram)
 ![img.png](img.png)
