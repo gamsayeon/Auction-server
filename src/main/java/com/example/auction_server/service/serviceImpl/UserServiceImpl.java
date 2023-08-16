@@ -30,6 +30,15 @@ public class UserServiceImpl implements UserService {
         this.userMapper = userMapper;
     }
 
+    /***
+     * @Transactional
+     * - 어노테이션을 사용하면 데이터베이스 작업들이 하나의 트랜잭션으로 묶이게 됩니다.
+     * - 트랜잭션 내에서 예외가 발생하면 해당 트랜잭션이 롤백이 됩니다.
+     * - 예외가 발생한 경우에도 데이터 일관성을 보장
+     *
+     * @param userDTO
+     * @return
+     */
     @Override
     @Transactional
     public UserDTO registerUser(UserDTO userDTO) {

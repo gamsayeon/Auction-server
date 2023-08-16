@@ -24,7 +24,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @PostMapping("/register")
+    @PostMapping
     @LoginCheck(types = LoginCheck.LoginType.ADMIN)
     public ResponseEntity<CategoryDTO> registerCategory(Long id, @RequestBody @Valid CategoryDTO categoryDTO) {
         logger.debug("category을 등록합니다.");
@@ -34,10 +34,11 @@ public class CategoryController {
 
     @PatchMapping("/{categoryId}")
     @LoginCheck(types = LoginCheck.LoginType.ADMIN)
-    public ResponseEntity<CategoryDTO> updateCategory(Long id, @PathVariable("categoryId") Long categoryId, @RequestBody @Valid CategoryDTO categoryDTO){
+    public ResponseEntity<CategoryDTO> updateCategory(Long id, @PathVariable("categoryId") Long categoryId,
+                                                      @RequestBody @Valid CategoryDTO categoryDTO){
         logger.debug("category을 수정합니다.");
-//        CategoryDTO resultCategoryDTO = categoryService.updateCategory(categoryDTO, categoryId);
-        return ResponseEntity.ok(null);
+        CategoryDTO resultCategoryDTO = categoryService.updateCategory(categoryDTO, categoryId);
+        return ResponseEntity.ok(resultCategoryDTO);
     }
 
     @DeleteMapping("/{categoryId}")

@@ -30,9 +30,12 @@ public class RedisConfig {
 
     /**
      * Jedis 와 Lettuce 의 차이
-     * Jedis 은 JAVA 의 표준 Redis 클라이언트
-     * Lettuce 은 Netty(비동기 이벤트 기반 고성능 네트워크 프레임워크) 기반의 Redis 클라이언트
-     *      비동기로 요청을 처리 하기 때문에 고성능을 자랑
+     * Jedis
+     *  - JAVA 의 표준 Redis 클라이언트, 레거시 I/O코드를 사용
+     *  - 비동기 처리시 별도의 라이브러리 사용
+     * Lettuce
+     *  - Netty(비동기 이벤트 기반 고성능 네트워크 프레임워크) 기반의 Redis 클라이언트
+     *  - 비동기로 요청을 처리 하기 때문에 고성능을 자랑
      *
      * Lettuce 는 TPS/CPU/Connection 개수/응답속도 등 전 분야에서 우위
      * 참고 : https://jojoldu.tistory.com/418

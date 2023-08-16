@@ -1,10 +1,7 @@
 package com.example.auction_server.service.serviceImpl;
 
 import com.example.auction_server.dto.CategoryDTO;
-import com.example.auction_server.exception.AddException;
-import com.example.auction_server.exception.DeleteException;
-import com.example.auction_server.exception.DuplicateException;
-import com.example.auction_server.exception.InputSettingException;
+import com.example.auction_server.exception.*;
 import com.example.auction_server.mapper.CategoryMapper;
 import com.example.auction_server.model.Category;
 import com.example.auction_server.repository.CategoryRepository;
@@ -60,6 +57,38 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
+    @Override
+    @Transactional
+    public CategoryDTO updateCategory(CategoryDTO categoryDTO, Long categoryId) {
+        Category category = categoryMapper.convertToEntity(categoryDTO);
+        Optional<Category> optionalCategory = categoryRepository.findByCategoryId(categoryId);
+        if (optionalCategory.isEmpty()) {
+            logger.warn("해당하는 카테고리는 찾지 못했습니다.");
+            throw new NotMatchingException("ERR_4003", categoryId);
+        } else {
+            boolean isDuplicateCategory = this.checkDuplicationCategoryName(category.getCategoryName());
+
+            if (isDuplicateCategory) {
+                logger.warn("중복된 category 입니다.");
+                throw new DuplicateException("ERR_2004", categoryDTO);
+            } else {
+                if (category.getBidMinPrice() >= category.getBidMaxPrice()) {
+                    logger.warn("금액을 잘못설정했습니다.");
+                    throw new InputSettingException("ERR_10000", categoryDTO);
+                }
+                category.setCategoryId(optionalCategory.get().getCategoryId());
+                Category resultCategory = categoryRepository.save(category);
+                if(resultCategory == null){
+                    logger.warn("카테고리를 수정하지 못했습니다.");
+                    throw new AddException("ERR_1003", categoryDTO);
+                }else{
+                    CategoryDTO resultCategoryDTO = categoryMapper.convertToDTO(resultCategory);
+                    logger.info(resultCategoryDTO.getCategoryName() + "을 카테고리 수정에 성공했습니다.");
+                    return resultCategoryDTO;
+                }
+            }
+        }
+    }
 
     @Override
     public boolean checkDuplicationCategoryName(String categoryName) {
