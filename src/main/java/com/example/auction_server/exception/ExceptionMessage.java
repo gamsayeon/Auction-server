@@ -17,8 +17,7 @@ public class ExceptionMessage {
         exceptionMessages.put("ERR_2000", "Id와 Email이 중복되었습니다.");
         exceptionMessages.put("ERR_2001", "중복된 ID 입니다. 다른 ID을 입력해주세요.");
         exceptionMessages.put("ERR_2002", "중복된 Email 입니다. 다른 Email을 입력해주세요.");
-        exceptionMessages.put("ERR_2003", "현재 Email 주소 입니다. 다른 Email을 입력해주세요.");
-        exceptionMessages.put("ERR_2004", "중복된 category 입니다.");
+        exceptionMessages.put("ERR_2003", "중복된 category 입니다.");
         //UserAccessDeniedException
         exceptionMessages.put("ERR_3000", "ADMIN 으로 회원가입할 수 없습니다.");
         //NotMatchingException

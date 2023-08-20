@@ -2,6 +2,7 @@ package com.example.auction_server.exception;
 
 import com.example.auction_server.model.CommonResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ValidationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -16,6 +17,16 @@ public class CustomExceptionHandler {
         String exceptionCode = ex.getMessage();
         CommonResponse commonResponse = new CommonResponse(exceptionCode,
                 ExceptionMessage.getExceptionMessage(exceptionCode), request.getServletPath());
+        return ResponseEntity.badRequest().body(commonResponse);
+    }
+
+    @ExceptionHandler(value = {ValidationException .class})
+    @ResponseBody
+    public ResponseEntity<Object> handleValidationException(ValidationException ex, HttpServletRequest request) {
+        String exceptionCode = ex.getCause().getMessage();
+        AuctionCommonException commonException = (AuctionCommonException) ex.getCause();
+        CommonResponse commonResponse = new CommonResponse(exceptionCode,
+                ExceptionMessage.getExceptionMessage(exceptionCode), request.getServletPath(), commonException.getResponseBody());
         return ResponseEntity.badRequest().body(commonResponse);
     }
 

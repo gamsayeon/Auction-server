@@ -1,6 +1,9 @@
 package com.example.auction_server.dto;
 
 import com.example.auction_server.enums.UserType;
+import com.example.auction_server.validation.annotation.UniqueEmail;
+import com.example.auction_server.validation.annotation.UniqueUser;
+import com.example.auction_server.validation.annotation.UniqueUserId;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -13,9 +16,11 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@UniqueUser(groups = {UserDTO.Signup.class})
 public class UserDTO {
 
     @NotBlank(groups = {Login.class, Signup.class, AdminSignup.class})
+    @UniqueUserId(groups = {AdminSignup.class})
     private String userId;
 
     @NotBlank(groups = {Login.class, Signup.class, AdminSignup.class, UpdateUser.class})
@@ -33,6 +38,7 @@ public class UserDTO {
 
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     @NotBlank(groups = {Signup.class, UpdateUser.class})
+    @UniqueEmail(groups = {UpdateUser.class})
     private String email;
 
     private UserType userType;

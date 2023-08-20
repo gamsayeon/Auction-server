@@ -41,6 +41,13 @@ public class CategoryController {
         return ResponseEntity.ok(resultCategoryDTO);
     }
 
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<CategoryDTO> selectCategory(@PathVariable("categoryId") Long categoryId){
+        logger.debug("category를 조회합니다.");
+        CategoryDTO resultCategoryDTO = categoryService.selectCategory(categoryId);
+        return ResponseEntity.ok(resultCategoryDTO);
+    }
+
     @DeleteMapping("/{categoryId}")
     @LoginCheck(types = LoginCheck.LoginType.ADMIN)
     public ResponseEntity<String> deleteCategory(Long id, @PathVariable("categoryId") Long categoryId){

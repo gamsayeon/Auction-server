@@ -28,4 +28,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE user u SET u.updateTime = :updateTime WHERE u.id = :id")
     int withDrawUser(@Param("id") Long id, @Param("updateTime") LocalDateTime updateTime);
+
+    boolean existsByEmail(String email);
+    boolean existsByUserId(String userId);
 }

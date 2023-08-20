@@ -8,15 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.file.AccessDeniedException;
 
 public interface UserService {
-    UserDTO registerUser(UserDTO userDTO) throws AccessDeniedException;
-
-    UserDTO registerAdminUser(UserDTO userDTO);
-
-    boolean checkDuplicationUserId(String userId);
-
-    boolean checkDuplicationEmail(String email);
-
-    boolean emailAndIdMatched(Long id, String email);
+    UserDTO registerUser(UserDTO userDTO, String userType);
 
     UserDTO loginUser(UserDTO userDTO, HttpSession session);
 

@@ -16,10 +16,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name = "user")
-/***
- * @DynamicUpdate 변경된 필드만을 포함한 업데이트 쿼리를 생성하여 실행
- */
-@DynamicUpdate
 public class User {
     @Id
     /***

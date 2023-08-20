@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 public interface CategoryService {
     CategoryDTO registerCategory(CategoryDTO categoryDTO);
     CategoryDTO updateCategory(CategoryDTO categoryDTO, Long categoryId);
-    boolean checkDuplicationCategoryName(String categoryName);
+
+    CategoryDTO selectCategory(Long categoryId);
+
     String deleteCategory(Long categoryId);
 }

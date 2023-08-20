@@ -9,7 +9,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @Setter
 @Table(name = "category")
-@DynamicUpdate
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
