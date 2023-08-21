@@ -13,6 +13,8 @@ public class ExceptionMessage {
         exceptionMessages.put("ERR_1001", "매핑에 실패했습니다. 조회해서 확인해주세요.");
         exceptionMessages.put("ERR_1002", "category 등록 오류. 재시도 해주세요.");
         exceptionMessages.put("ERR_1003", "category 수정 오류. 재시도 해주세요.");
+        exceptionMessages.put("ERR_1004", "상품등록에 실패했습니다. 다시시도해주세요.");
+        exceptionMessages.put("ERR_1005", "이미지 등록에 실패 했습니다.");
         //DuplicateException
         exceptionMessages.put("ERR_2000", "Id와 Email이 중복되었습니다.");
         exceptionMessages.put("ERR_2001", "중복된 ID 입니다. 다른 ID을 입력해주세요.");
@@ -42,6 +44,8 @@ public class ExceptionMessage {
         exceptionMessages.put("ERR_9001", "권한 부족");
         //InputSettingException
         exceptionMessages.put("ERR_10000", "category 금액을 잘못 입력하셨습니다.");
+        exceptionMessages.put("ERR_10001", "경매 시작시간을 잘못 입력하셨습니다. 다시 입력해주세요.");
+        exceptionMessages.put("ERR_10002", "경매 시작가가 즉시구매가와 같거나 큽니다. 다시 입력해주세요.");
         //DeleteException
         exceptionMessages.put("ERR_11000", "삭제에 실패했습니다.");
 

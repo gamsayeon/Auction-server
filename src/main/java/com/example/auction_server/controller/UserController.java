@@ -62,7 +62,7 @@ public class UserController {
         logger.debug("인증 이메일을 재전송 합니다.");
         UserDTO resultUserDTO = userService.selectUser(id);
         emailService.sendToUser(resultUserDTO.getUserId(), resultUserDTO.getEmail());
-        return ResponseEntity.ok("Email을 확인해주세요");
+        return ResponseEntity.ok(resultUserDTO.getEmail() + "Email을 확인해주세요");
     }
 
     @LoginCheck(types = {LoginCheck.LoginType.USER, LoginCheck.LoginType.ADMIN,
@@ -77,7 +77,7 @@ public class UserController {
     @LoginCheck(types = {LoginCheck.LoginType.USER, LoginCheck.LoginType.ADMIN,
             LoginCheck.LoginType.UNAUTHORIZED_USER})
     @PatchMapping
-    public ResponseEntity<UserDTO> updateUser(Long loginId, @RequestBody @Validated({UserDTO.UpdateUser.class})UserDTO userDTO) {
+    public ResponseEntity<UserDTO> updateUser(Long loginId, @RequestBody @Validated({UserDTO.UpdateUser.class}) UserDTO userDTO) {
         logger.debug("유저를 수정합니다.");
         UserDTO resultUserDTO = userService.updateUser(loginId, userDTO);
         return ResponseEntity.ok(resultUserDTO);

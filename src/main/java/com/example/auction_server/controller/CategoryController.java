@@ -8,7 +8,6 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/category")
@@ -35,14 +34,14 @@ public class CategoryController {
     @PatchMapping("/{categoryId}")
     @LoginCheck(types = LoginCheck.LoginType.ADMIN)
     public ResponseEntity<CategoryDTO> updateCategory(Long id, @PathVariable("categoryId") Long categoryId,
-                                                      @RequestBody @Valid CategoryDTO categoryDTO){
+                                                      @RequestBody @Valid CategoryDTO categoryDTO) {
         logger.debug("category을 수정합니다.");
         CategoryDTO resultCategoryDTO = categoryService.updateCategory(categoryDTO, categoryId);
         return ResponseEntity.ok(resultCategoryDTO);
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<CategoryDTO> selectCategory(@PathVariable("categoryId") Long categoryId){
+    public ResponseEntity<CategoryDTO> selectCategory(@PathVariable("categoryId") Long categoryId) {
         logger.debug("category를 조회합니다.");
         CategoryDTO resultCategoryDTO = categoryService.selectCategory(categoryId);
         return ResponseEntity.ok(resultCategoryDTO);
@@ -50,9 +49,9 @@ public class CategoryController {
 
     @DeleteMapping("/{categoryId}")
     @LoginCheck(types = LoginCheck.LoginType.ADMIN)
-    public ResponseEntity<String> deleteCategory(Long id, @PathVariable("categoryId") Long categoryId){
+    public ResponseEntity<String> deleteCategory(Long id, @PathVariable("categoryId") Long categoryId) {
         logger.debug("category을 삭제합니다.");
         String categoryName = categoryService.deleteCategory(categoryId);
-        return ResponseEntity.ok( categoryName+ "은 정상적으로 삭제되었습니다.");
+        return ResponseEntity.ok(categoryName + "은 정상적으로 삭제되었습니다.");
     }
 }
