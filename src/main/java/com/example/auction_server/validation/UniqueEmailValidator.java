@@ -13,7 +13,7 @@ public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, St
     private static final Logger logger = LogManager.getLogger(UniqueUserValidator.class);
 
 
-    public UniqueEmailValidator(UserRepository userRepository){
+    public UniqueEmailValidator(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

@@ -16,8 +16,10 @@ import lombok.Setter;
 public class CategoryDTO {
     @NotBlank
     private String categoryName;
+
     @Min(value = 1000)
     private int bidMaxPrice;
+
     @Min(value = 1000)
     private int bidMinPrice;
 

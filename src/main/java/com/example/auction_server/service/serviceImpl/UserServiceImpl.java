@@ -2,7 +2,10 @@ package com.example.auction_server.service.serviceImpl;
 
 import com.example.auction_server.dto.UserDTO;
 import com.example.auction_server.enums.UserType;
-import com.example.auction_server.exception.*;
+import com.example.auction_server.exception.AddException;
+import com.example.auction_server.exception.LogoutFailedException;
+import com.example.auction_server.exception.NotMatchingException;
+import com.example.auction_server.exception.UpdateException;
 import com.example.auction_server.mapper.UserMapper;
 import com.example.auction_server.model.User;
 import com.example.auction_server.repository.UserRepository;
@@ -52,9 +55,9 @@ public class UserServiceImpl implements UserService {
     public UserDTO registerUser(UserDTO userDTO, String userType) {
         User user = userMapper.convertToEntity(userDTO);
 
-        if (userType == "USER"){
+        if (userType == "USER") {
             user.setUserType(UserType.UNAUTHORIZED_USER);
-        }else if(userType == "ADMIN"){
+        } else if (userType == "ADMIN") {
             user.setUserType(UserType.ADMIN);
         }
         user.setCreateTime(LocalDateTime.now());
@@ -106,7 +109,7 @@ public class UserServiceImpl implements UserService {
             throw new NotMatchingException("ERR_4000", user);
         } else {
             User resultUser = optionalUser.get();
-            this.insertSession(session,resultUser.getId(), resultUser.getUserType());
+            this.insertSession(session, resultUser.getId(), resultUser.getUserType());
             resultUser.setLastLoginTime(LocalDateTime.now());
             resultUser = userRepository.save(resultUser);
             if (resultUser == null) {

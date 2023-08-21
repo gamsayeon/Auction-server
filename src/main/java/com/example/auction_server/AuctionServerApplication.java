@@ -6,7 +6,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /***
- * @SpringBootAplication (@Configuration + @EnableAutoConfiguration + @ComponentScan)
+ * @SpringBootAplication (@ Configuration + @ EnableAutoConfiguration + @ ComponentScan)
  * 스프링 부트 애플리케이션의 구성 요소를 간편하게 설정하고, 자동 구성과 컴포넌트 스캔과 같은 중요한 기능을 활성화하는 역할을 수행
  *
  *  @Configuration
@@ -25,8 +25,8 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableCaching
 public class AuctionServerApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AuctionServerApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AuctionServerApplication.class, args);
+    }
 
 }

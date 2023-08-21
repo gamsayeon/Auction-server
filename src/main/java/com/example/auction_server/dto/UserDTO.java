@@ -8,7 +8,10 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +21,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @UniqueUser(groups = {UserDTO.Signup.class})
 public class UserDTO {
-
     @NotBlank(groups = {Login.class, Signup.class, AdminSignup.class})
     @UniqueUserId(groups = {AdminSignup.class})
     private String userId;

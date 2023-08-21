@@ -13,7 +13,7 @@ public class UniqueUserIdValidator implements ConstraintValidator<UniqueUserId, 
     private static final Logger logger = LogManager.getLogger(UniqueUserIdValidator.class);
 
 
-    public UniqueUserIdValidator(UserRepository userRepository){
+    public UniqueUserIdValidator(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

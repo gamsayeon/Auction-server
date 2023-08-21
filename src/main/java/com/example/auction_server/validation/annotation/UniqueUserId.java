@@ -14,6 +14,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = UniqueUserIdValidator.class)
 public @interface UniqueUserId {
     String message() default "이미 사용 중인 아이디입니다.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

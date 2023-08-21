@@ -20,7 +20,7 @@ public class CustomExceptionHandler {
         return ResponseEntity.badRequest().body(commonResponse);
     }
 
-    @ExceptionHandler(value = {ValidationException .class})
+    @ExceptionHandler(value = {ValidationException.class})
     @ResponseBody
     public ResponseEntity<Object> handleValidationException(ValidationException ex, HttpServletRequest request) {
         String exceptionCode = ex.getCause().getMessage();

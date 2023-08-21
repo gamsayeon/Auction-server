@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Sha256Encrypt {
-    public static String encrypt(String password){
+    public static String encrypt(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] encodedHash = md.digest(password.getBytes(StandardCharsets.UTF_8));
@@ -18,8 +18,8 @@ public class Sha256Encrypt {
             }
 
             return hexString.toString();
-        }catch (NoSuchAlgorithmException e){
-            throw new RuntimeException("암호화 Error",e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("암호화 Error", e);
         }
     }
 }

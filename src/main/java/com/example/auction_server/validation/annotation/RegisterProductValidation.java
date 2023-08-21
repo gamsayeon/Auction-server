@@ -14,6 +14,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = RegisterProductValidator.class)
 public @interface RegisterProductValidation {
     String message() default "상품을 등록하지 못했습니다. 설정들을 다시 확인해주세요.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

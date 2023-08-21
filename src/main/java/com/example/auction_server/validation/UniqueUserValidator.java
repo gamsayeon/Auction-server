@@ -7,7 +7,6 @@ import com.example.auction_server.exception.UserAccessDeniedException;
 import com.example.auction_server.mapper.UserMapper;
 import com.example.auction_server.model.User;
 import com.example.auction_server.repository.UserRepository;
-import com.example.auction_server.util.Sha256Encrypt;
 import com.example.auction_server.validation.annotation.UniqueUser;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

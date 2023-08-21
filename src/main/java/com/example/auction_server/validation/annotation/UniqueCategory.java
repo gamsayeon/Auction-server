@@ -14,6 +14,8 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = UniqueCategoryValidator.class)
 public @interface UniqueCategory {
     String message() default "중복된 카테고리입니다.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

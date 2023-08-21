@@ -3,9 +3,6 @@ package com.example.auction_server.service;
 import com.example.auction_server.dto.UserDTO;
 import com.example.auction_server.enums.UserType;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.nio.file.AccessDeniedException;
 
 public interface UserService {
     UserDTO registerUser(UserDTO userDTO, String userType);

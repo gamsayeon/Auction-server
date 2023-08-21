@@ -11,5 +11,6 @@ public @interface LoginCheck {
     public static enum LoginType {
         USER, ADMIN, UNAUTHORIZED_USER
     }
+
     LoginType[] types() default {};
 }

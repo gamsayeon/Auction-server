@@ -12,10 +12,9 @@ public class SessionUtil {
     }
 
     public static void setLoginSession(HttpSession session, Long id, UserType userType) {
-        if(userType != UserType.ADMIN){
+        if (userType != UserType.ADMIN) {
             session.setAttribute(USER, id);
-        }
-        else{
+        } else {
             session.setAttribute(ADMIN, id);
         }
         session.setAttribute("userType", userType);
@@ -33,7 +32,7 @@ public class SessionUtil {
     }
 
 
-    public static void clear(HttpSession session){
+    public static void clear(HttpSession session) {
         session.invalidate();
     }
 }
