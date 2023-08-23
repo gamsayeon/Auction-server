@@ -30,7 +30,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDTO> registerUser(@RequestBody @Validated({UserDTO.Signup.class}) UserDTO userDTO) {
         logger.debug("회원을 가입합니다.");
-        UserDTO resultUserDTO = userService.registerUser(userDTO, "USER");
+        UserDTO resultUserDTO = userService.registerUser(userDTO);
         return ResponseEntity.ok(resultUserDTO);
     }
 
@@ -45,7 +45,7 @@ public class UserController {
     @PostMapping("/admin")
     public ResponseEntity<UserDTO> registerAdminUser(@RequestBody @Validated({UserDTO.AdminSignup.class}) UserDTO userDTO) {
         logger.debug("ADMIN 회원을 가입합니다.");
-        UserDTO resultUserDTO = userService.registerUser(userDTO, "ADMIN");
+        UserDTO resultUserDTO = userService.registerUser(userDTO);
         return ResponseEntity.ok(resultUserDTO);
     }
 

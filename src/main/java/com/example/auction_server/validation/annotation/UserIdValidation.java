@@ -1,6 +1,6 @@
 package com.example.auction_server.validation.annotation;
 
-import com.example.auction_server.validation.UniqueEmailValidator;
+import com.example.auction_server.validation.UserIdValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,9 +11,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = UniqueEmailValidator.class)
-public @interface UniqueEmail {
-    String message() default "중복된 이메일입니다.";
+@Constraint(validatedBy = UserIdValidator.class)
+public @interface UserIdValidation {
+    String message() default "이미 사용 중인 아이디입니다.";
 
     Class<?>[] groups() default {};
 

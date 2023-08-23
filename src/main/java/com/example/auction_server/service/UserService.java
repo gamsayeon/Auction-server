@@ -5,7 +5,7 @@ import com.example.auction_server.enums.UserType;
 import jakarta.servlet.http.HttpSession;
 
 public interface UserService {
-    UserDTO registerUser(UserDTO userDTO, String userType);
+    UserDTO registerUser(UserDTO userDTO);
 
     UserDTO loginUser(UserDTO userDTO, HttpSession session);
 

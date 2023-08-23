@@ -3,10 +3,10 @@ package com.example.auction_server.controller;
 import com.example.auction_server.aop.LoginCheck;
 import com.example.auction_server.dto.ProductDTO;
 import com.example.auction_server.service.serviceImpl.ProductServiceImpl;
+import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,7 +23,7 @@ public class ProductController {
 
     @PostMapping
     @LoginCheck(types = {LoginCheck.LoginType.USER})
-    public ResponseEntity<ProductDTO> registerProduct(Long loginId, @RequestBody @Validated(ProductDTO.register.class) ProductDTO productDTO) {
+    public ResponseEntity<ProductDTO> registerProduct(Long loginId, @RequestBody @Valid ProductDTO productDTO) {
         logger.debug("상품을 등록합니다.");
         ProductDTO resultProductDTO = productService.registerProduct(loginId, productDTO);
         return ResponseEntity.ok(resultProductDTO);

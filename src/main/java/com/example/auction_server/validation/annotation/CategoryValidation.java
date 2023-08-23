@@ -1,6 +1,6 @@
 package com.example.auction_server.validation.annotation;
 
-import com.example.auction_server.validation.UniqueUserValidator;
+import com.example.auction_server.validation.CategoryValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -9,11 +9,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.TYPE})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = UniqueUserValidator.class)
-public @interface UniqueUser {
-    String message() default "중복된 아이디입니다.";
+@Constraint(validatedBy = CategoryValidator.class)
+public @interface CategoryValidation {
+    String message() default "중복된 카테고리입니다.";
 
     Class<?>[] groups() default {};
 

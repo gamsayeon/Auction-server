@@ -1,13 +1,10 @@
 package com.example.auction_server.dto;
 
 import com.example.auction_server.enums.UserType;
-import com.example.auction_server.validation.annotation.UniqueEmail;
-import com.example.auction_server.validation.annotation.UniqueUser;
-import com.example.auction_server.validation.annotation.UniqueUserId;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.example.auction_server.validation.annotation.EmailValidation;
+import com.example.auction_server.validation.annotation.IsAdminValidation;
+import com.example.auction_server.validation.annotation.UserIdValidation;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,13 +16,12 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@UniqueUser(groups = {UserDTO.Signup.class})
 public class UserDTO {
-    @NotBlank(groups = {Login.class, Signup.class, AdminSignup.class})
-    @UniqueUserId(groups = {AdminSignup.class})
+    @NotBlank(groups = {Signup.class, AdminSignup.class, Login.class})
+    @UserIdValidation(groups = {Signup.class, AdminSignup.class})
     private String userId;
 
-    @NotBlank(groups = {Login.class, Signup.class, AdminSignup.class, UpdateUser.class})
+    @NotBlank(groups = {Signup.class, AdminSignup.class, UpdateUser.class, Login.class})
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{3,20}$",
             message = "비밀번호는 3자기 이상 20자리 이하로 숫자와 영어, 특수기호(!@#$%^&*)를 각 하나이상 포함해주세요")
     private String password;
@@ -40,9 +36,11 @@ public class UserDTO {
 
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     @NotBlank(groups = {Signup.class, UpdateUser.class})
-    @UniqueEmail(groups = {UpdateUser.class})
+    @EmailValidation(groups = {Signup.class, UpdateUser.class})
     private String email;
 
+    @NotNull(groups = {Signup.class, AdminSignup.class})
+    @IsAdminValidation(groups = {Signup.class})
     private UserType userType;
 
     private LocalDateTime createTime;

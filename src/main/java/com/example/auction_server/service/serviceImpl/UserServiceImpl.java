@@ -39,11 +39,8 @@ public class UserServiceImpl implements UserService {
      * - 트랜잭션 내에서 예외가 발생하면 해당 트랜잭션이 롤백이 됩니다.
      * - 예외가 발생한 경우에도 데이터 일관성을 보장
      *
-     * 1. 메서드에 Transactional 어노테이션이 적용
-     * 2-1. 예외 발생시
-     * 3-1. 예외가 발생시 DB CRUD 내용이 적용되지 않음(ROLLBACK)
-     * 2-2. 예외가 발생하지 않을시
-     * 3-2. DB CRUD 내용이 적용(COMMIT)
+     * 메서드에 Transactional 어노테이션이 적용
+     * 예외가 발생시 DB CRUD 내용이 적용되지 않음(ROLLBACK)
      *
      * ex) 회원가입시 ID 유효성 검사를 통해 중복되어 있다면 Create 하지 않게 할 수 있다.
      * 또는 회원가입시 DB Connection exception 이 발생한다면 ROLLBACK 으로 인해 추가 되지 않는다.
@@ -52,28 +49,27 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public UserDTO registerUser(UserDTO userDTO, String userType) {
+    public UserDTO registerUser(UserDTO userDTO) {
         User user = userMapper.convertToEntity(userDTO);
 
-        if (userType == "USER") {
+        if (userDTO.getUserType() != UserType.ADMIN) {
             user.setUserType(UserType.UNAUTHORIZED_USER);
-        } else if (userType == "ADMIN") {
-            user.setUserType(UserType.ADMIN);
         }
+
         user.setCreateTime(LocalDateTime.now());
         User resultUser = userRepository.save(user);
         if (resultUser != null) {
             UserDTO resultUserDTO = userMapper.convertToDTO(resultUser);
             if (resultUserDTO == null) {
                 logger.warn("매핑에 실패했습니다.");
-                throw new NotMatchingException("ERR_1001", user);
+                throw new NotMatchingException("ERR_1001", userDTO);
             } else {
                 logger.info("유저 " + resultUser.getUserId() + "을 회원가입에 성공했습니다.");
                 return resultUserDTO;
             }
         } else {
             logger.warn("회원가입 오류. 재시도 해주세요.");
-            throw new AddException("ERR_1000", user);
+            throw new AddException("ERR_1000", userDTO);
         }
 
     }
@@ -106,7 +102,7 @@ public class UserServiceImpl implements UserService {
 
         if (optionalUser.isEmpty()) {
             logger.warn("로그인에 실패 했습니다. 아이디 및 비밀번호 확인 후 재시도 해주세요.");
-            throw new NotMatchingException("ERR_4000", user);
+            throw new NotMatchingException("ERR_4000", userDTO);
         } else {
             User resultUser = optionalUser.get();
             this.insertSession(session, resultUser.getId(), resultUser.getUserType());
@@ -119,7 +115,7 @@ public class UserServiceImpl implements UserService {
                 UserDTO resultUserDTO = userMapper.convertToDTO(optionalUser.get());
                 if (resultUserDTO == null) {
                     logger.warn("매핑에 실패했습니다.");
-                    throw new NotMatchingException("ERR_1001", user);
+                    throw new NotMatchingException("ERR_1001", userDTO);
                 } else {
                     logger.info("로그인에 성공하엿습니다.");
                     return resultUserDTO;
@@ -175,7 +171,7 @@ public class UserServiceImpl implements UserService {
                     return resultUserDTO;
                 } else {
                     logger.warn("매핑에 실패했습니다.");
-                    throw new AddException("ERR_1001", user);
+                    throw new AddException("ERR_1001", userDTO);
                 }
             } else {
                 logger.warn("회원정보를 수정하지 못했습니다. 재시도 해주세요");

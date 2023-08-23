@@ -1,6 +1,6 @@
 package com.example.auction_server.dto;
 
-import com.example.auction_server.validation.annotation.UniqueCategory;
+import com.example.auction_server.validation.annotation.CategoryValidation;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -12,9 +12,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@UniqueCategory
 public class CategoryDTO {
     @NotBlank
+    @CategoryValidation
     private String categoryName;
 
     @Min(value = 1000)

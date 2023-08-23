@@ -27,6 +27,7 @@ public class ExceptionMessage {
         exceptionMessages.put("ERR_4001", "해당 유저를 찾지 못했습니다. 재시도 해주세요.");
         exceptionMessages.put("ERR_4002", "회원 조회에 실패 했습니다. 재시도 해주세요.");
         exceptionMessages.put("ERR_4003", "해당 카테고리를 찾지 못했습니다.");
+        exceptionMessages.put("ERR_4004", "해당 상품을 찾지 못했습니다.");
         //UpdateException
         exceptionMessages.put("ERR_5000", "회원정보를 수정하지 못했습니다.");
         exceptionMessages.put("ERR_5001", "회원 삭제에 실패했습니다.");

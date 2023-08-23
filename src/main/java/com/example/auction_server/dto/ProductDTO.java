@@ -1,7 +1,6 @@
 package com.example.auction_server.dto;
 
 import com.example.auction_server.enums.ProductStatus;
-import com.example.auction_server.validation.annotation.RegisterProductValidation;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -16,41 +15,38 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@RegisterProductValidation(groups = {ProductDTO.register.class})
 public class ProductDTO {
     private Long productId;
 
     private Long saleUserId;
 
-    @NotBlank(groups = {register.class})
+    @NotBlank
     private String productName;
 
-    @NotBlank(groups = {register.class})
+    @NotBlank
     private Long categoryId;
 
     @Lob
-    @NotBlank(groups = {register.class})
+    @NotBlank
     private String explanation;
 
     private LocalDateTime productRegisterTime;
 
-    @NotBlank(groups = {register.class})
+    @NotBlank
     private int startPrice;
 
-    @NotBlank(groups = {register.class})
+    @NotBlank
     private LocalDateTime startTime;
 
-    @NotBlank(groups = {register.class})
+    @NotBlank
     private LocalDateTime endTime;
 
-    @NotBlank(groups = {register.class})
+    @NotBlank
     private int highestPrice;
 
     private ProductStatus productStatus;
 
     private List<ProductImageDTO> imageDTOS;
 
-    public interface register {
-    }
 
 }

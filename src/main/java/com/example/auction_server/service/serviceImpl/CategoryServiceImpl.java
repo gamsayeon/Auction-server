@@ -3,6 +3,7 @@ package com.example.auction_server.service.serviceImpl;
 import com.example.auction_server.dto.CategoryDTO;
 import com.example.auction_server.exception.AddException;
 import com.example.auction_server.exception.DeleteException;
+import com.example.auction_server.exception.InputSettingException;
 import com.example.auction_server.exception.NotMatchingException;
 import com.example.auction_server.mapper.CategoryMapper;
 import com.example.auction_server.model.Category;
@@ -33,6 +34,11 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDTO registerCategory(CategoryDTO categoryDTO) {
         Category category = categoryMapper.convertToEntity(categoryDTO);
 
+        if (category.getBidMinPrice() >= category.getBidMaxPrice()) {
+            logger.warn("금액을 잘못설정했습니다.");
+            throw new InputSettingException("ERR_10000", categoryDTO);
+        }
+
         Category resultCategory = categoryRepository.save(category);
         if (resultCategory != null) {
             CategoryDTO resultCategoryDTO = categoryMapper.convertToDTO(resultCategory);
@@ -58,6 +64,10 @@ public class CategoryServiceImpl implements CategoryService {
             logger.warn("해당하는 카테고리는 찾지 못했습니다.");
             throw new NotMatchingException("ERR_4003", categoryId);
         } else {
+            if (category.getBidMinPrice() >= category.getBidMaxPrice()) {
+                logger.warn("금액을 잘못설정했습니다.");
+                throw new InputSettingException("ERR_10000", categoryDTO);
+            }
             category.setCategoryId(optionalCategory.get().getCategoryId());
             Category resultCategory = categoryRepository.save(category);
             if (resultCategory == null) {
