@@ -19,8 +19,16 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long id);
+    @Query("SELECT u FROM user u WHERE u.id = :id AND u.updateTime IS NULL")
+    Optional<User> findByIdWithNullUpdateTime(@Param("id") Long id);
+    Optional<User> findByUserId(String userId);
+    Optional<User> findByEmail(String email);
+    Optional<User> findByIdAndEmail(Long id, String email);
     Optional<User> findByUserIdAndPassword(String userId, String password);
     @Modifying
-    @Query("UPDATE user u SET u.deleteTime = :deleteTime WHERE u.id = :id")
-    void deleteUser(@Param("id") Long id, @Param("deleteTime") LocalDateTime deleteTime);
+    @Query("UPDATE user u SET u.updateTime = :updateTime WHERE u.id = :id")
+    int withDrawUser(@Param("id") Long id, @Param("updateTime") LocalDateTime updateTime);
+
+    boolean existsByEmail(String email);
+    boolean existsByUserId(String userId);
 }

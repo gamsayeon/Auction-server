@@ -16,10 +16,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name = "user")
-/***
- * @DynamicUpdate 변경된 필드만을 포함한 업데이트 쿼리를 생성하여 실행
- */
-@DynamicUpdate
 public class User {
     @Id
     /***
@@ -68,7 +64,11 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createTime;
 
-    @Column(name = "delete_time")
+    @Column(name = "update_time")
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime deleteTime;
+    private LocalDateTime updateTime;
+
+    @Column(name = "last_login_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime lastLoginTime;
 }

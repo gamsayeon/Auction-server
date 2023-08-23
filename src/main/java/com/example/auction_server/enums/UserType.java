@@ -1,7 +1,8 @@
 package com.example.auction_server.enums;
 
 public enum UserType {
-    SELLER,
-    BUYER,
-    ADMIN
+    USER,
+    ADMIN,
+    UNAUTHORIZED_USER,
+    STOP_ACTIVITY
 }
