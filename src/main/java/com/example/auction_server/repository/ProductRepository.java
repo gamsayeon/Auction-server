@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Product findByProductId(Long productId);
+
+    int deleteBySaleUserIdAndProductId(Long saleUserId, Long productId);
 }

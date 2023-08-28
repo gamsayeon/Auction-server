@@ -11,6 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductImageDTO {
+    private Long imageId;
+
     private Long productId;
 
     @Lob

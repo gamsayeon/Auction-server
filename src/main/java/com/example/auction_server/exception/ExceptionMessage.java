@@ -25,7 +25,7 @@ public class ExceptionMessage {
         //NotMatchingException
         exceptionMessages.put("ERR_4000", "로그인에 실패 했습니다. 아이디 및 비밀번호 확인 후 재시도 해주세요.");
         exceptionMessages.put("ERR_4001", "해당 유저를 찾지 못했습니다. 재시도 해주세요.");
-        exceptionMessages.put("ERR_4002", "회원 조회에 실패 했습니다. 재시도 해주세요.");
+        exceptionMessages.put("ERR_4002", "이상 유저 입니다.");
         exceptionMessages.put("ERR_4003", "해당 카테고리를 찾지 못했습니다.");
         exceptionMessages.put("ERR_4004", "해당 상품을 찾지 못했습니다.");
         //UpdateException
@@ -33,6 +33,9 @@ public class ExceptionMessage {
         exceptionMessages.put("ERR_5001", "회원 삭제에 실패했습니다.");
         exceptionMessages.put("ERR_5002", "마지막 로그인 시간을 업데이트 하는데 실패하였습니다. 다시 로그인해주세요.");
         exceptionMessages.put("ERR_5003", "타입을 수정하지 못했습니다. 다시 인증해주세요.");
+        exceptionMessages.put("ERR_5004", "해당 상품은 경매가 시작되여 수정이 불가능합니다.");
+        exceptionMessages.put("ERR_5005", "상품을 수정하지 못했습니다.");
+        exceptionMessages.put("ERR_5006", "이상이 있는 유저입니다.(회원 삭제, 이상유저 제재 등의 이유로 삭제 불가)");
         //LogoutFailedException
         exceptionMessages.put("ERR_6000", "로그아웃에 실패했습니다.");
         //EmailSendException
@@ -43,12 +46,14 @@ public class ExceptionMessage {
         exceptionMessages.put("ERR_9000", "User login required");
         //UserAccessDeniedException
         exceptionMessages.put("ERR_9001", "권한 부족");
+        exceptionMessages.put("ERR_9002", "권한이 없어 해당 상품을 수정하지 못합니다.");
         //InputSettingException
         exceptionMessages.put("ERR_10000", "category 금액을 잘못 입력하셨습니다.");
         exceptionMessages.put("ERR_10001", "경매 시작시간을 잘못 입력하셨습니다. 다시 입력해주세요.");
         exceptionMessages.put("ERR_10002", "경매 시작가가 즉시구매가와 같거나 큽니다. 다시 입력해주세요.");
         //DeleteException
         exceptionMessages.put("ERR_11000", "삭제에 실패했습니다.");
+        exceptionMessages.put("ERR_11001", "이미지 삭제에 실패했습니다.");
 
     }
 

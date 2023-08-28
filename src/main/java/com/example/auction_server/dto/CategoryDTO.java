@@ -1,6 +1,6 @@
 package com.example.auction_server.dto;
 
-import com.example.auction_server.validation.annotation.CategoryValidation;
+import com.example.auction_server.validation.annotation.isExistCategoryValidation;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -14,13 +14,15 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CategoryDTO {
     @NotBlank
-    @CategoryValidation
+    @isExistCategoryValidation
     private String categoryName;
 
-    @Min(value = 1000)
-    private int bidMaxPrice;
-
-    @Min(value = 1000)
+    @Min(value = 1000, groups = {isNotUpdate.class})
     private int bidMinPrice;
 
+    @Min(value = 1000, groups = {isNotUpdate.class})
+    private int bidMaxPrice;
+
+    public interface isNotUpdate {
+    }
 }

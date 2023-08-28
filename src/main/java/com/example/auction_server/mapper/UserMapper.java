@@ -36,7 +36,6 @@ public class UserMapper {
     public User convertToEntity(UserDTO userDTO) {
         User user = modelMapper.map(userDTO, User.class);
         user.setPassword(Sha256Encrypt.encrypt(userDTO.getPassword()));
-        user.setUserType(UserType.UNAUTHORIZED_USER);
         return user;
     }
 

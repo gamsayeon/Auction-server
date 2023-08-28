@@ -2,7 +2,9 @@ package com.example.auction_server.dto;
 
 import com.example.auction_server.enums.ProductStatus;
 import jakarta.persistence.Lob;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +25,7 @@ public class ProductDTO {
     @NotBlank
     private String productName;
 
-    @NotBlank
+    @NotNull
     private Long categoryId;
 
     @Lob
@@ -32,21 +34,20 @@ public class ProductDTO {
 
     private LocalDateTime productRegisterTime;
 
-    @NotBlank
+    @Min(value = 1000)
     private int startPrice;
 
-    @NotBlank
+    @NotNull
     private LocalDateTime startTime;
 
-    @NotBlank
+    @NotNull
     private LocalDateTime endTime;
 
-    @NotBlank
+    @Min(value = 1000)
     private int highestPrice;
 
     private ProductStatus productStatus;
 
     private List<ProductImageDTO> imageDTOS;
-
 
 }

@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/category")
@@ -34,7 +35,7 @@ public class CategoryController {
     @PatchMapping("/{categoryId}")
     @LoginCheck(types = LoginCheck.LoginType.ADMIN)
     public ResponseEntity<CategoryDTO> updateCategory(Long id, @PathVariable("categoryId") Long categoryId,
-                                                      @RequestBody @Valid CategoryDTO categoryDTO) {
+                                                      @RequestBody @Validated(CategoryDTO.isNotUpdate.class) CategoryDTO categoryDTO) {
         logger.debug("category을 수정합니다.");
         CategoryDTO resultCategoryDTO = categoryService.updateCategory(categoryDTO, categoryId);
         return ResponseEntity.ok(resultCategoryDTO);

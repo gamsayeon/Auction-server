@@ -1,6 +1,6 @@
 package com.example.auction_server.validation.annotation;
 
-import com.example.auction_server.validation.UserIdValidator;
+import com.example.auction_server.validation.isExistUserIdlValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = UserIdValidator.class)
-public @interface UserIdValidation {
+@Constraint(validatedBy = isExistUserIdlValidator.class)
+public @interface isExistUserIdlValidation {
     String message() default "이미 사용 중인 아이디입니다.";
 
     Class<?>[] groups() default {};

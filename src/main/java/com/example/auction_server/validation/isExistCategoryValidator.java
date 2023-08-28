@@ -2,18 +2,18 @@ package com.example.auction_server.validation;
 
 import com.example.auction_server.exception.DuplicateException;
 import com.example.auction_server.repository.CategoryRepository;
-import com.example.auction_server.validation.annotation.CategoryValidation;
+import com.example.auction_server.validation.annotation.isExistCategoryValidation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CategoryValidator implements ConstraintValidator<CategoryValidation, String> {
+public class isExistCategoryValidator implements ConstraintValidator<isExistCategoryValidation, String> {
     private final CategoryRepository categoryRepository;
-    private static final Logger logger = LogManager.getLogger(CategoryValidator.class);
+    private static final Logger logger = LogManager.getLogger(isExistCategoryValidator.class);
 
 
-    public CategoryValidator(CategoryRepository categoryRepository) {
+    public isExistCategoryValidator(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 

@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpSession;
 public interface UserService {
     UserDTO registerUser(UserDTO userDTO);
 
+    UserDTO updateUserType(String userId);
+
     UserDTO loginUser(UserDTO userDTO, HttpSession session);
 
     void insertSession(HttpSession session, Long id, UserType userType);

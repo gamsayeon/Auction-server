@@ -1,6 +1,6 @@
 package com.example.auction_server.validation.annotation;
 
-import com.example.auction_server.validation.EmailValidator;
+import com.example.auction_server.validation.isExistCategoryValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,9 +11,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = EmailValidator.class)
-public @interface EmailValidation {
-    String message() default "중복된 이메일입니다.";
+@Constraint(validatedBy = isExistCategoryValidator.class)
+public @interface isExistCategoryValidation {
+    String message() default "중복된 카테고리입니다.";
 
     Class<?>[] groups() default {};
 

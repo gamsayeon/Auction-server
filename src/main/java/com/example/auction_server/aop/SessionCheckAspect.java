@@ -3,9 +3,12 @@ package com.example.auction_server.aop;
 import com.example.auction_server.enums.UserType;
 import com.example.auction_server.exception.LoginRequiredException;
 import com.example.auction_server.exception.UserAccessDeniedException;
+import com.example.auction_server.service.serviceImpl.ProductServiceImpl;
 import com.example.auction_server.util.SessionUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SessionCheckAspect {
     private final HttpServletRequest request;
+    private static final Logger logger = LogManager.getLogger(SessionCheckAspect.class);
 
     public SessionCheckAspect(HttpServletRequest request) {
         this.request = request;
@@ -54,7 +58,8 @@ public class SessionCheckAspect {
             }
         }
         if (isPresent == false) {
-            throw new UserAccessDeniedException("ERR_9001");
+            logger.warn("권한 부족");
+            throw new UserAccessDeniedException("ERR_9001", loginType);
         }
         Object[] args = joinPoint.getArgs();
         args[0] = id;

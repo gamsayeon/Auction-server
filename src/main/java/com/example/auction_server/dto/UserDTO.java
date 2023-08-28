@@ -1,9 +1,9 @@
 package com.example.auction_server.dto;
 
 import com.example.auction_server.enums.UserType;
-import com.example.auction_server.validation.annotation.EmailValidation;
 import com.example.auction_server.validation.annotation.IsAdminValidation;
-import com.example.auction_server.validation.annotation.UserIdValidation;
+import com.example.auction_server.validation.annotation.isExistEmailValidation;
+import com.example.auction_server.validation.annotation.isExistUserIdlValidation;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserDTO {
     @NotBlank(groups = {Signup.class, AdminSignup.class, Login.class})
-    @UserIdValidation(groups = {Signup.class, AdminSignup.class})
+    @isExistUserIdlValidation(groups = {Signup.class, AdminSignup.class})
     private String userId;
 
     @NotBlank(groups = {Signup.class, AdminSignup.class, UpdateUser.class, Login.class})
@@ -36,7 +36,7 @@ public class UserDTO {
 
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     @NotBlank(groups = {Signup.class, UpdateUser.class})
-    @EmailValidation(groups = {Signup.class, UpdateUser.class})
+    @isExistEmailValidation(groups = {Signup.class, UpdateUser.class})
     private String email;
 
     @NotNull(groups = {Signup.class, AdminSignup.class})

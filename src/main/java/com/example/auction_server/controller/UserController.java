@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/users")
+@RequestMapping("/user")
 @RestController
 @Log4j2
 public class UserController {
@@ -83,13 +83,22 @@ public class UserController {
         return ResponseEntity.ok(resultUserDTO);
     }
 
-    @LoginCheck(types = {LoginCheck.LoginType.USER, LoginCheck.LoginType.UNAUTHORIZED_USER})
+    @LoginCheck(types = {LoginCheck.LoginType.ADMIN})
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserDTO> updateUserByAdmin(Long loginId, @PathVariable("id") Long id,
+                                                     @RequestBody @Validated({UserDTO.UpdateUser.class}) UserDTO userDTO) {
+        logger.debug("유저를 수정합니다.");
+        UserDTO resultUserDTO = userService.updateUser(id, userDTO);
+        return ResponseEntity.ok(resultUserDTO);
+    }
+
+    @LoginCheck(types = {LoginCheck.LoginType.USER, LoginCheck.LoginType.UNAUTHORIZED_USER, LoginCheck.LoginType.ADMIN})
     @PatchMapping("/withdraw")
     public ResponseEntity<String> withDrawUser(Long loginId, HttpSession session) {
         logger.debug("유저를 탈퇴합니다.");
         userService.withDrawUser(loginId);
         userService.logoutUser(session);
-        return ResponseEntity.ok(loginId + "User delete Success");
+        return ResponseEntity.ok(loginId + " User delete Success");
     }
 
     @LoginCheck(types = {LoginCheck.LoginType.ADMIN})

@@ -2,18 +2,18 @@ package com.example.auction_server.validation;
 
 import com.example.auction_server.exception.DuplicateException;
 import com.example.auction_server.repository.UserRepository;
-import com.example.auction_server.validation.annotation.UserIdValidation;
+import com.example.auction_server.validation.annotation.isExistUserIdlValidation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class UserIdValidator implements ConstraintValidator<UserIdValidation, String> {
+public class isExistUserIdlValidator implements ConstraintValidator<isExistUserIdlValidation, String> {
     private final UserRepository userRepository;
-    private static final Logger logger = LogManager.getLogger(UserIdValidator.class);
+    private static final Logger logger = LogManager.getLogger(isExistUserIdlValidator.class);
 
 
-    public UserIdValidator(UserRepository userRepository) {
+    public isExistUserIdlValidator(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
