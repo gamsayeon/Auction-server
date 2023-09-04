@@ -1,7 +1,6 @@
 package com.example.auction_server.mapper;
 
 import com.example.auction_server.dto.UserDTO;
-import com.example.auction_server.enums.UserType;
 import com.example.auction_server.model.User;
 import com.example.auction_server.util.Sha256Encrypt;
 import org.modelmapper.ModelMapper;

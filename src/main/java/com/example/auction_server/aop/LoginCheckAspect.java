@@ -3,7 +3,6 @@ package com.example.auction_server.aop;
 import com.example.auction_server.enums.UserType;
 import com.example.auction_server.exception.LoginRequiredException;
 import com.example.auction_server.exception.UserAccessDeniedException;
-import com.example.auction_server.service.serviceImpl.ProductServiceImpl;
 import com.example.auction_server.util.SessionUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -16,11 +15,11 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class SessionCheckAspect {
+public class LoginCheckAspect {
     private final HttpServletRequest request;
-    private static final Logger logger = LogManager.getLogger(SessionCheckAspect.class);
+    private static final Logger logger = LogManager.getLogger(LoginCheckAspect.class);
 
-    public SessionCheckAspect(HttpServletRequest request) {
+    public LoginCheckAspect(HttpServletRequest request) {
         this.request = request;
     }
 
@@ -34,7 +33,7 @@ public class SessionCheckAspect {
 
         // 값이 없으면 로그인이 필요한 예외를 던짐
         if (id == null) {
-            throw new LoginRequiredException("ERR_9000");
+            throw new LoginRequiredException("ERR_COMMON_2");
         }
 
         boolean isPresent = false;
@@ -59,7 +58,7 @@ public class SessionCheckAspect {
         }
         if (isPresent == false) {
             logger.warn("권한 부족");
-            throw new UserAccessDeniedException("ERR_9001", loginType);
+            throw new UserAccessDeniedException("ERR_COMMON_3", loginType);
         }
         Object[] args = joinPoint.getArgs();
         args[0] = id;

@@ -2,12 +2,10 @@ package com.example.auction_server.repository;
 
 import com.example.auction_server.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 /***
@@ -26,10 +24,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUserId(String userId);
 
     Optional<User> findByUserIdAndPassword(String userId, String password);
-
-    @Modifying
-    @Query("UPDATE user u SET u.updateTime = :updateTime WHERE u.id = :id")
-    int withDrawUser(@Param("id") Long id, @Param("updateTime") LocalDateTime updateTime);
 
     boolean existsByEmail(String email);
 

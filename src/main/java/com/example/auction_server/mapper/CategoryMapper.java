@@ -1,6 +1,7 @@
 package com.example.auction_server.mapper;
 
 import com.example.auction_server.dto.CategoryDTO;
+import com.example.auction_server.dto.CategoryUpdateDTO;
 import com.example.auction_server.model.Category;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,11 @@ public class CategoryMapper {
     }
 
     public Category convertToEntity(CategoryDTO categoryDTO) {
+        Category category = modelMapper.map(categoryDTO, Category.class);
+        return category;
+    }
+
+    public Category convertToEntity(CategoryUpdateDTO categoryDTO) {
         Category category = modelMapper.map(categoryDTO, Category.class);
         return category;
     }

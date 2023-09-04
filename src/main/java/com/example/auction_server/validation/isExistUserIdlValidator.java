@@ -12,7 +12,6 @@ public class isExistUserIdlValidator implements ConstraintValidator<isExistUserI
     private final UserRepository userRepository;
     private static final Logger logger = LogManager.getLogger(isExistUserIdlValidator.class);
 
-
     public isExistUserIdlValidator(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -23,7 +22,7 @@ public class isExistUserIdlValidator implements ConstraintValidator<isExistUserI
 
         if (isDuplicationUserId) {
             logger.warn("중복된 ID 입니다.");
-            throw new DuplicateException("ERR_2001", userId);
+            throw new DuplicateException("ERR_USER_2", userId);
         }
         return true;
     }

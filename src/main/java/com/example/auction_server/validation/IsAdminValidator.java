@@ -15,7 +15,7 @@ public class IsAdminValidator implements ConstraintValidator<IsAdminValidation, 
     public boolean isValid(UserType userType, ConstraintValidatorContext context) {
         if (userType == UserType.ADMIN) {
             logger.warn("ADMIN 으로 회원가입할 수 없습니다.");
-            throw new UserAccessDeniedException("ERR_3000", userType);
+            throw new UserAccessDeniedException("ERR_USER_4", userType);
         }
 
         return true;

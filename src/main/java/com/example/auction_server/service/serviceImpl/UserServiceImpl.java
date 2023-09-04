@@ -48,7 +48,6 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    @Transactional
     public UserDTO registerUser(UserDTO userDTO) {
         User user = userMapper.convertToEntity(userDTO);
 
@@ -62,24 +61,25 @@ public class UserServiceImpl implements UserService {
             UserDTO resultUserDTO = userMapper.convertToDTO(resultUser);
             if (resultUserDTO == null) {
                 logger.warn("매핑에 실패했습니다.");
-                throw new NotMatchingException("ERR_1001", userDTO);
+                throw new NotMatchingException("ERR_COMMON_1", userDTO);
             } else {
                 logger.info("유저 " + resultUser.getUserId() + "을 회원가입에 성공했습니다.");
                 return resultUserDTO;
             }
         } else {
             logger.warn("회원가입 오류. 재시도 해주세요.");
-            throw new AddException("ERR_1000", userDTO);
+            throw new AddException("ERR_USER_1", userDTO);
         }
 
     }
 
     @Override
+    @Transactional
     public UserDTO updateUserType(String userId) {
         Optional<User> optionalUser = userRepository.findByUserId(userId);
         if (optionalUser.isEmpty() || optionalUser.get().getUserType() == UserType.STOP_ACTIVITY) {
             logger.warn("해당 유저를 찾을수 없습니다.");
-            throw new NotMatchingException("ERR_4001", userId);
+            throw new NotMatchingException("ERR_USER_6", userId);
         } else {
             UserDTO resultUserDTO = userMapper.convertToDTO(optionalUser.get());
             resultUserDTO.setUserType(UserType.USER);
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
                 return resultUserDTO;
             } else {
                 logger.warn("타입을 수정하지 못했습니다. 다시 인증해주세요.");
-                throw new UpdateException("ERR_5003", "retry");
+                throw new UpdateException("ERR_USER_11", "retry");
             }
         }
     }
@@ -103,10 +103,10 @@ public class UserServiceImpl implements UserService {
 
         if (optionalUser.isEmpty()) {
             logger.warn("로그인에 실패 했습니다. 아이디 및 비밀번호 확인 후 재시도 해주세요.");
-            throw new NotMatchingException("ERR_4000", userDTO);
+            throw new NotMatchingException("ERR_USER_5", userDTO);
         } else if (optionalUser.get().getUserType() == UserType.STOP_ACTIVITY) {
             logger.warn("이상 유저 입니다.");
-            throw new NotMatchingException("ERR_4002", UserType.STOP_ACTIVITY);
+            throw new NotMatchingException("ERR_USER_7", UserType.STOP_ACTIVITY);
         } else {
             User resultUser = optionalUser.get();
             this.insertSession(session, resultUser.getId(), resultUser.getUserType());
@@ -114,12 +114,12 @@ public class UserServiceImpl implements UserService {
             resultUser = userRepository.save(resultUser);
             if (resultUser == null) {
                 logger.warn("마지막 로그인 시간을 업데이트 하는데 실패하였습니다.");
-                throw new UpdateException("ERR_5002", "retry login");
+                throw new UpdateException("ERR_USER_10", "retry login");
             } else {
                 UserDTO resultUserDTO = userMapper.convertToDTO(optionalUser.get());
                 if (resultUserDTO == null) {
                     logger.warn("매핑에 실패했습니다.");
-                    throw new NotMatchingException("ERR_1001", userDTO);
+                    throw new NotMatchingException("ERR_COMMON_1", userDTO);
                 } else {
                     logger.info("로그인에 성공하엿습니다.");
                     return resultUserDTO;
@@ -130,6 +130,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void insertSession(HttpSession session, Long id, UserType userType) {
         SessionUtil.setLoginSession(session, id, userType);
     }
@@ -140,16 +141,16 @@ public class UserServiceImpl implements UserService {
 
         if (optionalUser.isEmpty()) {
             logger.warn("해당 유저를 찾지 못했습니다. 재시도 해주세요.");
-            throw new NotMatchingException("ERR_4001", id);
+            throw new NotMatchingException("ERR_USER_6", id);
         } else if (optionalUser.get().getUserType() == UserType.STOP_ACTIVITY) {
             logger.warn("이상 유저입니다.");
-            throw new NotMatchingException("ERR_4002", UserType.STOP_ACTIVITY);
+            throw new NotMatchingException("ERR_USER_7", UserType.STOP_ACTIVITY);
         }
 
         UserDTO resultUserDTO = userMapper.convertToDTO(optionalUser.get());
         if (resultUserDTO == null) {
             logger.warn("매핑에 실패했습니다.");
-            throw new AddException("ERR_1001", id);
+            throw new AddException("ERR_COMMON_1", id);
         } else {
             logger.info("회원 조회에 성공하였습니다.");
             return resultUserDTO;
@@ -164,7 +165,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isEmpty()) {
             logger.warn("유저를 찾지 못했습니다.");
-            throw new NotMatchingException("ERR_4001", id);
+            throw new NotMatchingException("ERR_USER_6", id);
         } else {
             User resultUser = optionalUser.get();
             resultUser.setPassword(user.getPassword());
@@ -179,11 +180,11 @@ public class UserServiceImpl implements UserService {
                     return resultUserDTO;
                 } else {
                     logger.warn("매핑에 실패했습니다.");
-                    throw new AddException("ERR_1001", userDTO);
+                    throw new AddException("ERR_COMMON_1", userDTO);
                 }
             } else {
                 logger.warn("회원정보를 수정하지 못했습니다. 재시도 해주세요");
-                throw new UpdateException("ERR_5000", "retry");
+                throw new UpdateException("ERR_USER_8", "retry");
             }
         }
     }
@@ -192,20 +193,20 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void withDrawUser(Long id) {
         Optional<User> optionalResultUser = userRepository.findById(id);
-        if (optionalResultUser.get().getUserType() == UserType.STOP_ACTIVITY) {
+        if (optionalResultUser.isEmpty()) {
+            logger.warn("해당하는 유저가 없습니다. 다시 확인해주세요.");
+            throw new NotMatchingException("ERR_USER_6", id);
+        } else if (optionalResultUser.get().getUserType() == UserType.STOP_ACTIVITY) {
             logger.warn("이상이 있는 유저입니다.(회원 삭제, 이상유저 제재 등의 이유로 삭제 불가)");
-            throw new UpdateException("ERR_5006", id);
-        }
-        int updateCount = userRepository.withDrawUser(id, LocalDateTime.now());
-        if (updateCount != UPDATE_SUCCESS) {
-            logger.warn("회원 삭제 업데이트에 실패했습니다.");
-            throw new UpdateException("ERR_5001", id);
+            throw new UpdateException("ERR_PRODUCT_4", id);
         } else {
-            optionalResultUser.get().setUserType(UserType.STOP_ACTIVITY);
-            User resultUser = userRepository.save(optionalResultUser.get());
+            User resultUser = optionalResultUser.get();
+            resultUser.setUpdateTime(LocalDateTime.now());
+            resultUser.setUserType(UserType.STOP_ACTIVITY);
+            resultUser = userRepository.save(resultUser);
             if (resultUser == null) {
-                logger.warn("회원정보를 수정하지 못했습니다.");
-                throw new UpdateException("ERR_5000", "retry withDraw");
+                logger.warn("회원 삭제 업데이트에 실패했습니다.");
+                throw new UpdateException("ERR_USER_9", id);
             } else {
                 logger.info("회원 삭제 업데이트에 성공했습니다.");
             }
@@ -213,13 +214,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void logoutUser(HttpSession session) {
         try {
             SessionUtil.clear(session);
             logger.info("로그아웃에 성공했습니다.");
         } catch (Exception e) {
             logger.warn("로그아웃에 실패했습니다.");
-            throw new LogoutFailedException("ERR_6000");
+            throw new LogoutFailedException("ERR_USER_12");
         }
     }
 

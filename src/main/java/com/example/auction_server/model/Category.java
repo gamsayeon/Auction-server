@@ -3,13 +3,11 @@ package com.example.auction_server.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Entity(name = "category")
 @Getter
 @Setter
 @Table(name = "category")
-@DynamicUpdate
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

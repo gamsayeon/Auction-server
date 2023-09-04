@@ -57,7 +57,7 @@ public class EmailServiceImpl implements EmailService {
 
         } catch (MessagingException e) {
             logger.warn("email 전송 실패");
-            throw new EmailSendException("ERR_7000");
+            throw new EmailSendException("ERR_EMAIL_1");
         }
     }
 
@@ -68,7 +68,7 @@ public class EmailServiceImpl implements EmailService {
             return cachedUserId;
         } else {
             logger.warn("만료시간이 지나 다시시도해주세요");
-            throw new CacheTTLOutException("ERR_8000");
+            throw new CacheTTLOutException("ERR_EMAIL_2");
         }
     }
 
