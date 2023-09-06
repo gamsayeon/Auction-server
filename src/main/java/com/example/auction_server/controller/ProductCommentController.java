@@ -20,7 +20,6 @@ public class ProductCommentController {
 
     public ProductCommentController(ProductCommentServiceImpl productCommentService) {
         this.productCommentService = productCommentService;
-
     }
 
     @PostMapping("/{productId}")

@@ -39,7 +39,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
             return resultProductCommentDTO;
         } else {
             logger.warn("댓글을 등록하지 못했습니다.");
-            throw new AddException("ERR_PRODUCT_COMMENT_1", productCommentDTO);
+            throw new AddException("PRODUCT_COMMENT_1", productCommentDTO);
         }
     }
 }

@@ -33,7 +33,7 @@ public class LoginCheckAspect {
 
         // 값이 없으면 로그인이 필요한 예외를 던짐
         if (id == null) {
-            throw new LoginRequiredException("ERR_COMMON_2");
+            throw new LoginRequiredException("COMMON_2");
         }
 
         boolean isPresent = false;
@@ -58,7 +58,7 @@ public class LoginCheckAspect {
         }
         if (isPresent == false) {
             logger.warn("권한 부족");
-            throw new UserAccessDeniedException("ERR_COMMON_3", loginType);
+            throw new UserAccessDeniedException("COMMON_3", loginType);
         }
         Object[] args = joinPoint.getArgs();
         args[0] = id;
