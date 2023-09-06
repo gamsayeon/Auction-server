@@ -16,15 +16,15 @@ public class CustomExceptionHandler {
 
     private static final Logger logger = LogManager.getLogger(isExistUserIdlValidator.class);
 
-//    @ExceptionHandler(value = {RuntimeException.class})
-//    @ResponseBody
-//    public ResponseEntity<Object> handleException(RuntimeException ex, HttpServletRequest request) {
-//        String exceptionCode = ex.getMessage();
-//        CommonResponse commonResponse = new CommonResponse(exceptionCode,
-//                ExceptionMessage.getExceptionMessage(exceptionCode), request.getServletPath());
-//        logger.error(commonResponse.toString());
-//        return ResponseEntity.badRequest().body(commonResponse);
-//    }
+    @ExceptionHandler(value = {RuntimeException.class})
+    @ResponseBody
+    public ResponseEntity<Object> handleException(RuntimeException ex, HttpServletRequest request) {
+        String exceptionCode = ex.getMessage();
+        CommonResponse commonResponse = new CommonResponse(exceptionCode,
+                ExceptionMessage.getExceptionMessage(exceptionCode), request.getServletPath());
+        logger.error(commonResponse.toString());
+        return ResponseEntity.badRequest().body(commonResponse);
+    }
 
     @ExceptionHandler(value = {ValidationException.class})
     @ResponseBody
