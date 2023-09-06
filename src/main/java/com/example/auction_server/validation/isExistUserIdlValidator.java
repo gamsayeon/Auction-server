@@ -22,7 +22,7 @@ public class isExistUserIdlValidator implements ConstraintValidator<isExistUserI
 
         if (isDuplicationUserId) {
             logger.warn("중복된 ID 입니다.");
-            throw new DuplicateException("ERR_USER_2", userId);
+            throw new DuplicateException("USER_2", userId);
         }
         return true;
     }

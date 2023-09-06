@@ -33,7 +33,7 @@ public class LoginCheckAspect {
 
         // 값이 없으면 로그인이 필요한 예외를 던짐
         if (id == null) {
-            throw new LoginRequiredException("ERR_COMMON_2");
+            throw new LoginRequiredException("COMMON_2");
         }
 
         boolean isPresent = false;
@@ -41,16 +41,13 @@ public class LoginCheckAspect {
         for (int i = 0; i < loginCheck.types().length; i++) {
             switch (loginCheck.types()[i].toString()) {
                 case "USER":
-                    if (loginType == UserType.USER.name())
-                        isPresent = true;
+                    if (loginType == UserType.USER.name()) isPresent = true;
                     break;
                 case "ADMIN":
-                    if (loginType == UserType.ADMIN.name())
-                        isPresent = true;
+                    if (loginType == UserType.ADMIN.name()) isPresent = true;
                     break;
                 case "UNAUTHORIZED_USER":
-                    if (loginType == UserType.UNAUTHORIZED_USER.name())
-                        isPresent = true;
+                    if (loginType == UserType.UNAUTHORIZED_USER.name()) isPresent = true;
                     break;
                 default:
                     break;
@@ -58,7 +55,7 @@ public class LoginCheckAspect {
         }
         if (isPresent == false) {
             logger.warn("권한 부족");
-            throw new UserAccessDeniedException("ERR_COMMON_3", loginType);
+            throw new UserAccessDeniedException("COMMON_3", loginType);
         }
         Object[] args = joinPoint.getArgs();
         args[0] = id;

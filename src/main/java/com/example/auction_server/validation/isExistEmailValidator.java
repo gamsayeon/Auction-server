@@ -23,7 +23,7 @@ public class isExistEmailValidator implements ConstraintValidator<isExistEmailVa
 
         if (isDuplicationEmail) {
             logger.warn("중복된 Email 주소입니다.");
-            throw new DuplicateException("ERR_USER_3", email);
+            throw new DuplicateException("USER_3", email);
         }
 
         return true;

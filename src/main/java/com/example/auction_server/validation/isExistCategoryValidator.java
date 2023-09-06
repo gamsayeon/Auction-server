@@ -23,7 +23,7 @@ public class isExistCategoryValidator implements ConstraintValidator<isExistCate
 
         if (isDuplicateCategory) {
             logger.warn("중복된 category 입니다.");
-            throw new DuplicateException("ERR_CATEGORY_1", categoryName);
+            throw new DuplicateException("CATEGORY_1", categoryName);
         }
 
         return true;

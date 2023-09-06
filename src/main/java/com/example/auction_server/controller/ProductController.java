@@ -9,8 +9,6 @@ import jakarta.validation.Valid;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,8 +57,8 @@ public class ProductController {
     @PatchMapping("/{productId}")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     public ResponseEntity<CommonResponse<ProductDTO>> updateProduct(Long loginId, @PathVariable("productId") Long productId,
-                                                    @RequestBody @Valid ProductDTO productDTO,
-                                                    HttpServletRequest request) {
+                                                                    @RequestBody @Valid ProductDTO productDTO,
+                                                                    HttpServletRequest request) {
         logger.debug("상품을 수정합니다.");
         CommonResponse<ProductDTO> response = new CommonResponse<>("SUCCESS", "상품을 수정했습니다.",
                 request.getRequestURI(), productService.updateProduct(loginId, productId, productDTO));
@@ -70,7 +68,7 @@ public class ProductController {
     @DeleteMapping("/withdraw/{productId}")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     public ResponseEntity<CommonResponse<String>> deleteProduct(Long loginId, @PathVariable("productId") Long productId,
-                                                HttpServletRequest request) {
+                                                                HttpServletRequest request) {
         logger.debug("상품을 삭제합니다.");
         productService.deleteProduct(loginId, productId);
         CommonResponse<String> response = new CommonResponse<>("SUCCESS", "상품을 삭제했습니다.",
@@ -79,7 +77,6 @@ public class ProductController {
     }
 
     @Scheduled(cron = "${auction.time.interval}")
-    @Retryable(maxAttempts = 10, backoff = @Backoff(delay = 30000, multiplier = 2))
     public void updateProductAuctionStatus() {
         logger.debug("경매상태값을 수정합니다.");
         productService.updateProductStatus();
