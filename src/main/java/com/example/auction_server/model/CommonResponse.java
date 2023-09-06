@@ -1,21 +1,23 @@
 package com.example.auction_server.model;
 
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 @Getter
 public class CommonResponse<T> {
     private String code;
     private String message;
-    private T url;
+    private String url;
     private T responseBody;
 
-    public CommonResponse(String code, String message, T url) {
+    public CommonResponse(String code, String message, String url) {
         this.code = code;
         this.message = message;
         this.url = url;
     }
 
-    public CommonResponse(String code, String message, T url, T responseBody) {
+    public CommonResponse(String code, String message, String url, T responseBody) {
         this.code = code;
         this.message = message;
         this.url = url;

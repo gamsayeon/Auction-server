@@ -1,6 +1,6 @@
 package com.example.auction_server.validation.annotation;
 
-import com.example.auction_server.validation.UniqueUserIdValidator;
+import com.example.auction_server.validation.IsAdminValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,9 +11,11 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = UniqueUserIdValidator.class)
-public @interface UniqueUserId {
-    String message() default "이미 사용 중인 아이디입니다.";
+@Constraint(validatedBy = IsAdminValidator.class)
+public @interface IsAdminValidation {
+    String message() default "ADMIN으로 회원가입 할 수 없습니다.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

@@ -6,6 +6,8 @@ import com.example.auction_server.exception.UserAccessDeniedException;
 import com.example.auction_server.util.SessionUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,10 +15,11 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class SessionCheckAspect {
+public class LoginCheckAspect {
     private final HttpServletRequest request;
+    private static final Logger logger = LogManager.getLogger(LoginCheckAspect.class);
 
-    public SessionCheckAspect(HttpServletRequest request) {
+    public LoginCheckAspect(HttpServletRequest request) {
         this.request = request;
     }
 
@@ -30,7 +33,7 @@ public class SessionCheckAspect {
 
         // 값이 없으면 로그인이 필요한 예외를 던짐
         if (id == null) {
-            throw new LoginRequiredException("ERR_9000");
+            throw new LoginRequiredException("COMMON_2");
         }
 
         boolean isPresent = false;
@@ -38,23 +41,21 @@ public class SessionCheckAspect {
         for (int i = 0; i < loginCheck.types().length; i++) {
             switch (loginCheck.types()[i].toString()) {
                 case "USER":
-                    if (loginType == UserType.USER.name())
-                        isPresent = true;
+                    if (loginType == UserType.USER.name()) isPresent = true;
                     break;
                 case "ADMIN":
-                    if (loginType == UserType.ADMIN.name())
-                        isPresent = true;
+                    if (loginType == UserType.ADMIN.name()) isPresent = true;
                     break;
                 case "UNAUTHORIZED_USER":
-                    if (loginType == UserType.UNAUTHORIZED_USER.name())
-                        isPresent = true;
+                    if (loginType == UserType.UNAUTHORIZED_USER.name()) isPresent = true;
                     break;
                 default:
                     break;
             }
         }
         if (isPresent == false) {
-            throw new UserAccessDeniedException("ERR_9001");
+            logger.warn("권한 부족");
+            throw new UserAccessDeniedException("COMMON_3", loginType);
         }
         Object[] args = joinPoint.getArgs();
         args[0] = id;

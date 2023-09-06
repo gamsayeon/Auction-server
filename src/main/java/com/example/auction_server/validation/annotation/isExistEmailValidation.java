@@ -1,6 +1,5 @@
 package com.example.auction_server.validation.annotation;
 
-import com.example.auction_server.validation.UniqueCategoryValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -9,11 +8,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.TYPE})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = UniqueCategoryValidator.class)
-public @interface UniqueCategory {
-    String message() default "중복된 카테고리입니다.";
+@Constraint(validatedBy = com.example.auction_server.validation.isExistEmailValidator.class)
+public @interface isExistEmailValidation {
+    String message() default "중복된 이메일입니다.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

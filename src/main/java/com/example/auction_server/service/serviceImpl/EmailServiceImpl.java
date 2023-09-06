@@ -33,13 +33,13 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    @Cacheable(key = "#token", value ="userId")
-    public String putCacheToken(String token, String userId){
+    @Cacheable(key = "#token", value = "userId")
+    public String putCacheToken(String token, String userId) {
         return userId;
     }
 
     @Override
-    public void sendToUser(String userId, String email){
+    public void sendToUser(String userId, String email) {
         String token = UUID.randomUUID().toString();
         this.putCacheToken(token, userId);
         try {
@@ -55,21 +55,20 @@ public class EmailServiceImpl implements EmailService {
 
             javaMailSender.send(mimeMessage);
 
-        }catch (MessagingException e){
+        } catch (MessagingException e) {
             logger.warn("email 전송 실패");
-            throw new EmailSendException("ERR_7000");
+            throw new EmailSendException("EMAIL_1");
         }
     }
 
     public String verifyEmail(String token) {
         String cachedUserId = this.getCachedToken(token);
-        if(cachedUserId != null) {
+        if (cachedUserId != null) {
             logger.info("redis value 값을 정상적으로 가지고 왔습니다.");
             return cachedUserId;
-        }
-        else{
+        } else {
             logger.warn("만료시간이 지나 다시시도해주세요");
-            throw new CacheTTLOutException("ERR_8000");
+            throw new CacheTTLOutException("EMAIL_2");
         }
     }
 

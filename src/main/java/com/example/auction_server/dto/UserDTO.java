@@ -1,14 +1,14 @@
 package com.example.auction_server.dto;
 
 import com.example.auction_server.enums.UserType;
-import com.example.auction_server.validation.annotation.UniqueEmail;
-import com.example.auction_server.validation.annotation.UniqueUser;
-import com.example.auction_server.validation.annotation.UniqueUserId;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.*;
+import com.example.auction_server.validation.annotation.IsAdminValidation;
+import com.example.auction_server.validation.annotation.isExistEmailValidation;
+import com.example.auction_server.validation.annotation.isExistUserIdlValidation;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -16,31 +16,31 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@UniqueUser(groups = {UserDTO.Signup.class})
 public class UserDTO {
-
-    @NotBlank(groups = {Login.class, Signup.class, AdminSignup.class})
-    @UniqueUserId(groups = {AdminSignup.class})
+    @NotBlank(groups = {SignUp.class, AdminSignUp.class, Login.class})
+    @isExistUserIdlValidation(groups = {SignUp.class, AdminSignUp.class})
     private String userId;
 
-    @NotBlank(groups = {Login.class, Signup.class, AdminSignup.class, UpdateUser.class})
+    @NotBlank(groups = {SignUp.class, AdminSignUp.class, UpdateUser.class, Login.class})
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{3,20}$",
             message = "비밀번호는 3자기 이상 20자리 이하로 숫자와 영어, 특수기호(!@#$%^&*)를 각 하나이상 포함해주세요")
     private String password;
 
-    @NotBlank(groups = {Signup.class, AdminSignup.class, UpdateUser.class})
+    @NotBlank(groups = {SignUp.class, AdminSignUp.class, UpdateUser.class})
     private String name;
 
-    @NotBlank(groups = {Signup.class, UpdateUser.class})
+    @NotBlank(groups = {SignUp.class, UpdateUser.class})
     @Size(max = 20)
     @Pattern(regexp = "[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}", message = "올바른 전화번호 형식이 아닙니다.")
     private String phoneNumber;
 
     @Email(message = "올바른 이메일 형식이 아닙니다.")
-    @NotBlank(groups = {Signup.class, UpdateUser.class})
-    @UniqueEmail(groups = {UpdateUser.class})
+    @NotBlank(groups = {SignUp.class, UpdateUser.class})
+    @isExistEmailValidation(groups = {SignUp.class, UpdateUser.class})
     private String email;
 
+    @NotNull(groups = {SignUp.class, AdminSignUp.class})
+    @IsAdminValidation(groups = {SignUp.class})
     private UserType userType;
 
     private LocalDateTime createTime;
@@ -48,10 +48,10 @@ public class UserDTO {
     public interface Login {
     }
 
-    public interface Signup {
+    public interface SignUp {
     }
 
-    public interface AdminSignup {
+    public interface AdminSignUp {
     }
 
     public interface UpdateUser {
