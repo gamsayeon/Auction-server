@@ -5,6 +5,7 @@ import com.example.auction_server.exception.EmailSendException;
 import com.example.auction_server.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
     @Value("${expireUrl}")
@@ -25,12 +27,6 @@ public class EmailServiceImpl implements EmailService {
 
     private final Logger logger = LogManager.getLogger(EmailServiceImpl.class);
     private final RedisTemplate<String, String> redisTemplate;
-
-
-    public EmailServiceImpl(JavaMailSender javaMailSender, RedisTemplate<String, String> redisTemplate) {
-        this.javaMailSender = javaMailSender;
-        this.redisTemplate = redisTemplate;
-    }
 
     @Override
     @Cacheable(key = "#token", value = "userId")

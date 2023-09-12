@@ -10,6 +10,7 @@ import com.example.auction_server.mapper.CategoryMapper;
 import com.example.auction_server.model.Category;
 import com.example.auction_server.repository.CategoryRepository;
 import com.example.auction_server.service.CategoryService;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -18,17 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final int DELETE_SUCCESS = 1;
     private static final Logger logger = LogManager.getLogger(CategoryServiceImpl.class);
-
-
-    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
-        this.categoryRepository = categoryRepository;
-        this.categoryMapper = categoryMapper;
-    }
 
     @Override
     public CategoryDTO registerCategory(CategoryDTO categoryDTO) {

@@ -6,6 +6,7 @@ import com.example.auction_server.mapper.ProductCommentMapper;
 import com.example.auction_server.model.ProductComment;
 import com.example.auction_server.repository.ProductCommentRepository;
 import com.example.auction_server.service.ProductCommentService;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -13,17 +14,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class ProductCommentServiceImpl implements ProductCommentService {
 
     private final Logger logger = LogManager.getLogger(ProductCommentServiceImpl.class);
 
     private final ProductCommentRepository productCommentRepository;
     private final ProductCommentMapper productCommentMapper;
-
-    public ProductCommentServiceImpl(ProductCommentRepository productCommentRepository, ProductCommentMapper productCommentMapper) {
-        this.productCommentRepository = productCommentRepository;
-        this.productCommentMapper = productCommentMapper;
-    }
 
     @Override
     public ProductCommentDTO registerProduct(Long userId, Long productId, ProductCommentDTO productCommentDTO) {

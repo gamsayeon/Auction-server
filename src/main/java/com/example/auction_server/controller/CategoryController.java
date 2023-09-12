@@ -7,6 +7,7 @@ import com.example.auction_server.model.CommonResponse;
 import com.example.auction_server.service.serviceImpl.CategoryServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,15 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/category")
 @RestController
 @Log4j2
+@RequiredArgsConstructor
 public class CategoryController {
 
     private final Logger logger = LogManager.getLogger(CategoryController.class);
 
     private final CategoryServiceImpl categoryService;
-
-    public CategoryController(CategoryServiceImpl categoryService) {
-        this.categoryService = categoryService;
-    }
 
     @PostMapping
     @LoginCheck(types = LoginCheck.LoginType.ADMIN)
