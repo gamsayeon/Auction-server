@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -62,7 +61,7 @@ public class ProductServiceImpl implements ProductService {
         if (resultProduct != null) {
             ProductDTO resultProductDTO = productMapper.convertToDTO(resultProduct);
             try {
-                if (productDTO.getImageDTOS() != null && !productDTO.getImageDTOS().isEmpty()) {
+                if (!productDTO.getImageDTOS().isEmpty()) {
                     List<ProductImageDTO> resultProductImages =
                             this.registerProductImage(productDTO, resultProduct.getProductId());
                     resultProductDTO.setImageDTOS(resultProductImages);
@@ -221,6 +220,9 @@ public class ProductServiceImpl implements ProductService {
                     logger.info("경매 상태를 AUCTION_STARTS 로 성공적으로 바꿨습니다.");
                 }
             }
+        }
+        resultProducts = productRepository.findByProductStatus(ProductStatus.AUCTION_STARTS);
+        for (Product product : resultProducts) {
             if (product.getEndTime().compareTo(LocalDateTime.now()) <= 0) {   //경매 마감시간이 현재시간과 비교해서 과거인지 확인
                 product.setProductStatus(ProductStatus.AUCTION_END);
                 Product resultProduct = productRepository.save(product);
@@ -269,13 +271,24 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
     public List<ProductDTO> findByKeyword(String productName, Long saleUserId, Long categoryId, String explanation, ProductSortOrder sortOrder) {
         List<Product> products = productRepository.searchProducts(productName, saleUserId, categoryId, explanation);
+        products = this.orderSearchProductByProductSortOrder(sortOrder, products);
 
+        List<ProductDTO> productDTOs = new ArrayList<>();
+        for (Product product : products) {
+            productDTOs.add(productMapper.convertToDTO(product));
+        }
+        return productDTOs;
+    }
+
+    public List<Product> orderSearchProductByProductSortOrder(ProductSortOrder sortOrder, List<Product> products) {
         switch (sortOrder) {
+            //TODO : 입찰 기능 개발 후에 추가
             case BIDDER_COUNT_DESC:             //입찰자가 많은 순
                 break;
-            case HIGHEST_PRICE_HIGH_TO_LOW:     // 최고 즉시 구매가 순
+            case HIGHEST_PRICE_DESC:     // 최고 즉시 구매가 순
                 Collections.sort(products, (p1, p2) -> {
                     double highestPrice1 = p1.getHighestPrice();
                     double highestPrice2 = p2.getHighestPrice();
@@ -289,7 +302,7 @@ public class ProductServiceImpl implements ProductService {
                     }
                 });
                 break;
-            case HIGHEST_PRICE_LOW_TO_HIGH:     // 최저 즉시 구매가 순
+            case HIGHEST_PRICE_ASC:     // 최저 즉시 구매가 순
                 Collections.sort(products, (p1, p2) -> {
                     double highestPrice1 = p1.getHighestPrice();
                     double highestPrice2 = p2.getHighestPrice();
@@ -303,9 +316,12 @@ public class ProductServiceImpl implements ProductService {
                     }
                 });
                 break;
-            case PRICE_HIGH_TO_LOW:             //최고 입찰가 순
+            //TODO : 입찰 기능 개발 후에 추가
+            case PRICE_DESC:             //최고 입찰가 순
                 break;
-            case PRICE_LOW_TO_HIGH:             //최저 입찰가 순
+
+            //TODO : 입찰 기능 개발 후에 추가
+            case PRICE_ASC:             //최저 입찰가 순
                 break;
             case NEWEST_FIRST:                  //등록일 최신 순
                 Collections.sort(products, (p1, p2) -> {
@@ -324,12 +340,7 @@ public class ProductServiceImpl implements ProductService {
                 });
                 break;
         }
-
-        List<ProductDTO> productDTOs = new ArrayList<>();
-        for (Product product : products) {
-            productDTOs.add(productMapper.convertToDTO(product));
-        }
-        return productDTOs;
+        return products;
     }
 
 }

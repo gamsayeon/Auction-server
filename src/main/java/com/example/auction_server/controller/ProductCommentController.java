@@ -6,6 +6,7 @@ import com.example.auction_server.model.CommonResponse;
 import com.example.auction_server.service.serviceImpl.ProductCommentServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/product-comments")
+@Log4j2
 public class ProductCommentController {
     private final Logger logger = LogManager.getLogger(ProductCommentController.class);
 

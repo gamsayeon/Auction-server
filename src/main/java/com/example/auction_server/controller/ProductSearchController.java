@@ -5,6 +5,7 @@ import com.example.auction_server.enums.ProductSortOrder;
 import com.example.auction_server.model.CommonResponse;
 import com.example.auction_server.service.serviceImpl.ProductServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +18,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products/search")
+@Log4j2
 public class ProductSearchController {
     private final ProductServiceImpl productService;
 
     private final Logger logger = LogManager.getLogger(ProductSearchController.class);
 
-    public ProductSearchController(ProductServiceImpl productService){
+    public ProductSearchController(ProductServiceImpl productService) {
         this.productService = productService;
     }
 
     @GetMapping
-    public ResponseEntity<CommonResponse<List<ProductDTO>>> registerUser(@RequestParam(value = "productName", required = false) String productName,
+    public ResponseEntity<CommonResponse<List<ProductDTO>>> searchProduct(@RequestParam(value = "productName", required = false) String productName,
                                                                          @RequestParam(value = "saleUserId", required = false) Long saleUserId,
                                                                          @RequestParam(value = "categoryId", required = false) Long categoryId,
                                                                          @RequestParam(value = "explanation", required = false) String explanation,

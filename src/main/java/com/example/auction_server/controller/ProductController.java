@@ -2,10 +2,12 @@ package com.example.auction_server.controller;
 
 import com.example.auction_server.aop.LoginCheck;
 import com.example.auction_server.dto.ProductDTO;
+import com.example.auction_server.enums.ProductSortOrder;
 import com.example.auction_server.model.CommonResponse;
 import com.example.auction_server.service.serviceImpl.ProductServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
+@Log4j2
 public class ProductController {
 
     private final Logger logger = LogManager.getLogger(ProductController.class);
@@ -57,8 +60,8 @@ public class ProductController {
     @PatchMapping("/{productId}")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     public ResponseEntity<CommonResponse<ProductDTO>> updateProduct(Long loginId, @PathVariable("productId") Long productId,
-                                                    @RequestBody @Valid ProductDTO productDTO,
-                                                    HttpServletRequest request) {
+                                                                    @RequestBody @Valid ProductDTO productDTO,
+                                                                    HttpServletRequest request) {
         logger.debug("상품을 수정합니다.");
         CommonResponse<ProductDTO> response = new CommonResponse<>("SUCCESS", "상품을 수정했습니다.",
                 request.getRequestURI(), productService.updateProduct(loginId, productId, productDTO));
@@ -68,7 +71,7 @@ public class ProductController {
     @DeleteMapping("/withdraw/{productId}")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     public ResponseEntity<CommonResponse<String>> deleteProduct(Long loginId, @PathVariable("productId") Long productId,
-                                                HttpServletRequest request) {
+                                                                HttpServletRequest request) {
         logger.debug("상품을 삭제합니다.");
         productService.deleteProduct(loginId, productId);
         CommonResponse<String> response = new CommonResponse<>("SUCCESS", "상품을 삭제했습니다.",
@@ -82,4 +85,16 @@ public class ProductController {
         productService.updateProductStatus();
     }
 
+    @GetMapping
+    public ResponseEntity<CommonResponse<List<ProductDTO>>> searchProduct(@RequestParam(value = "productName", required = false) String productName,
+                                                                          @RequestParam(value = "saleUserId", required = false) Long saleUserId,
+                                                                          @RequestParam(value = "categoryId", required = false) Long categoryId,
+                                                                          @RequestParam(value = "explanation", required = false) String explanation,
+                                                                          @RequestParam(value = "sortOrder", defaultValue = "BIDDER_COUNT_DESC", required = false) ProductSortOrder sortOrder,
+                                                                          HttpServletRequest request) {
+        logger.debug("상품을 검색합니다.");
+        CommonResponse<List<ProductDTO>> response = new CommonResponse<>("SUCCESS", "상품검색에 성공했습니다.",
+                request.getRequestURI(), productService.findByKeyword(productName, saleUserId, categoryId, explanation, sortOrder));
+        return ResponseEntity.ok(response);
+    }
 }
