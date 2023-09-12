@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface BidRepository extends JpaRepository<Bid, Long> {
     @Query("SELECT MAX(b.price) FROM bid b WHERE b.productId = :productId")
     Integer findMaxPriceByProductId(@Param("productId") Long productId);
+
+    Long countByProductId(Long productId);
 }
