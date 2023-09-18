@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO selectUser(Long id) {
-        Optional<User> optionalUser = userRepository.findByIdWithNullUpdateTime(id);
+        Optional<User> optionalUser = userRepository.findByIdAndUpdateTimeIsNull(id);
 
         if (optionalUser.isEmpty()) {
             logger.warn("해당 유저를 찾지 못했습니다. 재시도 해주세요.");

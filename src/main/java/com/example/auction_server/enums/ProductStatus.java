@@ -2,7 +2,7 @@ package com.example.auction_server.enums;
 
 public enum ProductStatus {
     PRODUCT_REGISTRATION,   //상품등록
-    AUCTION_STARTS, //경매 시작
+    AUCTION_PROCEEDING, //경매 진행중
     AUCTION_END,    //경매 종료
     DELIVERING,     //배송중
     DELIVERY_COMPLETED, //배송완료

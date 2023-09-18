@@ -2,7 +2,6 @@ package com.example.auction_server.model;
 
 import com.example.auction_server.enums.ProductStatus;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,8 +19,8 @@ public class Product {
     @Column(name = "product_id")
     private Long productId;
 
-    @Column(name = "sale_user_id")
-    private Long saleUserId;
+    @Column(name = "sale_id")
+    private Long saleId;
 
     @Column(name = "product_name")
     private String productName;

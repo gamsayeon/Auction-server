@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/bid")
+@RequestMapping("/bids")
 @RestController
 @Log4j2
 @RequiredArgsConstructor

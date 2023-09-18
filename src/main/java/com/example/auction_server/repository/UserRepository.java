@@ -2,8 +2,6 @@ package com.example.auction_server.repository;
 
 import com.example.auction_server.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -18,8 +16,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long id);
 
-    @Query("SELECT u FROM user u WHERE u.id = :id AND u.updateTime IS NULL")
-    Optional<User> findByIdWithNullUpdateTime(@Param("id") Long id);
+    Optional<User> findByIdAndUpdateTimeIsNull(Long id);
 
     Optional<User> findByUserId(String userId);
 

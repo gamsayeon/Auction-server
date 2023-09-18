@@ -3,6 +3,7 @@ package com.example.auction_server.controller;
 import com.example.auction_server.aop.LoginCheck;
 import com.example.auction_server.dto.ProductCommentDTO;
 import com.example.auction_server.dto.ProductDTO;
+import com.example.auction_server.dto.SearchProductDTO;
 import com.example.auction_server.enums.ProductSortOrder;
 import com.example.auction_server.model.CommonResponse;
 import com.example.auction_server.service.serviceImpl.ProductCommentServiceImpl;
@@ -86,19 +87,6 @@ public class ProductController {
         productService.updateProductStatus();
     }
 
-    @GetMapping
-    public ResponseEntity<CommonResponse<List<ProductDTO>>> searchProduct(@RequestParam(value = "productName", required = false) String productName,
-                                                                          @RequestParam(value = "saleUserId", required = false) Long saleUserId,
-                                                                          @RequestParam(value = "categoryId", required = false) Long categoryId,
-                                                                          @RequestParam(value = "explanation", required = false) String explanation,
-                                                                          @RequestParam(value = "sortOrder", defaultValue = "BIDDER_COUNT_DESC", required = false) ProductSortOrder sortOrder,
-                                                                          HttpServletRequest request) {
-        logger.debug("상품을 검색합니다.");
-        CommonResponse<List<ProductDTO>> response = new CommonResponse<>("SUCCESS", "상품검색에 성공했습니다.",
-                request.getRequestURI(), productService.findByKeyword(productName, saleUserId, categoryId, explanation, sortOrder));
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/comments/{productId}")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     public ResponseEntity<CommonResponse<ProductCommentDTO>> registerProductComment(Long loginId, @PathVariable("productId") Long productId,
@@ -111,15 +99,17 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<CommonResponse<List<ProductDTO>>> registerUser(@RequestParam(value = "productName", required = false) String productName,
-                                                                         @RequestParam(value = "saleUserId", required = false) Long saleUserId,
-                                                                         @RequestParam(value = "categoryId", required = false) Long categoryId,
-                                                                         @RequestParam(value = "explanation", required = false) String explanation,
-                                                                         @RequestParam(value = "sortOrder", defaultValue = "BIDDER_COUNT_DESC", required = false) ProductSortOrder sortOrder,
-                                                                         HttpServletRequest request) {
+    public ResponseEntity<CommonResponse<SearchProductDTO>> searchProduct(@RequestParam(value = "productName", required = false) String productName,
+                                                                          @RequestParam(value = "saleId", required = false) Long saleId,
+                                                                          @RequestParam(value = "categoryId", required = false) Long categoryId,
+                                                                          @RequestParam(value = "explanation", required = false) String explanation,
+                                                                          @RequestParam(name = "page", defaultValue = "1") int page,
+                                                                          @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+                                                                          @RequestParam(value = "sortOrder", defaultValue = "BIDDER_COUNT_DESC", required = false) ProductSortOrder sortOrder,
+                                                                          HttpServletRequest request) {
         logger.debug("상품을 검색합니다.");
-        CommonResponse<List<ProductDTO>> response = new CommonResponse<>("SUCCESS", "상품검색에 성공했습니다.",
-                request.getRequestURI(), productService.findByKeyword(productName, saleUserId, categoryId, explanation, sortOrder));
+        CommonResponse<SearchProductDTO> response = new CommonResponse<>("SUCCESS", "상품검색에 성공했습니다.",
+                request.getRequestURI(), productService.findByKeyword(productName, saleId, categoryId, explanation, page, pageSize, sortOrder));
         return ResponseEntity.ok(response);
     }
 }

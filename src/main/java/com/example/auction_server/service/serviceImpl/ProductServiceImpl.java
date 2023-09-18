@@ -2,6 +2,7 @@ package com.example.auction_server.service.serviceImpl;
 
 import com.example.auction_server.dto.ProductDTO;
 import com.example.auction_server.dto.ProductImageDTO;
+import com.example.auction_server.dto.SearchProductDTO;
 import com.example.auction_server.enums.ProductSortOrder;
 import com.example.auction_server.enums.ProductStatus;
 import com.example.auction_server.exception.*;
@@ -43,11 +44,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductDTO registerProduct(Long saleUserId, ProductDTO productDTO) {
+    public ProductDTO registerProduct(Long saleId, ProductDTO productDTO) {
         this.validatorProduct(productDTO);
 
         Product product = productMapper.convertToEntity(productDTO);
-        product.setSaleUserId(saleUserId);
+        product.setSaleId(saleId);
         product.setProductRegisterTime(LocalDateTime.now());
         product.setProductStatus(ProductStatus.PRODUCT_REGISTRATION);
         Product resultProduct = productRepository.save(product);
@@ -119,7 +120,7 @@ public class ProductServiceImpl implements ProductService {
         if (product != null) {
             switch (product.getProductStatus()) {
                 case PRODUCT_REGISTRATION:
-                case AUCTION_STARTS:
+                case AUCTION_PROCEEDING:
                     ProductDTO resultProductDTO = productMapper.convertToDTO(product);
                     List<ProductImage> productImages = productImageRepository.findByProductId(productId);
                     if (!productImages.isEmpty()) {
@@ -140,8 +141,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDTO> selectProductForUser(Long saleUserId) {
-        List<Product> products = productRepository.findBySaleUserId(saleUserId);
+    public List<ProductDTO> selectProductForUser(Long saleId) {
+        List<Product> products = productRepository.findBySaleId(saleId);
         if (!products.isEmpty()) {
             List<ProductDTO> resultProductDTOs = new ArrayList<>();
             for (Product product : products) {
@@ -158,14 +159,14 @@ public class ProductServiceImpl implements ProductService {
             return resultProductDTOs;
         } else {
             logger.warn("해당 상품을 찾지 못했습니다.");
-            throw new NotMatchingException("CATEGORY_5", saleUserId);
+            throw new NotMatchingException("CATEGORY_5", saleId);
         }
     }
 
 
     @Override
     @Transactional
-    public ProductDTO updateProduct(Long saleUserId, Long productId, ProductDTO productDTO) {
+    public ProductDTO updateProduct(Long saleId, Long productId, ProductDTO productDTO) {
         Product resultProduct = productRepository.findByProductId(productId);
 
         if (resultProduct.getProductStatus() != ProductStatus.PRODUCT_REGISTRATION) {
@@ -173,12 +174,12 @@ public class ProductServiceImpl implements ProductService {
             throw new UpdateException("PRODUCT_2", resultProduct.getProductStatus());
         }
 
-        if (resultProduct.getSaleUserId() == saleUserId) {
+        if (resultProduct.getSaleId() == saleId) {
             this.validatorProduct(productDTO);
 
             Product product = productMapper.convertToEntity(productDTO);
             product.setProductId(resultProduct.getProductId());
-            product.setSaleUserId(resultProduct.getSaleUserId());
+            product.setSaleId(resultProduct.getSaleId());
             product.setProductRegisterTime(resultProduct.getProductRegisterTime());
             resultProduct = productRepository.save(resultProduct);
             if (resultProduct == null) {
@@ -195,7 +196,7 @@ public class ProductServiceImpl implements ProductService {
             return resultProductDTO;
         } else {
             logger.warn("권한이 없어 해당 상품을 수정하지 못합니다.");
-            throw new UserAccessDeniedException("PRODUCT_6", saleUserId);
+            throw new UserAccessDeniedException("PRODUCT_6", saleId);
         }
     }
 
@@ -205,17 +206,17 @@ public class ProductServiceImpl implements ProductService {
         List<Product> resultProducts = productRepository.findByProductStatus(ProductStatus.PRODUCT_REGISTRATION);
         for (Product product : resultProducts) {
             if (product.getStartTime().compareTo(LocalDateTime.now()) <= 0) {  //경매 시작시간이 현재시간과 비교해서 과거인지 확인
-                product.setProductStatus(ProductStatus.AUCTION_STARTS);
+                product.setProductStatus(ProductStatus.AUCTION_PROCEEDING);
                 Product resultProduct = productRepository.save(product);
                 if (resultProduct == null) {
                     logger.warn("경매 시작 상태로 수정하지 못했습니다.");
                     throw new UpdateException("PRODUCT_5", product.getProductId());
                 } else {
-                    logger.info("경매 상태를 AUCTION_STARTS 로 성공적으로 바꿨습니다.");
+                    logger.info("경매 상태를 AUCTION_PROCEEDING 로 성공적으로 바꿨습니다.");
                 }
             }
         }
-        resultProducts = productRepository.findByProductStatus(ProductStatus.AUCTION_STARTS);
+        resultProducts = productRepository.findByProductStatus(ProductStatus.AUCTION_PROCEEDING);
         for (Product product : resultProducts) {
             if (product.getEndTime().compareTo(LocalDateTime.now()) <= 0) {   //경매 마감시간이 현재시간과 비교해서 과거인지 확인
                 product.setProductStatus(ProductStatus.AUCTION_END);
@@ -232,15 +233,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void deleteProduct(Long saleUserId, Long productId) {
+    public void deleteProduct(Long saleId, Long productId) {
         Product resultProduct = productRepository.findByProductId(productId);
 
         if (resultProduct.getProductStatus() != ProductStatus.PRODUCT_REGISTRATION) {
             logger.warn("해당 상품은 경매가 시작되여 삭제가 불가능합니다.");
             throw new UpdateException("PRODUCT_2", resultProduct.getProductStatus());
-        } else if (saleUserId == resultProduct.getSaleUserId()) {
+        } else if (saleId == resultProduct.getSaleId()) {
             this.deleteProductImage(productId);
-            int resultDelete = productRepository.deleteBySaleUserIdAndProductId(saleUserId, productId);
+            int resultDelete = productRepository.deleteBySaleIdAndProductId(saleId, productId);
             if (resultDelete == DELETE_FAIL) {
                 logger.warn("상품을 삭제 하지 못했습니다.");
                 throw new DeleteException("COMMON_4", productId);
@@ -249,7 +250,7 @@ public class ProductServiceImpl implements ProductService {
             }
         } else {
             logger.warn("권한이 없습니다.");
-            throw new UserAccessDeniedException("COMMON_3", saleUserId);
+            throw new UserAccessDeniedException("COMMON_3", saleId);
         }
     }
 
@@ -266,18 +267,31 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDTO> findByKeyword(String productName, Long saleUserId, Long categoryId, String explanation, ProductSortOrder sortOrder) {
-        List<Product> products = productRepository.searchProducts(productName, saleUserId, categoryId, explanation);
-        products = this.orderSearchProductByProductSortOrder(sortOrder, products);
+    public SearchProductDTO findByKeyword(String productName, Long saleId, Long categoryId,
+                                          String explanation, int page, int pageSize, ProductSortOrder sortOrder) {
+        List<Product> products = productRepository.searchProducts(productName, saleId, categoryId, explanation, page, pageSize);
+        products = this.sortProducts(sortOrder, products);
 
         List<ProductDTO> productDTOs = new ArrayList<>();
         for (Product product : products) {
             productDTOs.add(productMapper.convertToDTO(product));
         }
-        return productDTOs;
+        int totalItems = productRepository.countBySearchProducts(productName, saleId, categoryId, explanation);
+        int totalPages = totalItems / pageSize;
+        if (totalItems % pageSize != 0) {
+            totalPages++;
+        }
+        SearchProductDTO searchProductDTD = SearchProductDTO.builder()
+                .page(page)
+                .pageSize(pageSize)
+                .totalItems(totalItems)
+                .totalPages(totalPages)
+                .productDTOs(productDTOs)
+                .build();
+        return searchProductDTD;
     }
 
-    public List<Product> orderSearchProductByProductSortOrder(ProductSortOrder sortOrder, List<Product> products) {
+    public List<Product> sortProducts(ProductSortOrder sortOrder, List<Product> products) {
         switch (sortOrder) {
             case BIDDER_COUNT_DESC:             //입찰자가 많은 순
                 Collections.sort(products, (p1, p2) -> {
@@ -321,18 +335,10 @@ public class ProductServiceImpl implements ProductService {
                     }
                 });
                 break;
-            case PRICE_DESC:             //최고 입찰가 순
+            case BID_PRICE_DESC:             //최고 입찰가 순
                 Collections.sort(products, (p1, p2) -> {
-                    Long productId1 = p1.getProductId();
-                    Long productId2 = p2.getProductId();
-
-                    Integer maxPriceProductId1 = bidRepository.findMaxPriceByProductId(productId1);
-                    Integer maxPriceProductId2 = bidRepository.findMaxPriceByProductId(productId2);
-
-                    if (maxPriceProductId1 == null)
-                        maxPriceProductId1 = productRepository.findByProductId(productId1).getStartPrice();
-                    if (maxPriceProductId2 == null)
-                        maxPriceProductId2 = productRepository.findByProductId(productId2).getStartPrice();
+                    Integer maxPriceProductId1 = this.currentBid(p1.getProductId());
+                    Integer maxPriceProductId2 = this.currentBid(p2.getProductId());
 
                     if (maxPriceProductId1 > maxPriceProductId2) {
                         return -1; // p1이 p2보다 작으면 음수 값 반환
@@ -343,18 +349,10 @@ public class ProductServiceImpl implements ProductService {
                     }
                 });
                 break;
-            case PRICE_ASC:             //최저 입찰가 순
+            case BID_PRICE_ASC:             //최저 입찰가 순
                 Collections.sort(products, (p1, p2) -> {
-                    Long productId1 = p1.getProductId();
-                    Long productId2 = p2.getProductId();
-
-                    Integer maxPriceProductId1 = bidRepository.findMaxPriceByProductId(productId1);
-                    Integer maxPriceProductId2 = bidRepository.findMaxPriceByProductId(productId2);
-
-                    if (maxPriceProductId1 == null)
-                        maxPriceProductId1 = productRepository.findByProductId(productId1).getStartPrice();
-                    if (maxPriceProductId2 == null)
-                        maxPriceProductId2 = productRepository.findByProductId(productId2).getStartPrice();
+                    Integer maxPriceProductId1 = this.currentBid(p1.getProductId());
+                    Integer maxPriceProductId2 = this.currentBid(p2.getProductId());
 
                     if (maxPriceProductId1 < maxPriceProductId2) {
                         return -1; // p1이 p2보다 작으면 음수 값 반환
@@ -383,6 +381,13 @@ public class ProductServiceImpl implements ProductService {
                 break;
         }
         return products;
+    }
+
+    public Integer currentBid(Long productId) {
+        Integer maxPriceProductId = bidRepository.findMaxPriceByProductId(productId);
+        if (maxPriceProductId == null)
+            maxPriceProductId = productRepository.findByProductId(productId).getStartPrice();
+        return maxPriceProductId;
     }
 
 }

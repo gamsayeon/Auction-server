@@ -19,7 +19,4 @@ public class Category {
 
     @Column(name = "bid_min_price")
     private int bidMinPrice;
-
-    @Column(name = "bid_max_price")
-    private int bidMaxPrice;
 }

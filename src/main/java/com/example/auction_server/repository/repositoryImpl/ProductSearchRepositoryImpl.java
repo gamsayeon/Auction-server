@@ -19,11 +19,18 @@ public class ProductSearchRepositoryImpl implements ProductSearchRepository {
     }
 
     @Override
-    public List<Product> searchProducts(String productName, Long saleUserId, Long categoryId, String explanation) {
+    public List<Product> searchProducts(String productName, Long saleId, Long categoryId, String explanation, int page, int pageSize) {
         JPAQuery<Product> query = new JPAQuery<>(entityManager);
 
         QProduct product = QProduct.product;
 
+        BooleanExpression whereClause = this.searchWhereClause(productName, saleId, categoryId, explanation);
+
+        return query.select(product).from(product).where(whereClause).limit(pageSize).offset((page - 1) * pageSize).fetch();
+    }
+
+    public BooleanExpression searchWhereClause(String productName, Long saleId, Long categoryId, String explanation) {
+        QProduct product = QProduct.product;
         BooleanExpression whereClause = null;
 
         if (productName != null) {
@@ -34,11 +41,11 @@ public class ProductSearchRepositoryImpl implements ProductSearchRepository {
             }
         }
 
-        if (saleUserId != null) {
+        if (saleId != null) {
             if (whereClause == null) {
-                whereClause = product.saleUserId.eq(saleUserId);
+                whereClause = product.saleId.eq(saleId);
             } else {
-                whereClause = whereClause.and(product.saleUserId.eq(saleUserId));
+                whereClause = whereClause.and(product.saleId.eq(saleId));
             }
         }
 
@@ -57,7 +64,17 @@ public class ProductSearchRepositoryImpl implements ProductSearchRepository {
                 whereClause = whereClause.and(product.explanation.contains(explanation));
             }
         }
-        System.out.println(query.select(product).from(product).where(whereClause));
-        return query.select(product).from(product).where(whereClause).fetch();
+        return whereClause;
+    }
+
+    @Override
+    public int countBySearchProducts(String productName, Long saleId, Long categoryId, String explanation) {
+        JPAQuery<Product> query = new JPAQuery<>(entityManager);
+
+        QProduct product = QProduct.product;
+
+        BooleanExpression whereClause = this.searchWhereClause(productName, saleId, categoryId, explanation);
+
+        return query.select(product.count()).from(product).where(whereClause).fetchFirst().intValue();
     }
 }

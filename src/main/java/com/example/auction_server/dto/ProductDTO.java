@@ -20,7 +20,7 @@ import java.util.List;
 public class ProductDTO {
     private Long productId;
 
-    private Long saleUserId;
+    private Long saleId;
 
     @NotBlank
     private String productName;

@@ -20,7 +20,4 @@ public class CategoryDTO {
     @Min(value = 1000)
     private int bidMinPrice;
 
-    @Min(value = 1000)
-    private int bidMaxPrice;
-
 }

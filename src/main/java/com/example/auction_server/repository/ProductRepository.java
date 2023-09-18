@@ -11,9 +11,9 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long>, ProductSearchRepository {
     Product findByProductId(Long productId);
 
-    List<Product> findBySaleUserId(Long saleUserId);
+    List<Product> findBySaleId(Long saleId);
 
-    int deleteBySaleUserIdAndProductId(Long saleUserId, Long productId);
+    int deleteBySaleIdAndProductId(Long saleId, Long productId);
 
     List<Product> findByProductStatus(ProductStatus productStatus);
 }
