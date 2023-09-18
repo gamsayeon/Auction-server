@@ -26,7 +26,6 @@ import java.util.List;
 public class ProductController {
 
     private final Logger logger = LogManager.getLogger(ProductController.class);
-
     private final ProductServiceImpl productService;
     private final ProductCommentServiceImpl productCommentService;
 
@@ -110,16 +109,4 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<CommonResponse<List<ProductDTO>>> registerUser(@RequestParam(value = "productName", required = false) String productName,
-                                                                         @RequestParam(value = "saleUserId", required = false) Long saleUserId,
-                                                                         @RequestParam(value = "categoryId", required = false) Long categoryId,
-                                                                         @RequestParam(value = "explanation", required = false) String explanation,
-                                                                         @RequestParam(value = "sortOrder", defaultValue = "BIDDER_COUNT_DESC", required = false) ProductSortOrder sortOrder,
-                                                                         HttpServletRequest request) {
-        logger.debug("상품을 검색합니다.");
-        CommonResponse<List<ProductDTO>> response = new CommonResponse<>("SUCCESS", "상품검색에 성공했습니다.",
-                request.getRequestURI(), productService.findByKeyword(productName, saleUserId, categoryId, explanation, sortOrder));
-        return ResponseEntity.ok(response);
-    }
 }

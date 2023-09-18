@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 @RestController
 @Log4j2
+/***
+ * 생성자 주입을 자동으로 처리 함
+ */
 @RequiredArgsConstructor
 public class UserController {
 
