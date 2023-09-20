@@ -68,5 +68,9 @@
     - 자신의 경매 기록 확인
     - 상품의 경매 기록 확인
 ---
+# 객체 변환 과정
+
+---
 # ERD(Entity Relationship Diagram)
 ![img.png](img.png)
+

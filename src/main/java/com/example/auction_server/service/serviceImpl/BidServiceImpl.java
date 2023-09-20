@@ -8,7 +8,7 @@ import com.example.auction_server.model.Bid;
 import com.example.auction_server.model.Product;
 import com.example.auction_server.repository.ProductRepository;
 import com.example.auction_server.service.BidService;
-import com.example.auction_server.service.MessageService;
+import com.example.auction_server.service.MessageQueueService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final BidMapper bidMapper;
-    private final MessageService messageService;
+    private final MessageQueueService messageQueueService;
     private final ProductRepository productRepository;
     private final BidPriceValidServiceImpl bidPriceValidService;
     private static final Logger logger = LogManager.getLogger(BidServiceImpl.class);
@@ -41,7 +41,7 @@ public class BidServiceImpl implements BidService {
                     .price(bidDTO.getPrice())
                     .build();
 
-            messageService.enqueueMassage(bid);
+            messageQueueService.enqueueMassage(bid);
 
             return bidMapper.convertToDTO(bid);
         }

@@ -2,8 +2,12 @@ package com.example.auction_server.service;
 
 import com.example.auction_server.exception.AddException;
 import com.example.auction_server.model.Bid;
+import com.example.auction_server.model.User;
 import com.example.auction_server.repository.BidRepository;
+import com.example.auction_server.repository.ProductRepository;
+import com.example.auction_server.repository.UserRepository;
 import com.example.auction_server.service.serviceImpl.BidPriceValidServiceImpl;
+import com.example.auction_server.service.serviceImpl.EmailServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -20,9 +24,14 @@ import org.springframework.stereotype.Service;
  */
 @RequiredArgsConstructor
 @Service
-public class MessageService {
+public class MessageQueueService {
     private final BidPriceValidServiceImpl bidPriceValidService;
-    private static final Logger logger = LogManager.getLogger(MessageService.class);
+    private final UserRepository userRepository;
+    private final EmailServiceImpl emailService;
+    private final RabbitTemplate rabbitTemplate;
+    private final ProductRepository productRepository;
+    private final BidRepository bidRepository;
+    private static final Logger logger = LogManager.getLogger(MessageQueueService.class);
 
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
@@ -30,8 +39,6 @@ public class MessageService {
     @Value("${rabbitmq.routing.key}")
     private String routingKey;
 
-    private final RabbitTemplate rabbitTemplate;
-    private final BidRepository bidRepository;
 
     public void enqueueMassage(Bid bid) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -58,6 +65,9 @@ public class MessageService {
                 throw new AddException("BID_2", deserializedBid);
             } else {
                 logger.info("정상적으로 입찰 되었습니다.");
+                String recipientEmail = userRepository.findEmailById(resultBid.getBuyerId());
+                String productName = productRepository.findProductNameByProductId(resultBid.getProductId());
+                emailService.notifyAuction(recipientEmail, "경매 입찰", productName + "경매에 입찰하였습니다.");
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();

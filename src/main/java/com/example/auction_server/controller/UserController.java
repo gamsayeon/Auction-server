@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RequestMapping("/users")
 @RestController
 @Log4j2
@@ -68,9 +70,11 @@ public class UserController {
     public ResponseEntity<CommonResponse<String>> sendEmail(Long id, HttpServletRequest request) {
         logger.debug("인증 이메일을 재전송 합니다.");
         UserDTO resultUserDTO = userService.selectUser(id);
-        emailService.sendToUser(resultUserDTO.getUserId(), resultUserDTO.getEmail());
-        CommonResponse<String> response = new CommonResponse<>("SUCCESS", "이메일 재전송에 성공했습니다.",
-                request.getRequestURI(), resultUserDTO.getEmail() + "Email을 확인해주세요");
+        String token = UUID.randomUUID().toString();
+        emailService.putCacheToken(token, resultUserDTO.getUserId());
+        emailService.sendTokenToUser(token, resultUserDTO.getEmail());
+        CommonResponse<String> response = new CommonResponse<>("SUCCESS", "이메일 전송에 성공했습니다.",
+                request.getRequestURI(), resultUserDTO.getEmail() + " Email을 확인해주세요");
         return ResponseEntity.ok(response);
     }
 

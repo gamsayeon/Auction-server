@@ -76,10 +76,9 @@ public class UserServiceImpl implements UserService {
             logger.warn("해당 유저를 찾을수 없습니다.");
             throw new NotMatchingException("USER_6", userId);
         } else {
-            UserDTO resultUserDTO = userMapper.convertToDTO(optionalUser.get());
-            resultUserDTO.setUserType(UserType.USER);
-            User user = userMapper.convertToEntity(resultUserDTO);
-            User resultUser = userRepository.save(user);
+            optionalUser.get().setUserType(UserType.USER);
+            User resultUser = userRepository.save(optionalUser.get());
+            UserDTO resultUserDTO = userMapper.convertToDTO(resultUser);
             if (resultUser != null) {
                 logger.info("인증되었습니다.");
                 return resultUserDTO;
