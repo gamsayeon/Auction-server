@@ -8,6 +8,7 @@ import com.example.auction_server.mapper.ProductImageMapper;
 import com.example.auction_server.mapper.ProductMapper;
 import com.example.auction_server.model.Product;
 import com.example.auction_server.model.ProductImage;
+import com.example.auction_server.repository.BidRepository;
 import com.example.auction_server.repository.CategoryRepository;
 import com.example.auction_server.repository.ProductImageRepository;
 import com.example.auction_server.repository.ProductRepository;
@@ -33,6 +34,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
     private final ProductImageMapper productImageMapper;
+    private final BidRepository bidRepository;
     private static final Logger logger = LogManager.getLogger(ProductServiceImpl.class);
 
     @Override
@@ -256,6 +258,18 @@ public class ProductServiceImpl implements ProductService {
         switch (sortOrder) {
             //TODO : 입찰 기능 개발 후에 추가
             case BIDDER_COUNT_DESC:             //입찰자가 많은 순
+                Collections.sort(products, (p1, p2) -> {
+                    Long productId1 = p1.getProductId();
+                    Long productId2 = p2.getProductId();
+
+                    if (bidRepository.countByProductId(productId1) > bidRepository.countByProductId(productId2)) {
+                        return -1; // p1이 p2보다 작으면 음수 값 반환
+                    } else if (bidRepository.countByProductId(productId1) < bidRepository.countByProductId(productId2)) {
+                        return 1; // p1이 p2보다 크면 양수 값 반환
+                    } else {
+                        return 0; // p1과 p2가 같으면 0 반환
+                    }
+                });
                 break;
             case HIGHEST_PRICE_DESC:     // 최고 즉시 구매가 순
                 Collections.sort(products, (p1, p2) -> {
@@ -283,12 +297,49 @@ public class ProductServiceImpl implements ProductService {
                     }
                 });
                 break;
-            //TODO : 입찰 기능 개발 후에 추가
             case PRICE_DESC:             //최고 입찰가 순
-                break;
+                Collections.sort(products, (p1, p2) -> {
+                    Long productId1 = p1.getProductId();
+                    Long productId2 = p2.getProductId();
 
-            //TODO : 입찰 기능 개발 후에 추가
+                    Integer maxPriceProductId1 = bidRepository.findMaxPriceByProductId(productId1);
+                    Integer maxPriceProductId2 = bidRepository.findMaxPriceByProductId(productId2);
+
+                    if (maxPriceProductId1 == null)
+                        maxPriceProductId1 = productRepository.findByProductId(productId1).getStartPrice();
+                    if (maxPriceProductId2 == null)
+                        maxPriceProductId2 = productRepository.findByProductId(productId2).getStartPrice();
+
+                    if (maxPriceProductId1 > maxPriceProductId2) {
+                        return -1; // p1이 p2보다 작으면 음수 값 반환
+                    } else if (maxPriceProductId1 < maxPriceProductId2) {
+                        return 1; // p1이 p2보다 크면 양수 값 반환
+                    } else {
+                        return 0; // p1과 p2가 같으면 0 반환
+                    }
+                });
+                break;
             case PRICE_ASC:             //최저 입찰가 순
+                Collections.sort(products, (p1, p2) -> {
+                    Long productId1 = p1.getProductId();
+                    Long productId2 = p2.getProductId();
+
+                    Integer maxPriceProductId1 = bidRepository.findMaxPriceByProductId(productId1);
+                    Integer maxPriceProductId2 = bidRepository.findMaxPriceByProductId(productId2);
+
+                    if (maxPriceProductId1 == null)
+                        maxPriceProductId1 = productRepository.findByProductId(productId1).getStartPrice();
+                    if (maxPriceProductId2 == null)
+                        maxPriceProductId2 = productRepository.findByProductId(productId2).getStartPrice();
+
+                    if (maxPriceProductId1 < maxPriceProductId2) {
+                        return -1; // p1이 p2보다 작으면 음수 값 반환
+                    } else if (maxPriceProductId1 > maxPriceProductId2) {
+                        return 1; // p1이 p2보다 크면 양수 값 반환
+                    } else {
+                        return 0; // p1과 p2가 같으면 0 반환
+                    }
+                });
                 break;
             case NEWEST_FIRST:                  //등록일 최신 순
                 Collections.sort(products, (p1, p2) -> {

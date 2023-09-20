@@ -50,7 +50,10 @@ public class ExceptionMessage {
         exceptionMessages.put("PRODUCT_IMAGE_2", "이미지 삭제에 실패했습니다.");
         //ProductComment
         exceptionMessages.put("PRODUCT_COMMENT_1", "댓글을 등록하지 못했습니다.");
-
+        //Bid
+        exceptionMessages.put("BID_1", "입력값을 잘못입력했습니다.");
+        exceptionMessages.put("BID_2", "입찰이 되지 않았습니다.");
+        exceptionMessages.put("BID_3", "경매가 시작되지 않았습니다.");
     }
 
     public static String getExceptionMessage(String exceptionCode) {

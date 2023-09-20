@@ -28,8 +28,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
-    private final int UPDATE_SUCCESS = 1;
-
     /***
      * @Transactional
      * - 어노테이션을 사용하면 데이터베이스 작업들이 하나의 트랜잭션으로 묶이게 됩니다.
