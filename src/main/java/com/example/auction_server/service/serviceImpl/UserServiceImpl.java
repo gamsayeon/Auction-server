@@ -12,6 +12,7 @@ import com.example.auction_server.repository.UserRepository;
 import com.example.auction_server.service.UserService;
 import com.example.auction_server.util.SessionUtil;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -21,17 +22,13 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
     private final int UPDATE_SUCCESS = 1;
-
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
 
     /***
      * @Transactional

@@ -1,6 +1,7 @@
 package com.example.auction_server.service;
 
 import com.example.auction_server.dto.ProductDTO;
+import com.example.auction_server.enums.ProductSortOrder;
 
 import java.util.List;
 
@@ -17,4 +18,5 @@ public interface ProductService {
 
     void updateProductStatus();
 
+    List<ProductDTO> findByKeyword(String productName, Long saleUserId, Long categoryId, String explanation, ProductSortOrder sortOrder);
 }

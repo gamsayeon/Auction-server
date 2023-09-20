@@ -3,10 +3,12 @@ package com.example.auction_server.mapper;
 import com.example.auction_server.dto.UserDTO;
 import com.example.auction_server.model.User;
 import com.example.auction_server.util.Sha256Encrypt;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UserMapper {
     /***
      * ModelMapper는 자바 객체 간의 매핑을 간편하게 수행하기 위한 라이브러리
@@ -14,11 +16,6 @@ public class UserMapper {
      * - 복잡한 매핑 규칙을 간단하게 설정하여 개발 생산성을 높일수 있습니다.
      */
     private final ModelMapper modelMapper;
-
-    public UserMapper(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
-
     /***
      * Entity <-> DTO 를 하는 이유
      *

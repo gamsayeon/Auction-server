@@ -3,6 +3,7 @@ package com.example.auction_server.mapper;
 import com.example.auction_server.dto.ProductDTO;
 import com.example.auction_server.dto.ProductImageDTO;
 import com.example.auction_server.model.ProductImage;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -10,13 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ProductImageMapper {
     private final ModelMapper modelMapper;
-
-    public ProductImageMapper(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
-
 
     public List<ProductImage> convertToEntity(ProductDTO productDTO) {
         List<ProductImage> productImages = new ArrayList<>();

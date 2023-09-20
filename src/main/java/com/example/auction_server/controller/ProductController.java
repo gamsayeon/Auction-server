@@ -1,11 +1,15 @@
 package com.example.auction_server.controller;
 
 import com.example.auction_server.aop.LoginCheck;
+import com.example.auction_server.dto.ProductCommentDTO;
 import com.example.auction_server.dto.ProductDTO;
+import com.example.auction_server.enums.ProductSortOrder;
 import com.example.auction_server.model.CommonResponse;
+import com.example.auction_server.service.serviceImpl.ProductCommentServiceImpl;
 import com.example.auction_server.service.serviceImpl.ProductServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +20,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
 
     private final Logger logger = LogManager.getLogger(ProductController.class);
-
     private final ProductServiceImpl productService;
-
-    public ProductController(ProductServiceImpl productService) {
-        this.productService = productService;
-    }
+    private final ProductCommentServiceImpl productCommentService;
 
     @PostMapping
     @LoginCheck(types = {LoginCheck.LoginType.USER})
@@ -80,6 +81,30 @@ public class ProductController {
     public void updateProductAuctionStatus() {
         logger.debug("경매상태값을 수정합니다.");
         productService.updateProductStatus();
+    }
+
+    @PostMapping("/comments/{productId}")
+    @LoginCheck(types = {LoginCheck.LoginType.USER})
+    public ResponseEntity<CommonResponse<ProductCommentDTO>> registerProductComment(Long loginId, @PathVariable("productId") Long productId,
+                                                                                    @RequestBody @Valid ProductCommentDTO productCommentDTO,
+                                                                                    HttpServletRequest request) {
+        logger.info("상품 댓글을 등록합니다.");
+        CommonResponse<ProductCommentDTO> response = new CommonResponse<>("SUCCESS", "상품에 댓글을 추가했습니다.",
+                request.getRequestURI(), productCommentService.registerProduct(loginId, productId, productCommentDTO));
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<CommonResponse<List<ProductDTO>>> registerUser(@RequestParam(value = "productName", required = false) String productName,
+                                                                         @RequestParam(value = "saleUserId", required = false) Long saleUserId,
+                                                                         @RequestParam(value = "categoryId", required = false) Long categoryId,
+                                                                         @RequestParam(value = "explanation", required = false) String explanation,
+                                                                         @RequestParam(value = "sortOrder", defaultValue = "BIDDER_COUNT_DESC", required = false) ProductSortOrder sortOrder,
+                                                                         HttpServletRequest request) {
+        logger.debug("상품을 검색합니다.");
+        CommonResponse<List<ProductDTO>> response = new CommonResponse<>("SUCCESS", "상품검색에 성공했습니다.",
+                request.getRequestURI(), productService.findByKeyword(productName, saleUserId, categoryId, explanation, sortOrder));
+        return ResponseEntity.ok(response);
     }
 
 }
