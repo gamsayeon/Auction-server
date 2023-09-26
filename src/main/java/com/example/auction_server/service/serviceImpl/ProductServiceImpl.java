@@ -280,7 +280,7 @@ public class ProductServiceImpl implements ProductService {
         for (Product product : products) {
             productDTOs.add(productMapper.convertToDTO(product));
         }
-        int totalItems = productRepository.countBySearchProducts(productName, saleId, categoryId, explanation);
+        int totalItems = products.size();
         int totalPages = totalItems / pageSize;
         if (totalItems % pageSize != 0) {
             totalPages++;

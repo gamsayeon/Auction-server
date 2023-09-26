@@ -36,11 +36,11 @@ public class EmailServiceImpl implements EmailService {
         String htmlContent = "<html><body>" +
                 "<h1>Amazon SES Test (HTML)</h1>" +
                 "<p>This email contains a clickable link:</p>" +
-                "<a href='"+ url + token +"'>Click here to visit Example.com</a>" +
+                "<a href='" + url + token + "'>Click here to visit Example.com</a>" +
                 "</body></html>";
 
         Content bodyContent = new Content().withData(htmlContent);
-        Body body = new Body().withText(bodyContent);
+        Body body = new Body().withHtml(bodyContent);
         Message emailMessage = new Message().withSubject(subjectContent).withBody(body);
 
         SendEmailRequest request = new SendEmailRequest()
@@ -49,9 +49,9 @@ public class EmailServiceImpl implements EmailService {
                 .withSource("aud4551@naver.com"); // 발신자 이메일 주소
 
         SendEmailResult sendEmailResult = amazonSimpleEmailService.sendEmail(request);
-        if(sendEmailResult.getSdkHttpMetadata().getHttpStatusCode() == 200) {
+        if (sendEmailResult.getSdkHttpMetadata().getHttpStatusCode() == 200) {
             logger.info("[AWS SES] 메일전송완료");
-        }else {
+        } else {
             logger.warn("email 전송 실패");
             throw new EmailSendException("EMAIL_1");
         }
@@ -62,7 +62,7 @@ public class EmailServiceImpl implements EmailService {
         Destination destination = new Destination().withToAddresses(recipientEmail);
         Content subjectContent = new Content().withData(subject);
         Content textBodyContent = new Content().withData(message);
-        Body body = new Body().withText(textBodyContent);
+        Body body = new Body().withHtml(textBodyContent);
         Message emailMessage = new Message().withSubject(subjectContent).withBody(body);
 
         SendEmailRequest request = new SendEmailRequest()
@@ -71,9 +71,9 @@ public class EmailServiceImpl implements EmailService {
                 .withSource("aud4551@naver.com"); // 발신자 이메일 주소
 
         SendEmailResult sendEmailResult = amazonSimpleEmailService.sendEmail(request);
-        if(sendEmailResult.getSdkHttpMetadata().getHttpStatusCode() == 200) {
+        if (sendEmailResult.getSdkHttpMetadata().getHttpStatusCode() == 200) {
             logger.info("[AWS SES] 메일전송완료");
-        }else {
+        } else {
             logger.warn("email 전송 실패");
             throw new EmailSendException("EMAIL_1");
         }

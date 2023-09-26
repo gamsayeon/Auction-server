@@ -67,14 +67,4 @@ public class ProductSearchRepositoryImpl implements ProductSearchRepository {
         return whereClause;
     }
 
-    @Override
-    public int countBySearchProducts(String productName, Long saleId, Long categoryId, String explanation) {
-        JPAQuery<Product> query = new JPAQuery<>(entityManager);
-
-        QProduct product = QProduct.product;
-
-        BooleanExpression whereClause = this.searchWhereClause(productName, saleId, categoryId, explanation);
-
-        return query.select(product.count()).from(product).where(whereClause).fetchFirst().intValue();
-    }
 }
