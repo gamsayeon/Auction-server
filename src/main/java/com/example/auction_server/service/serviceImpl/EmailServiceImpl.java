@@ -3,7 +3,7 @@ package com.example.auction_server.service.serviceImpl;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
 import com.example.auction_server.exception.CacheTTLOutException;
-import com.example.auction_server.exception.EmailSendException;
+import com.example.auction_server.exception.EmailSendFailedException;
 import com.example.auction_server.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -53,7 +53,7 @@ public class EmailServiceImpl implements EmailService {
             logger.info("[AWS SES] 메일전송완료");
         } else {
             logger.warn("email 전송 실패");
-            throw new EmailSendException("EMAIL_1");
+            throw new EmailSendFailedException("EMAIL_SEND_FAILED");
         }
     }
 
@@ -75,7 +75,7 @@ public class EmailServiceImpl implements EmailService {
             logger.info("[AWS SES] 메일전송완료");
         } else {
             logger.warn("email 전송 실패");
-            throw new EmailSendException("EMAIL_1");
+            throw new EmailSendFailedException("EMAIL_SEND_FAILED");
         }
     }
 
@@ -86,7 +86,7 @@ public class EmailServiceImpl implements EmailService {
             return cachedUserId;
         } else {
             logger.warn("만료시간이 지나 다시시도해주세요");
-            throw new CacheTTLOutException("EMAIL_2");
+            throw new CacheTTLOutException("EMAIL_CACHE_TTL_OUT");
         }
     }
 

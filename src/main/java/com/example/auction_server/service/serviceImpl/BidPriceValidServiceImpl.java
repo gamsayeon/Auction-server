@@ -1,6 +1,6 @@
 package com.example.auction_server.service.serviceImpl;
 
-import com.example.auction_server.exception.InputSettingException;
+import com.example.auction_server.exception.InputMismatchException;
 import com.example.auction_server.model.Category;
 import com.example.auction_server.model.Product;
 import com.example.auction_server.repository.BidRepository;
@@ -38,20 +38,20 @@ public class BidPriceValidServiceImpl implements BidPriceValidService {
                 return;
             } else if (startPrice > price) {
                 logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
-                throw new InputSettingException("BID_1", price);
+                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
             } else if (price - startPrice < minBidPriceUnit) {
                 logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
-                throw new InputSettingException("BID_1", price);
+                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
             }
         } else {
             if (price - currentPrice > minBidPriceUnit) {
                 return;
             } else if (currentPrice >= price) {
                 logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
-                throw new InputSettingException("BID_1", price);
+                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
             } else if (currentPrice + minBidPriceUnit > price) {
                 logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
-                throw new InputSettingException("BID_1", price);
+                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
             }
         }
     }

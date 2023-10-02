@@ -1,9 +1,8 @@
 package com.example.auction_server.repository;
 
 import com.example.auction_server.model.User;
+import com.example.auction_server.projection.UserProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -28,6 +27,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUserId(String userId);
 
-    @Query("SELECT u.email FROM user u WHERE u.id = :id")
-    String findEmailById(@Param("id") Long id);
+    UserProjection findUserProjectionById(Long id);
 }

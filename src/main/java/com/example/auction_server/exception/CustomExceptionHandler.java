@@ -37,8 +37,8 @@ public class CustomExceptionHandler {
         return ResponseEntity.badRequest().body(commonResponse);
     }
 
-    @ExceptionHandler(value = {DuplicateException.class, AddException.class, NotMatchingException.class,
-            InputSettingException.class, UpdateException.class})
+    @ExceptionHandler(value = {DuplicateException.class, AddFailedException.class, NotMatchingException.class,
+            InputMismatchException.class, UpdateFailedException.class})
     @ResponseBody
     public ResponseEntity<Object> handleAuctionCommonException(AuctionCommonException ex, HttpServletRequest request) {
         String exceptionCode = ex.getMessage();

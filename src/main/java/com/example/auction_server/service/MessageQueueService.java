@@ -1,8 +1,9 @@
 package com.example.auction_server.service;
 
-import com.example.auction_server.exception.AddException;
+import com.example.auction_server.exception.AddFailedException;
 import com.example.auction_server.model.Bid;
 import com.example.auction_server.model.Product;
+import com.example.auction_server.projection.UserProjection;
 import com.example.auction_server.repository.BidRepository;
 import com.example.auction_server.repository.ProductRepository;
 import com.example.auction_server.repository.UserRepository;
@@ -62,14 +63,14 @@ public class MessageQueueService {
             Bid resultBid = bidRepository.save(deserializedBid);
             if (resultBid == null) {
                 logger.warn("입찰이 되지 않았습니다.");
-                throw new AddException("BID_2", deserializedBid);
+                throw new AddFailedException("BID_ADD_FAILED", deserializedBid);
             } else {
                 logger.info("정상적으로 입찰 되었습니다.");
-                String recipientEmail = userRepository.findEmailById(resultBid.getBuyerId());
+                UserProjection recipientEmail = userRepository.findEmailById(resultBid.getBuyerId());
                 Product product = productRepository.findByProductId(resultBid.getProductId());
-                emailService.notifyAuction(recipientEmail, "경매 입찰", product.getProductName() + "경매에 입찰하였습니다.");
+                emailService.notifyAuction(recipientEmail.getEmail(), "경매 입찰", product.getProductName() + "경매에 입찰하였습니다.");
                 recipientEmail = userRepository.findEmailById(product.getSaleId());
-                emailService.notifyAuction(recipientEmail, "경매 입찰", product.getProductName() + "경매에 입찰하였습니다.");
+                emailService.notifyAuction(recipientEmail.getEmail(), "경매 입찰", product.getProductName() + "경매에 입찰하였습니다.");
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();

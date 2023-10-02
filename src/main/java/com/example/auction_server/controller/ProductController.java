@@ -27,7 +27,6 @@ import java.util.List;
 public class ProductController {
 
     private final Logger logger = LogManager.getLogger(ProductController.class);
-
     private final ProductServiceImpl productService;
     private final ProductCommentServiceImpl productCommentService;
 
