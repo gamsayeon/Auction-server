@@ -2,6 +2,7 @@ package com.example.auction_server.repository;
 
 import com.example.auction_server.model.ProductImage;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -10,8 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -19,39 +19,34 @@ import static org.junit.Assert.assertNotNull;
 class ProductImageRepositoryTest {
     @Autowired
     private ProductImageRepository productImageRepository;
-
-    private Long productId = 500L;
+    private Long TEST_PRODUCT_ID = 500L;
+    private int IMAGE_COUNT = 3;
 
     @BeforeEach
     public void generateTestProduct() {
-        ProductImage productImage = new ProductImage();
-        productImage.setProductId(productId);
-        productImage.setImagePath("testImagePath");
-        productImageRepository.save(productImage);
-
-        productImage = new ProductImage();
-        productImage.setProductId(productId);
-        productImage.setImagePath("testImagePath1");
-        productImageRepository.save(productImage);
-
-        productImage = new ProductImage();
-        productImage.setProductId(productId);
-        productImage.setImagePath("testImagePath2");
-        productImageRepository.save(productImage);
+        for (int i = 0; i < IMAGE_COUNT; i++) {
+            ProductImage productImage = new ProductImage();
+            productImage.setProductId(TEST_PRODUCT_ID);
+            productImage.setImagePath("testImagePath" + i);
+            productImageRepository.save(productImage);
+        }
     }
 
     @Test
+    @DisplayName("상품 식별자로 상품이미지 조회")
     void findByProductId() {
-        List<ProductImage> findProductImages = productImageRepository.findByProductId(productId);
+        List<ProductImage> findProductImages = productImageRepository.findByProductId(TEST_PRODUCT_ID);
+
         assertNotNull(findProductImages);
-        assertEquals(findProductImages.size(), 3);
+        assertEquals(IMAGE_COUNT, findProductImages.size());
     }
 
     @Test
+    @DisplayName("상품 식별자로 상품이미지 삭제")
     void deleteAllByProductId() {
-        int deleteProductImage = productImageRepository.deleteAllByProductId(productId);
-        assertNotNull(deleteProductImage);
-        assertEquals(deleteProductImage, 3);
-        assertEquals(productImageRepository.findAll().size(), 0);
+        int deleteProductImage = productImageRepository.deleteAllByProductId(TEST_PRODUCT_ID);
+
+        assertEquals(IMAGE_COUNT, deleteProductImage);
+        assertTrue(productImageRepository.findByProductId(TEST_PRODUCT_ID).isEmpty());
     }
 }

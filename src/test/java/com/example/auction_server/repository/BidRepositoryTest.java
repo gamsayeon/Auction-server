@@ -2,11 +2,11 @@ package com.example.auction_server.repository;
 
 import com.example.auction_server.model.Bid;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -15,46 +15,43 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class BidRepositoryTest {
     @Autowired
     private BidRepository bidRepository;
-
-    @Autowired
-    private TestEntityManager entityManager;
-
-    private Long buyerId = 500L;
-    private Long productId = 500L;
+    private Long TEST_BUYER_ID = 500L;
+    private Long TEST_PRODUCT_ID = 500L;
+    private int BID_COUNT = 2;
+    private int TEST_MAX_PRICE = 10000 * BID_COUNT;
 
     @BeforeEach
     public void generateTestBid() {
-        Bid bid = new Bid();
-        bid.setBuyerId(buyerId);
-        bid.setProductId(productId);
-        bid.setBidTime(LocalDateTime.now());
-        bid.setPrice(10000);
-        bidRepository.save(bid);
-
-        bid = new Bid();
-        bid.setBuyerId(buyerId);
-        bid.setProductId(productId);
-        bid.setBidTime(LocalDateTime.now());
-        bid.setPrice(20000);
-        bidRepository.save(bid);
+        for (int i = 1; i <= BID_COUNT; i++) {
+            Bid bid = new Bid();
+            bid.setBuyerId(TEST_BUYER_ID);
+            bid.setProductId(TEST_PRODUCT_ID);
+            bid.setBidTime(LocalDateTime.now());
+            bid.setPrice(10000 * i);
+            bidRepository.save(bid);
+        }
     }
 
     @Test
+    @DisplayName("상품의 입찰 최댓값 조회")
     void findMaxPriceByProductId() {
-        Integer findMaxBid = bidRepository.findMaxPriceByProductId(buyerId);
+        Integer findMaxBid = bidRepository.findMaxPriceByProductId(TEST_BUYER_ID);
+
         assertNotNull(findMaxBid);
-        assertEquals(20000, findMaxBid);
+        assertEquals(TEST_MAX_PRICE, findMaxBid);
     }
 
     @Test
+    @DisplayName("상품의 입찰 갯수 조회")
     void countByProductId() {
-        Long findCountBid = bidRepository.countByProductId(productId);
+        Long findCountBid = bidRepository.countByProductId(TEST_PRODUCT_ID);
+
         assertNotNull(findCountBid);
-        assertEquals(2, findCountBid);
+        assertEquals(BID_COUNT, findCountBid);
     }
 }

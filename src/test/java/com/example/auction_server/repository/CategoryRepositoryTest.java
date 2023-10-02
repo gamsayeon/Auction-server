@@ -1,6 +1,8 @@
 package com.example.auction_server.repository;
 
 import com.example.auction_server.model.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -9,8 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -18,59 +19,52 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class CategoryRepositoryTest {
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private CategoryRepository categoryRepository;
+    private String TEST_CATEGORY_NAME = "testCategoryName";
+    private int DELETE_SUCCESS = 1;
+    private Long SAVED_CATEGORY_ID;
 
-    public Category generateTestCategory() {
+    @BeforeEach
+    public void generateTestCategory() {
         Category category = new Category();
-        category.setCategoryName("testCategoryName");
+        category.setCategoryName(TEST_CATEGORY_NAME);
         category.setBidMinPrice(1000);
-        return category;
+
+        SAVED_CATEGORY_ID = categoryRepository.save(category).getCategoryId();
     }
 
     @Test
+    @DisplayName("카테고리 식별자로 카테고리 조회")
     void findByCategoryId() {
-        Category category = this.generateTestCategory();
-        Category savedCategory = categoryRepository.save(category);
-
-        Optional<Category> findCategory = categoryRepository.findByCategoryId(savedCategory.getCategoryId());
+        Optional<Category> findCategory = categoryRepository.findByCategoryId(SAVED_CATEGORY_ID);
 
         assertNotNull(findCategory);
-        assertEquals(findCategory.get().getCategoryName(), category.getCategoryName());
+        assertEquals(TEST_CATEGORY_NAME, findCategory.get().getCategoryName());
     }
 
     @Test
+    @DisplayName("카테고리 식별자로 카테고리 삭제")
     void deleteByCategoryId() {
-        Category category = this.generateTestCategory();
-        Category savedCategory = categoryRepository.save(category);
+        int deleteCategory = categoryRepository.deleteByCategoryId(SAVED_CATEGORY_ID);
 
-        int deleteCategory = categoryRepository.deleteByCategoryId(savedCategory.getCategoryId());
-
-        assertNotNull(deleteCategory);
-        assertEquals(categoryRepository.findAll().size(), 0);
-        assertEquals(deleteCategory, 1);
+        assertTrue(categoryRepository.findByCategoryId(SAVED_CATEGORY_ID).isEmpty());
+        assertEquals(DELETE_SUCCESS, deleteCategory);
     }
 
     @Test
+    @DisplayName("카테고리명 중복 검사")
     void existsByCategoryName() {
-        Category category = this.generateTestCategory();
-        categoryRepository.save(category);
+        Boolean existsCategoryName = categoryRepository.existsByCategoryName(TEST_CATEGORY_NAME);
 
-        Boolean existsCategoryName = categoryRepository.existsByCategoryName(category.getCategoryName());
-
-        assertNotNull(existsCategoryName);
-        assertEquals(existsCategoryName, true);
+        assertEquals(true, existsCategoryName);
     }
 
     @Test
+    @DisplayName("유효한 카테고리 식별자 확인")
     void existsByCategoryId() {
-        Category category = this.generateTestCategory();
-        Category savedCategory = categoryRepository.save(category);
+        Boolean existsCategoryId = categoryRepository.existsByCategoryId(SAVED_CATEGORY_ID);
 
-        Boolean existsCategoryId = categoryRepository.existsByCategoryId(savedCategory.getCategoryId());
-
-        assertNotNull(existsCategoryId);
-        assertEquals(existsCategoryId, true);
+        assertEquals(true, existsCategoryId);
     }
 }
