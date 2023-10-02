@@ -2,10 +2,10 @@ package com.example.auction_server.service.serviceImpl;
 
 import com.example.auction_server.dto.CategoryDTO;
 import com.example.auction_server.dto.CategoryUpdateDTO;
-import com.example.auction_server.exception.AddException;
-import com.example.auction_server.exception.DeleteException;
-import com.example.auction_server.exception.InputSettingException;
+import com.example.auction_server.exception.AddFailedException;
+import com.example.auction_server.exception.DeleteFailedException;
 import com.example.auction_server.exception.NotMatchingException;
+import com.example.auction_server.exception.UpdateFailedException;
 import com.example.auction_server.mapper.CategoryMapper;
 import com.example.auction_server.model.Category;
 import com.example.auction_server.repository.CategoryRepository;
@@ -30,11 +30,6 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDTO registerCategory(CategoryDTO categoryDTO) {
         Category category = categoryMapper.convertToEntity(categoryDTO);
 
-        if (category.getBidMinPrice() >= category.getBidMaxPrice()) {
-            logger.warn("금액을 잘못설정했습니다.");
-            throw new InputSettingException("CATEGORY_6", categoryDTO);
-        }
-
         Category resultCategory = categoryRepository.save(category);
         if (resultCategory != null) {
             CategoryDTO resultCategoryDTO = categoryMapper.convertToDTO(resultCategory);
@@ -43,11 +38,11 @@ public class CategoryServiceImpl implements CategoryService {
                 return resultCategoryDTO;
             } else {
                 logger.warn("매핑에 실패했습니다.");
-                throw new AddException("COMMON_1", categoryDTO);
+                throw new NotMatchingException("COMMON_NOT_MATCHING_MAPPER", categoryDTO);
             }
         } else {
             logger.warn("category 등록 오류. 재시도 해주세요.");
-            throw new AddException("CATEGORY_2", categoryDTO);
+            throw new AddFailedException("CATEGORY_ADD_FAILED", categoryDTO);
         }
     }
 
@@ -58,17 +53,13 @@ public class CategoryServiceImpl implements CategoryService {
         Optional<Category> optionalCategory = categoryRepository.findByCategoryId(categoryId);
         if (optionalCategory.isEmpty()) {
             logger.warn("해당하는 카테고리는 찾지 못했습니다.");
-            throw new NotMatchingException("CATEGORY_4", categoryId);
+            throw new NotMatchingException("CATEGORY_NOT_MATCH_ID", categoryId);
         } else {
-            if (category.getBidMinPrice() >= category.getBidMaxPrice()) {
-                logger.warn("금액을 잘못설정했습니다.");
-                throw new InputSettingException("CATEGORY_6", categoryDTO);
-            }
             category.setCategoryId(optionalCategory.get().getCategoryId());
             Category resultCategory = categoryRepository.save(category);
             if (resultCategory == null) {
                 logger.warn("카테고리를 수정하지 못했습니다.");
-                throw new AddException("CATEGORY_3", categoryDTO);
+                throw new UpdateFailedException("CATEGORY_UPDATE_FAILED", categoryDTO);
             } else {
                 CategoryDTO resultCategoryDTO = categoryMapper.convertToDTO(resultCategory);
                 logger.info(resultCategoryDTO.getCategoryName() + "을 카테고리 수정에 성공했습니다.");
@@ -82,7 +73,7 @@ public class CategoryServiceImpl implements CategoryService {
         Optional<Category> optionalCategory = categoryRepository.findByCategoryId(categoryId);
         if (optionalCategory.isEmpty()) {
             logger.warn("해당하는 카테고리는 찾지 못했습니다.");
-            throw new NotMatchingException("CATEGORY_4", categoryId);
+            throw new NotMatchingException("CATEGORY_NOT_MATCH_ID", categoryId);
         } else {
             CategoryDTO resultCategoryDTO = categoryMapper.convertToDTO(optionalCategory.get());
             logger.info("카테고리 조회에 성공했습니다.");
@@ -99,8 +90,8 @@ public class CategoryServiceImpl implements CategoryService {
             logger.info(categoryName + "을 카테고리 삭제에 성공했습니다.");
             return categoryName;
         } else {
-            logger.warn("category 실패 오류. 재시도 해주세요.");
-            throw new DeleteException("COMMON_4", categoryId);
+            logger.warn("category 삭제 실패 오류. 재시도 해주세요.");
+            throw new DeleteFailedException("CATEGORY_DELETE_FAILED", categoryId);
         }
     }
 

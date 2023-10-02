@@ -18,8 +18,8 @@ public class Bid {
     @Column(name = "bid_id")
     private Long bidId;
 
-    @Column(name = "buyer_user_id")
-    private Long buyerUserId;
+    @Column(name = "buyer_id")
+    private Long buyerId;
 
     @Column(name = "productId")
     private Long productId;
