@@ -10,6 +10,7 @@ import com.example.auction_server.mapper.ProductImageMapper;
 import com.example.auction_server.mapper.ProductMapper;
 import com.example.auction_server.model.Product;
 import com.example.auction_server.model.ProductImage;
+import com.example.auction_server.projection.UserProjection;
 import com.example.auction_server.repository.*;
 import com.example.auction_server.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -211,8 +212,8 @@ public class ProductServiceImpl implements ProductService {
                     throw new UpdateException("PRODUCT_5", product.getProductId());
                 } else {
                     logger.info("경매 상태를 AUCTION_PROCEEDING 로 성공적으로 바꿨습니다.");
-                    String recipientEmail = userRepository.findEmailById(resultProduct.getSaleId());
-                    emailService.notifyAuction(recipientEmail, "경매 시작",
+                    UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
+                    emailService.notifyAuction(recipientEmail.getEmail(), "경매 시작",
                             resultProduct.getProductName() + "의 경매가 시작되었습니다.");
                 }
             }
@@ -227,8 +228,8 @@ public class ProductServiceImpl implements ProductService {
                     throw new UpdateException("PRODUCT_5", product.getProductId());
                 } else {
                     logger.info("경매 상태를 AUCTION_END 로 성공적으로 바꿨습니다.");
-                    String recipientEmail = userRepository.findEmailById(resultProduct.getSaleId());
-                    emailService.notifyAuction(recipientEmail, "경매 종료",
+                    UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
+                    emailService.notifyAuction(recipientEmail.getEmail(), "경매 종료",
                             resultProduct.getProductName() + "의 경매가 종료되었습니다.");
                 }
             }

@@ -48,8 +48,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     // AWS SES
     implementation 'com.amazonaws:aws-java-sdk-ses:1.12.133'
-    // AWS SNS
-    implementation 'com.amazonaws:aws-java-sdk-sns:1.12.133'
 }
 def querydslDir = "src/main/generated"
 

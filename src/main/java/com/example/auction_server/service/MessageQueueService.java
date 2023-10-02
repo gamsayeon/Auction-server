@@ -2,7 +2,7 @@ package com.example.auction_server.service;
 
 import com.example.auction_server.exception.AddException;
 import com.example.auction_server.model.Bid;
-import com.example.auction_server.model.User;
+import com.example.auction_server.projection.UserProjection;
 import com.example.auction_server.repository.BidRepository;
 import com.example.auction_server.repository.ProductRepository;
 import com.example.auction_server.repository.UserRepository;
@@ -65,9 +65,9 @@ public class MessageQueueService {
                 throw new AddException("BID_2", deserializedBid);
             } else {
                 logger.info("정상적으로 입찰 되었습니다.");
-                String recipientEmail = userRepository.findEmailById(resultBid.getBuyerId());
+                UserProjection recipientEmail = userRepository.findUserProjectionById(resultBid.getBuyerId());
                 String productName = productRepository.findProductNameByProductId(resultBid.getProductId());
-                emailService.notifyAuction(recipientEmail, "경매 입찰", productName + "경매에 입찰하였습니다.");
+                emailService.notifyAuction(recipientEmail.getEmail(), "경매 입찰", productName + "경매에 입찰하였습니다.");
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
