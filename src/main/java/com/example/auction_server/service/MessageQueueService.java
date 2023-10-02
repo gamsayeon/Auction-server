@@ -1,6 +1,6 @@
 package com.example.auction_server.service;
 
-import com.example.auction_server.exception.AddException;
+import com.example.auction_server.exception.AddFailedException;
 import com.example.auction_server.model.Bid;
 import com.example.auction_server.projection.UserProjection;
 import com.example.auction_server.repository.BidRepository;
@@ -62,7 +62,7 @@ public class MessageQueueService {
             Bid resultBid = bidRepository.save(deserializedBid);
             if (resultBid == null) {
                 logger.warn("입찰이 되지 않았습니다.");
-                throw new AddException("BID_2", deserializedBid);
+                throw new AddFailedException("BID_ADD_FAILED", deserializedBid);
             } else {
                 logger.info("정상적으로 입찰 되었습니다.");
                 UserProjection recipientEmail = userRepository.findUserProjectionById(resultBid.getBuyerId());

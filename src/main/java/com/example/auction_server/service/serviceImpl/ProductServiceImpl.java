@@ -60,14 +60,14 @@ public class ProductServiceImpl implements ProductService {
                             this.registerProductImage(productDTO, resultProduct.getProductId());
                     resultProductDTO.setImageDTOS(resultProductImages);
                 }
-            } catch (AddException e) {
+            } catch (AddFailedException e) {
                 logger.warn("이미지 등록에 실패 했습니다.");
             }
             logger.info("상품을 정상적으로 등록했습니다.");
             return resultProductDTO;
         } else {
             logger.warn("상품등록에 실패했습니다. 다시시도해주세요.");
-            throw new AddException("PRODUCT_1", product);
+            throw new AddFailedException("PRODUCT_ADD_FAILED", product);
         }
     }
 
@@ -82,11 +82,11 @@ public class ProductServiceImpl implements ProductService {
 
                 if (resultProductImage == null) {
                     logger.warn("이미지 등록에 실패 했습니다.");
-                    throw new AddException("PRODUCT_IMAGE_1", productImage);
+                    throw new AddFailedException("PRODUCT_IMAGE_ADD_FAILED", productImage);
                 } else resultProductImages.add(resultProductImage);
             } else {
                 logger.warn("이미지 등록에 실패 했습니다.");
-                throw new AddException("PRODUCT_IMAGE_1", productImage);
+                throw new AddFailedException("PRODUCT_IMAGE_ADD_FAILED", productImage);
             }
         }
         return productImageMapper.convertToDTO(resultProductImages);
@@ -95,21 +95,21 @@ public class ProductServiceImpl implements ProductService {
     public void validatorProduct(ProductDTO productDTO) {
         if (!categoryRepository.existsByCategoryId(productDTO.getCategoryId())) {
             logger.warn("해당 카테고리를 찾지 못했습니다.");
-            throw new NotMatchingException("CATEGORY_4", productDTO.getCategoryId());
+            throw new NotMatchingException("CATEGORY_NOT_MATCH_ID", productDTO.getCategoryId());
         }
 
         if (productDTO.getStartTime().compareTo(LocalDateTime.now()) < TIME_COMPARE) {  //경매 시작시간을 과거로 입력
             logger.warn("경매 시작시간을 과거 시간으로 잘못 입력하셨습니다. 다시 입력해주세요.");
-            throw new InputSettingException("PRODUCT_7", productDTO);
+            throw new InputMismatchException("PRODUCT_INPUT_MISMATCH_TIME", productDTO);
         } else if (productDTO.getEndTime().compareTo(LocalDateTime.now()) < TIME_COMPARE) { //경매 마감시간을 과거로 입력
             logger.warn("경매 마감시간을 과거 시간으로 잘못 입력하셨습니다. 다시 입력해주세요.");
-            throw new InputSettingException("PRODUCT_7", productDTO);
+            throw new InputMismatchException("PRODUCT_INPUT_MISMATCH_TIME", productDTO);
         } else if (productDTO.getStartTime().compareTo(productDTO.getEndTime()) > TIME_COMPARE) {   //경매 마감시간을 경매 시작시간보다 과거로 입력
             logger.warn("경매 시작시간을 잘못 입력하셨습니다. 다시 입력해주세요.");
-            throw new InputSettingException("PRODUCT_7", productDTO);
+            throw new InputMismatchException("PRODUCT_INPUT_MISMATCH_TIME", productDTO);
         } else if (productDTO.getStartPrice() >= productDTO.getHighestPrice()) {    // 경매 시작가가 즉시구매가보다 작거나 같을때
             logger.warn("경매 시작가가 즉시구매가와 같거나 큽니다. 다시 입력해주세요.");
-            throw new InputSettingException("PRODUCT_8", productDTO);
+            throw new InputMismatchException("PRODUCT_INPUT_MISMATCH_PRICE", productDTO);
         }
     }
 
@@ -135,7 +135,7 @@ public class ProductServiceImpl implements ProductService {
             }
         } else {
             logger.warn("해당 상품을 찾지 못했습니다.");
-            throw new NotMatchingException("CATEGORY_5", productId);
+            throw new NotMatchingException("CATEGORY_NOT_MATCH", productId);
         }
     }
 
@@ -158,7 +158,7 @@ public class ProductServiceImpl implements ProductService {
             return resultProductDTOs;
         } else {
             logger.warn("해당 상품을 찾지 못했습니다.");
-            throw new NotMatchingException("CATEGORY_5", saleId);
+            throw new NotMatchingException("CATEGORY_NOT_MATCH", saleId);
         }
     }
 
@@ -170,7 +170,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (resultProduct.getProductStatus() != ProductStatus.PRODUCT_REGISTRATION) {
             logger.warn("해당 상품은 경매가 시작되여 수정이 불가능합니다.");
-            throw new UpdateException("PRODUCT_2", resultProduct.getProductStatus());
+            throw new UpdateFailedException("PRODUCT_UPDATE_FAILED_BY_STATUS", resultProduct.getProductStatus());
         }
 
         if (resultProduct.getSaleId() == saleId) {
@@ -183,7 +183,7 @@ public class ProductServiceImpl implements ProductService {
             resultProduct = productRepository.save(resultProduct);
             if (resultProduct == null) {
                 logger.warn("상품을 수정하지 못했습니다.");
-                throw new UpdateException("PRODUCT_3", "retry");
+                throw new UpdateFailedException("PRODUCT_UPDATE_FAILED", "retry");
             }
 
             ProductDTO resultProductDTO = productMapper.convertToDTO(resultProduct);
@@ -195,7 +195,7 @@ public class ProductServiceImpl implements ProductService {
             return resultProductDTO;
         } else {
             logger.warn("권한이 없어 해당 상품을 수정하지 못합니다.");
-            throw new UserAccessDeniedException("PRODUCT_6", saleId);
+            throw new UserAccessDeniedException("PRODUCT_ACCESS_DENIED", saleId);
         }
     }
 
@@ -209,7 +209,7 @@ public class ProductServiceImpl implements ProductService {
                 Product resultProduct = productRepository.save(product);
                 if (resultProduct == null) {
                     logger.warn("경매 시작 상태로 수정하지 못했습니다.");
-                    throw new UpdateException("PRODUCT_5", product.getProductId());
+                    throw new UpdateFailedException("PRODUCT_UPDATE_FAILED_STATUS", product.getProductId());
                 } else {
                     logger.info("경매 상태를 AUCTION_PROCEEDING 로 성공적으로 바꿨습니다.");
                     UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
@@ -225,7 +225,7 @@ public class ProductServiceImpl implements ProductService {
                 Product resultProduct = productRepository.save(product);
                 if (resultProduct == null) {
                     logger.warn("경매 마감 상태로 수정하지 못했습니다.");
-                    throw new UpdateException("PRODUCT_5", product.getProductId());
+                    throw new UpdateFailedException("PRODUCT_UPDATE_FAILED_STATUS", product.getProductId());
                 } else {
                     logger.info("경매 상태를 AUCTION_END 로 성공적으로 바꿨습니다.");
                     UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
@@ -243,19 +243,19 @@ public class ProductServiceImpl implements ProductService {
 
         if (resultProduct.getProductStatus() != ProductStatus.PRODUCT_REGISTRATION) {
             logger.warn("해당 상품은 경매가 시작되여 삭제가 불가능합니다.");
-            throw new UpdateException("PRODUCT_2", resultProduct.getProductStatus());
+            throw new UpdateFailedException("PRODUCT_UPDATE_FAILED_BY_STATUS", resultProduct.getProductStatus());
         } else if (saleId == resultProduct.getSaleId()) {
             this.deleteProductImage(productId);
             int resultDelete = productRepository.deleteBySaleIdAndProductId(saleId, productId);
             if (resultDelete == DELETE_FAIL) {
                 logger.warn("상품을 삭제 하지 못했습니다.");
-                throw new DeleteException("COMMON_4", productId);
+                throw new DeleteFailedException("PRODUCT_DELETE_FAILED", productId);
             } else {
                 logger.info("상품을 삭제 했습니다.");
             }
         } else {
             logger.warn("권한이 없습니다.");
-            throw new UserAccessDeniedException("COMMON_3", saleId);
+            throw new UserAccessDeniedException("COMMON_ACCESS_DENIED", saleId);
         }
     }
 
@@ -264,7 +264,7 @@ public class ProductServiceImpl implements ProductService {
         if (!productImages.isEmpty()) {
             if (productImageRepository.deleteAllByProductId(productId) != productImages.size()) {
                 logger.warn("이미지를 삭제 하지 못했습니다.");
-                throw new DeleteException("PRODUCT_IMAGE_2", productId);
+                throw new DeleteFailedException("PRODUCT_IMAGE_DELETE_FAILED", productId);
             } else {
                 logger.info("이미지를 정상적으로 삭제했습니다.");
             }

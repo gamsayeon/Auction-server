@@ -1,7 +1,7 @@
 package com.example.auction_server.service.serviceImpl;
 
 import com.example.auction_server.dto.ProductCommentDTO;
-import com.example.auction_server.exception.AddException;
+import com.example.auction_server.exception.AddFailedException;
 import com.example.auction_server.mapper.ProductCommentMapper;
 import com.example.auction_server.model.ProductComment;
 import com.example.auction_server.repository.ProductCommentRepository;
@@ -36,7 +36,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
             return resultProductCommentDTO;
         } else {
             logger.warn("댓글을 등록하지 못했습니다.");
-            throw new AddException("PRODUCT_COMMENT_1", productCommentDTO);
+            throw new AddFailedException("PRODUCT_COMMENT_ADD_FAILED", productCommentDTO);
         }
     }
 }

@@ -32,7 +32,7 @@ public class BidServiceImpl implements BidService {
 
         if (product.getProductStatus() != ProductStatus.AUCTION_PROCEEDING) {
             logger.warn("경매가 시작되지 않았습니다.");
-            throw new BidFailedNotStartException("BID_3");
+            throw new BidFailedNotStartException("BID_FAILED_NOT_START");
         } else {
             Bid bid = Bid.builder()
                     .buyerId(buyerId)

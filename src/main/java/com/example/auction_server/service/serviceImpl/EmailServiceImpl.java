@@ -3,7 +3,7 @@ package com.example.auction_server.service.serviceImpl;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
 import com.example.auction_server.exception.CacheTTLOutException;
-import com.example.auction_server.exception.EmailSendException;
+import com.example.auction_server.exception.EmailSendFailedException;
 import com.example.auction_server.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -36,7 +36,7 @@ public class EmailServiceImpl implements EmailService {
         String htmlContent = "<html><body>" +
                 "<h1>Amazon SES Test (HTML)</h1>" +
                 "<p>This email contains a clickable link:</p>" +
-                "<a href='"+ url + token +"'>Click here to visit Example.com</a>" +
+                "<a href='" + url + token + "'>Click here to visit Example.com</a>" +
                 "</body></html>";
 
         Content bodyContent = new Content().withData(htmlContent);
@@ -49,11 +49,11 @@ public class EmailServiceImpl implements EmailService {
                 .withSource("aud4551@naver.com"); // 발신자 이메일 주소
 
         SendEmailResult sendEmailResult = amazonSimpleEmailService.sendEmail(request);
-        if(sendEmailResult.getSdkHttpMetadata().getHttpStatusCode() == 200) {
+        if (sendEmailResult.getSdkHttpMetadata().getHttpStatusCode() == 200) {
             logger.info("[AWS SES] 메일전송완료");
-        }else {
+        } else {
             logger.warn("email 전송 실패");
-            throw new EmailSendException("EMAIL_1");
+            throw new EmailSendFailedException("EMAIL_SEND_FAILED");
         }
     }
 
@@ -71,11 +71,11 @@ public class EmailServiceImpl implements EmailService {
                 .withSource("aud4551@naver.com"); // 발신자 이메일 주소
 
         SendEmailResult sendEmailResult = amazonSimpleEmailService.sendEmail(request);
-        if(sendEmailResult.getSdkHttpMetadata().getHttpStatusCode() == 200) {
+        if (sendEmailResult.getSdkHttpMetadata().getHttpStatusCode() == 200) {
             logger.info("[AWS SES] 메일전송완료");
-        }else {
+        } else {
             logger.warn("email 전송 실패");
-            throw new EmailSendException("EMAIL_1");
+            throw new EmailSendFailedException("EMAIL_SEND_FAILED");
         }
     }
 
@@ -86,7 +86,7 @@ public class EmailServiceImpl implements EmailService {
             return cachedUserId;
         } else {
             logger.warn("만료시간이 지나 다시시도해주세요");
-            throw new CacheTTLOutException("EMAIL_2");
+            throw new CacheTTLOutException("EMAIL_CACHE_TTL_OUT");
         }
     }
 
