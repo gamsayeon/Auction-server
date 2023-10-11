@@ -28,16 +28,7 @@ public class LoginCheckAspect {
         // 세션 객체 가져오기
         HttpSession session = request.getSession();
 
-        // 세션에서 값을 읽어옴
-        Long id = SessionUtil.getLoginId(session);
-
-        // 값이 없으면 로그인이 필요한 예외를 던짐
-        if (id == null) {
-            throw new LoginRequiredException("COMMON_LOGIN_REQUIRED");
-        }
-
         boolean isPresent = false;
-        String loginType = SessionUtil.getLoginUserType(session);
         Long id = null;
         for (int i = 0; i < loginCheck.types().length; i++) {
             switch (loginCheck.types()[i].toString()) {
@@ -60,7 +51,7 @@ public class LoginCheckAspect {
         // 값이 없으면 로그인이 필요한 예외를 던짐
         if (id == null) {
             logger.warn("권한 부족");
-            throw new UserAccessDeniedException("COMMON_ACCESS_DENIED", loginType);
+            throw new UserAccessDeniedException("COMMON_ACCESS_DENIED", "권한 부족");
         }
         Object[] args = joinPoint.getArgs();
         args[0] = id;

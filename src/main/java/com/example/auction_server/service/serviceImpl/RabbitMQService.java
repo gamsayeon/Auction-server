@@ -3,6 +3,7 @@ package com.example.auction_server.service.serviceImpl;
 import com.example.auction_server.exception.AddFailedException;
 import com.example.auction_server.model.Bid;
 import com.example.auction_server.model.Product;
+import com.example.auction_server.projection.UserProjection;
 import com.example.auction_server.repository.BidRepository;
 import com.example.auction_server.repository.ProductRepository;
 import com.example.auction_server.repository.UserRepository;
