@@ -95,8 +95,8 @@ public class CategoryServiceImpl implements CategoryService {
                 throw new DeleteFailedException("CATEGORY_DELETE_FAILED", categoryId);
             }
         } else {
-            logger.warn("category 삭제 실패 오류. 재시도 해주세요.");
-            throw new DeleteFailedException("CATEGORY_DELETE_FAILED", categoryId);
+            logger.warn("해당하는 카테고리는 찾지 못했습니다.");
+            throw new NotMatchingException("CATEGORY_NOT_MATCH_ID", categoryId);
         }
     }
 

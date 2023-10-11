@@ -41,7 +41,9 @@ public class ExceptionMessage {
         exceptionMessages.put("PRODUCT_UPDATE_FAILED", "상품을 수정하지 못했습니다.");
         exceptionMessages.put("PRODUCT_UPDATE_FAILED_BY_USER_TYPE", "이상이 있는 유저입니다.(회원 삭제, 이상유저 제재 등의 이유로 삭제 불가)");
         exceptionMessages.put("PRODUCT_UPDATE_FAILED_STATUS", "경매 상태를 바꾸지 못했습니다.");
+        exceptionMessages.put("PRODUCT_NOT_MATCH_ID", "해당 상품을 찾지 못했습니다.");
         exceptionMessages.put("PRODUCT_ACCESS_DENIED", "권한이 없어 해당 상품을 수정하지 못합니다.");
+        exceptionMessages.put("PRODUCT_ACCESS_DENIED_SELECT", "권한이 없어 해당 상품을 조회하지 못합니다.");
         exceptionMessages.put("PRODUCT_INPUT_MISMATCH_TIME", "경매 시작시간을 잘못 입력하셨습니다. 다시 입력해주세요.");
         exceptionMessages.put("PRODUCT_INPUT_MISMATCH_PRICE", "경매 시작가가 즉시구매가와 같거나 큽니다. 다시 입력해주세요.");
         exceptionMessages.put("PRODUCT_DELETE_FAILED", "상품을 삭제하지 못했습니다.");
