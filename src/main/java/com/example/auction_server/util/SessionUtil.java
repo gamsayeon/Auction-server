@@ -7,30 +7,42 @@ public class SessionUtil {
 
     private static final String USER = "USER";
     private static final String ADMIN = "ADMIN";
+    private static final String UNAUTHORIZED_USER = "UNAUTHORIZED_USER";
+
 
     private SessionUtil() {
     }
 
     public static void setLoginSession(HttpSession session, Long id, UserType userType) {
-        if (userType != UserType.ADMIN) {
-            session.setAttribute(USER, id);
-        } else {
-            session.setAttribute(ADMIN, id);
+        switch (userType) {
+            case USER:
+                session.setAttribute(USER, id);
+                break;
+            case UNAUTHORIZED_USER:
+                session.setAttribute(UNAUTHORIZED_USER, id);
+                break;
+            case ADMIN:
+                session.setAttribute(ADMIN, id);
+                break;
+            default:
+                break;
         }
-        session.setAttribute("userType", userType);
     }
 
-    public static Long getLoginId(HttpSession session) {
+    public static Long getUserLoginId(HttpSession session) {
         Long id = (Long) session.getAttribute(USER);
-        if (id == null) {
-            return (Long) session.getAttribute(ADMIN);
-        } else return id;
+        return id;
     }
 
-    public static String getLoginUserType(HttpSession session) {
-        return session.getAttribute("userType").toString();
+    public static Long getUnauthorizedUserLoginId(HttpSession session) {
+        Long id = (Long) session.getAttribute(UNAUTHORIZED_USER);
+        return id;
     }
 
+    public static Long getAdminLoginId(HttpSession session) {
+        Long id = (Long) session.getAttribute(ADMIN);
+        return id;
+    }
 
     public static void clear(HttpSession session) {
         session.invalidate();

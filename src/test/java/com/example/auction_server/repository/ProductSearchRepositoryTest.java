@@ -1,5 +1,6 @@
 package com.example.auction_server.repository;
 
+import com.example.auction_server.enums.ProductStatus;
 import com.example.auction_server.model.Product;
 import com.example.auction_server.repository.repositoryImpl.ProductSearchRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import static org.junit.Assert.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@DisplayName("ProductSearchRepository Unit 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ProductSearchRepositoryTest {
     @Autowired
@@ -31,16 +33,19 @@ class ProductSearchRepositoryTest {
     @BeforeEach
     public void generateTestProduct() {
         for (int i = 0; i < PRODUCT_COUNT; i++) {
-            Product product = new Product();
-            product.setSaleId(TEST_SALE_ID + i);
-            product.setProductName("testProductName" + i);
-            product.setCategoryId(TEST_CATEGORY_ID);
-            product.setExplanation(TEST_EXPLANATION);
-            product.setProductRegisterTime(LocalDateTime.now());
-            product.setStartPrice(1000);
-            product.setStartTime(LocalDateTime.now());
-            product.setEndTime(LocalDateTime.now());
-            product.setHighestPrice(1000000);
+            Product product = Product.builder()
+                    .saleId(TEST_SALE_ID + i)
+                    .productName("testProductName" + i)
+                    .categoryId(TEST_CATEGORY_ID)
+                    .explanation(TEST_EXPLANATION)
+                    .productRegisterTime(LocalDateTime.now())
+                    .startPrice(1000)
+                    .startTime(LocalDateTime.now())
+                    .endTime(LocalDateTime.now())
+                    .highestPrice(1000000)
+                    .productStatus(ProductStatus.PRODUCT_REGISTRATION)
+                    .build();
+
             productRepository.save(product);
         }
     }

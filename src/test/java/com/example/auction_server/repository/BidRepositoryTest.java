@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@DisplayName("BidRepository Unit 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class BidRepositoryTest {
     @Autowired
@@ -28,11 +29,13 @@ class BidRepositoryTest {
     @BeforeEach
     public void generateTestBid() {
         for (int i = 1; i <= BID_COUNT; i++) {
-            Bid bid = new Bid();
-            bid.setBuyerId(TEST_BUYER_ID);
-            bid.setProductId(TEST_PRODUCT_ID);
-            bid.setBidTime(LocalDateTime.now());
-            bid.setPrice(10000 * i);
+            Bid bid = Bid.builder()
+                    .buyerId(TEST_BUYER_ID)
+                    .productId(TEST_PRODUCT_ID)
+                    .bidTime(LocalDateTime.now())
+                    .price(10000 * i)
+                    .build();
+
             bidRepository.save(bid);
         }
     }

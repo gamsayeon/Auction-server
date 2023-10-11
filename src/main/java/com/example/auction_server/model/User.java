@@ -2,8 +2,7 @@ package com.example.auction_server.model;
 
 import com.example.auction_server.enums.UserType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +13,9 @@ import java.time.LocalDateTime;
 @Entity(name = "user")
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "\"user\"")
 public class User {
     @Id

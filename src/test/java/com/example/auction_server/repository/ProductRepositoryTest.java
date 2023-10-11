@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@DisplayName("ProductRepository Unit 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ProductRepositoryTest {
     @Autowired
@@ -26,34 +27,36 @@ class ProductRepositoryTest {
     private Long TEST_SALE_ID = 500L;
     private Long TEST_CATEGORY_ID = 500L;
     private int PRODUCT_COUNT = 3;
-    private Product SAVED_PRODUCT;
+    private Product savedProduct;
     private int DELETE_SUCCESS = 1;
 
     @BeforeEach
     public void generateTestProduct() {
         for (int i = 0; i < PRODUCT_COUNT; i++) {
-            Product product = new Product();
-            product.setSaleId(TEST_SALE_ID);
-            product.setProductName("testProductName");
-            product.setCategoryId(TEST_CATEGORY_ID);
-            product.setExplanation("testExplanation");
-            product.setProductRegisterTime(LocalDateTime.now());
-            product.setStartPrice(1000);
-            product.setStartTime(LocalDateTime.now());
-            product.setEndTime(LocalDateTime.now());
-            product.setHighestPrice(1000000);
-            product.setProductStatus(ProductStatus.PRODUCT_REGISTRATION);
-            SAVED_PRODUCT = productRepository.save(product);
+            Product product = Product.builder()
+                    .saleId(TEST_SALE_ID)
+                    .productName("testProductName")
+                    .categoryId(TEST_CATEGORY_ID)
+                    .explanation("testExplanation")
+                    .productRegisterTime(LocalDateTime.now())
+                    .startPrice(1000)
+                    .startTime(LocalDateTime.now())
+                    .endTime(LocalDateTime.now())
+                    .highestPrice(1000000)
+                    .productStatus(ProductStatus.PRODUCT_REGISTRATION)
+                    .build();
+
+            savedProduct = productRepository.save(product);
         }
     }
 
     @Test
     @DisplayName("상품 식별자로 상품 조회")
     void findByProductId() {
-        Product findProduct = productRepository.findByProductId(SAVED_PRODUCT.getProductId());
+        Product findProduct = productRepository.findByProductId(savedProduct.getProductId());
 
         assertNotNull(findProduct);
-        assertEquals(SAVED_PRODUCT.getProductId(), findProduct.getProductId());
+        assertEquals(savedProduct.getProductId(), findProduct.getProductId());
     }
 
     @Test
@@ -70,9 +73,9 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("상품 식별자와 판매자 식별자로 상품 삭제")
     void deleteBySaleIdAndProductId() {
-        int deleteProduct = productRepository.deleteBySaleIdAndProductId(TEST_SALE_ID, SAVED_PRODUCT.getProductId());
+        int deleteProduct = productRepository.deleteBySaleIdAndProductId(TEST_SALE_ID, savedProduct.getProductId());
 
-        assertNull(productRepository.findByProductId(SAVED_PRODUCT.getProductId()));
+        assertNull(productRepository.findByProductId(savedProduct.getProductId()));
         assertEquals(DELETE_SUCCESS, deleteProduct);
     }
 

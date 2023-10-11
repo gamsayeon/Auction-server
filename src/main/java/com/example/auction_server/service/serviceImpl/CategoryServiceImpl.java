@@ -85,10 +85,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public String deleteCategory(Long categoryId) {
         Optional<Category> optionalCategory = categoryRepository.findByCategoryId(categoryId);
-        if (categoryRepository.deleteByCategoryId(categoryId) == DELETE_SUCCESS) {
-            String categoryName = optionalCategory.get().getCategoryName();
-            logger.info(categoryName + "을 카테고리 삭제에 성공했습니다.");
-            return categoryName;
+        if (optionalCategory.get() != null) {
+            if (categoryRepository.deleteByCategoryId(categoryId) == DELETE_SUCCESS) {
+                String categoryName = optionalCategory.get().getCategoryName();
+                logger.info(categoryName + "을 카테고리 삭제에 성공했습니다.");
+                return categoryName;
+            } else {
+                logger.warn("category 삭제 실패 오류. 재시도 해주세요.");
+                throw new DeleteFailedException("CATEGORY_DELETE_FAILED", categoryId);
+            }
         } else {
             logger.warn("category 삭제 실패 오류. 재시도 해주세요.");
             throw new DeleteFailedException("CATEGORY_DELETE_FAILED", categoryId);

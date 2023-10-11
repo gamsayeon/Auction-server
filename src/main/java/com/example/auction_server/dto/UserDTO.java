@@ -5,15 +5,13 @@ import com.example.auction_server.validation.annotation.IsAdminValidation;
 import com.example.auction_server.validation.annotation.isExistEmailValidation;
 import com.example.auction_server.validation.annotation.isExistUserIdlValidation;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {

@@ -38,22 +38,27 @@ public class LoginCheckAspect {
 
         boolean isPresent = false;
         String loginType = SessionUtil.getLoginUserType(session);
+        Long id = null;
         for (int i = 0; i < loginCheck.types().length; i++) {
             switch (loginCheck.types()[i].toString()) {
                 case "USER":
-                    if (loginType == UserType.USER.name()) isPresent = true;
-                    break;
-                case "ADMIN":
-                    if (loginType == UserType.ADMIN.name()) isPresent = true;
+                    if (id == null)
+                        id = SessionUtil.getUserLoginId(session);
                     break;
                 case "UNAUTHORIZED_USER":
-                    if (loginType == UserType.UNAUTHORIZED_USER.name()) isPresent = true;
+                    if (id == null)
+                        id = SessionUtil.getUnauthorizedUserLoginId(session);
+                    break;
+                case "ADMIN":
+                    if (id == null)
+                        id = SessionUtil.getAdminLoginId(session);
                     break;
                 default:
                     break;
             }
         }
-        if (isPresent == false) {
+        // 값이 없으면 로그인이 필요한 예외를 던짐
+        if (id == null) {
             logger.warn("권한 부족");
             throw new UserAccessDeniedException("COMMON_ACCESS_DENIED", loginType);
         }

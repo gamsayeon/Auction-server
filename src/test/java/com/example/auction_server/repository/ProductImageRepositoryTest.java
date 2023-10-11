@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@DisplayName("ProductImageRepository Unit 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ProductImageRepositoryTest {
     @Autowired
@@ -25,9 +26,11 @@ class ProductImageRepositoryTest {
     @BeforeEach
     public void generateTestProduct() {
         for (int i = 0; i < IMAGE_COUNT; i++) {
-            ProductImage productImage = new ProductImage();
-            productImage.setProductId(TEST_PRODUCT_ID);
-            productImage.setImagePath("testImagePath" + i);
+            ProductImage productImage = ProductImage.builder()
+                    .productId(TEST_PRODUCT_ID)
+                    .imagePath("testImagePath" + i)
+                    .build();
+
             productImageRepository.save(productImage);
         }
     }

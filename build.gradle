@@ -54,6 +54,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'com.h2database:h2'
+    testImplementation 'org.mockito:mockito-core'
 }
 def querydslDir = "src/main/generated"
 

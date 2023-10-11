@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@DisplayName("UserRepository Unit 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest {
     @Autowired
@@ -25,19 +26,21 @@ class UserRepositoryTest {
     private String TEST_USER_ID = "testUserId";
     private String TEST_EMAIL = "test@example.com";
     private String TEST_PASSWORD = Sha256Encrypt.encrypt("testPassword");
-    private Long SAVED_USER_ID;
+    private Long savedUserId;
 
     @BeforeEach
     public void generateTestUser() {
-        User user = new User();
-        user.setUserId(TEST_USER_ID);
-        user.setPassword(TEST_PASSWORD);
-        user.setName("testName");
-        user.setPhoneNumber("010-1234-5678");
-        user.setEmail(TEST_EMAIL);
-        user.setUserType(UserType.UNAUTHORIZED_USER);
-        user.setCreateTime(LocalDateTime.now());
-        SAVED_USER_ID = userRepository.save(user).getId();
+        User user = User.builder()
+                .userId(TEST_USER_ID)
+                .password(TEST_PASSWORD)
+                .name("testName")
+                .phoneNumber("010-1234-5678")
+                .email(TEST_EMAIL)
+                .userType(UserType.UNAUTHORIZED_USER)
+                .createTime(LocalDateTime.now())
+                .build();
+
+        savedUserId = userRepository.save(user).getId();
     }
 
     @Test
@@ -52,10 +55,10 @@ class UserRepositoryTest {
     @Test
     @DisplayName("유저 식별자와 업데이트 시간이 널인 유저 조회")
     void findByIdAndUpdateTimeIsNull() {
-        User findUser = userRepository.findByIdAndUpdateTimeIsNull(SAVED_USER_ID).orElse(null);
+        User findUser = userRepository.findByIdAndUpdateTimeIsNull(savedUserId).orElse(null);
 
         assertNotNull(findUser);
-        assertEquals(SAVED_USER_ID, findUser.getId());
+        assertEquals(savedUserId, findUser.getId());
     }
 
     @Test
@@ -96,7 +99,7 @@ class UserRepositoryTest {
     @Test
     @DisplayName("유저 식별자로 유저 Email 조회")
     void findEmailById() {
-        String email = userRepository.findEmailById(SAVED_USER_ID);
+        String email = userRepository.findUserProjectionById(savedUserId).getEmail();
 
         assertNotNull(email);
         assertEquals(TEST_EMAIL, email);

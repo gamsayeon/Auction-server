@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
                     logger.warn("매핑에 실패했습니다.");
                     throw new NotMatchingException("COMMON_NOT_MATCHING_MAPPER", userDTO);
                 } else {
-                    logger.info("로그인에 성공하엿습니다.");
+                    logger.info("로그인에 성공하였습니다.");
                     return resultUserDTO;
                 }
             }

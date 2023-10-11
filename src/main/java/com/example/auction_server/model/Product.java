@@ -2,17 +2,17 @@ package com.example.auction_server.model;
 
 import com.example.auction_server.enums.ProductStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity(name = "product")
 @Getter
 @Setter
-@Table(name = "product")
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "product")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

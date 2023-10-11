@@ -1,14 +1,16 @@
 package com.example.auction_server.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity(name = "product_comment")
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "product_comment")
 public class ProductComment {
     @Id
