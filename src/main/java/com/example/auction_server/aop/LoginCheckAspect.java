@@ -1,7 +1,5 @@
 package com.example.auction_server.aop;
 
-import com.example.auction_server.enums.UserType;
-import com.example.auction_server.exception.LoginRequiredException;
 import com.example.auction_server.exception.UserAccessDeniedException;
 import com.example.auction_server.util.SessionUtil;
 import jakarta.servlet.http.HttpServletRequest;

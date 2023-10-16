@@ -7,6 +7,8 @@ import jakarta.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,6 +25,15 @@ public class CustomExceptionHandler {
         CommonResponse commonResponse = new CommonResponse(exceptionCode,
                 ExceptionMessage.getExceptionMessage(exceptionCode), request.getServletPath());
         logger.error(commonResponse.toString());
+        return ResponseEntity.badRequest().body(commonResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        logger.error(ex.getMessage());
+        String errorMessage = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        CommonResponse commonResponse = new CommonResponse("COMMON_VALID",
+                errorMessage, request.getServletPath());
         return ResponseEntity.badRequest().body(commonResponse);
     }
 

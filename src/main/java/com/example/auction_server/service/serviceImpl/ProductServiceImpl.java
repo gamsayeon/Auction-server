@@ -1,4 +1,5 @@
 package com.example.auction_server.service.serviceImpl;
+
 import com.example.auction_server.dto.ProductDTO;
 import com.example.auction_server.dto.ProductImageDTO;
 import com.example.auction_server.dto.SearchProductDTO;
@@ -18,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,6 +67,7 @@ public class ProductServiceImpl implements ProductService {
             throw new AddFailedException("PRODUCT_ADD_FAILED", product);
         }
     }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<ProductImageDTO> registerProductImage(ProductDTO productDTO, Long productId) {
         List<ProductImage> resultProductImages = new ArrayList<>();
@@ -84,6 +87,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return productImageMapper.convertToDTO(resultProductImages);
     }
+
     public void validatorProduct(ProductDTO productDTO) {
         if (!categoryRepository.existsByCategoryId(productDTO.getCategoryId())) {
             logger.warn("해당 카테고리를 찾지 못했습니다.");
@@ -103,6 +107,7 @@ public class ProductServiceImpl implements ProductService {
             throw new InputMismatchException("PRODUCT_INPUT_MISMATCH_PRICE", productDTO);
         }
     }
+
     @Override
     public ProductDTO selectProduct(Long productId) {
         Product product = productRepository.findByProductId(productId);
@@ -120,14 +125,15 @@ public class ProductServiceImpl implements ProductService {
                     logger.info("상품을 정상적으로 조회했습니다.");
                     return resultProductDTO;
                 default:
-                    logger.warn("");
-                    throw new LoginRequiredException("");
+                    logger.warn("상품의 조회 권한이 없습니다.");
+                    throw new UserAccessDeniedException("PRODUCT_ACCESS_DENIED_SELECT", productId);
             }
         } else {
             logger.warn("해당 상품을 찾지 못했습니다.");
-            throw new NotMatchingException("CATEGORY_NOT_MATCH", productId);
+            throw new NotMatchingException("PRODUCT_NOT_MATCH_ID", productId);
         }
     }
+
     @Override
     public List<ProductDTO> selectProductForUser(Long saleId) {
         List<Product> products = productRepository.findBySaleId(saleId);
@@ -147,9 +153,10 @@ public class ProductServiceImpl implements ProductService {
             return resultProductDTOs;
         } else {
             logger.warn("해당 상품을 찾지 못했습니다.");
-            throw new NotMatchingException("CATEGORY_NOT_MATCH", saleId);
+            throw new NotMatchingException("PRODUCT_NOT_MATCH_ID", saleId);
         }
     }
+
     @Override
     @Transactional
     public ProductDTO updateProduct(Long saleId, Long productId, ProductDTO productDTO) {
@@ -180,6 +187,7 @@ public class ProductServiceImpl implements ProductService {
             throw new UserAccessDeniedException("PRODUCT_ACCESS_DENIED", saleId);
         }
     }
+
     @Override
     @Transactional
     public void updateProductStatus() {
@@ -216,6 +224,7 @@ public class ProductServiceImpl implements ProductService {
             }
         }
     }
+
     @Override
     @Transactional
     public void deleteProduct(Long saleId, Long productId) {
@@ -237,6 +246,7 @@ public class ProductServiceImpl implements ProductService {
             throw new UserAccessDeniedException("COMMON_ACCESS_DENIED", saleId);
         }
     }
+
     public void deleteProductImage(Long productId) {
         List<ProductImage> productImages = productImageRepository.findByProductId(productId);
         if (!productImages.isEmpty()) {
@@ -276,7 +286,6 @@ public class ProductServiceImpl implements ProductService {
 
     public List<Product> sortProducts(ProductSortOrder sortOrder, List<Product> products) {
         switch (sortOrder) {
-            //TODO : 입찰 기능 개발 후에 추가
             case BIDDER_COUNT_DESC:             //입찰자가 많은 순
                 Collections.sort(products, (p1, p2) -> {
                     Long productId1 = p1.getProductId();
@@ -362,6 +371,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return products;
     }
+
     public Integer currentBid(Long productId) {
         Integer maxPriceProductId = bidRepository.findMaxPriceByProductId(productId);
         if (maxPriceProductId == null)
