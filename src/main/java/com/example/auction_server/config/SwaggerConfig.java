@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("test")
 public class SwaggerConfig {
     @Profile({"dev", "test"})
     @Bean
@@ -19,7 +20,7 @@ public class SwaggerConfig {
                 .addServersItem(new Server().url("aws 링크"))
                 .info(new Info().title("Auction server back-end")
                         .description("Auction server API 명세서")
-                        .version("v0.0.1")
+                        .version("v1.0.0")
                         .license(new License().name("Auction Server wiki document").url("https://github.com/gamsayeon/Auction-Server/wiki")))
                 .externalDocs(new ExternalDocumentation()
                         .description("Auction Server Github URL")

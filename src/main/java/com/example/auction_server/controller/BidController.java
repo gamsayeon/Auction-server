@@ -33,8 +33,8 @@ public class BidController {
     @PostMapping("/{productId}")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "BID_FAILED_NOT_START", description = "경매가 시작하지 않음", content = @Content),
-            @ApiResponse(responseCode = "BID_INPUT_MISMATCH", description = "입찰 값을 잘못입력시", content = @Content),
+            @ApiResponse(responseCode = "400", description = "BID_FAILED_NOT_START : 경매가 시작하지 않음<br>" +
+                    "BID_INPUT_MISMATCH : 입찰 값을 잘못입력시", content = @Content),
             @ApiResponse(responseCode = "200", description = "입찰 등록 성공", content = @Content(schema = @Schema(implementation = BidDTO.class)))
     })
     @Operation(summary = "Bid 등록",

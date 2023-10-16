@@ -41,10 +41,10 @@ public class ProductController {
     @PostMapping
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "PRODUCT_ADD_FAILED", description = "상품 등록 실패", content = @Content),
-            @ApiResponse(responseCode = "PRODUCT_IMAGE_ADD_FAILED", description = "상품 이미지 등록 실패", content = @Content),
-            @ApiResponse(responseCode = "CATEGORY_NOT_MATCH_ID", description = "해당하는 카테고리 없음", content = @Content),
-            @ApiResponse(responseCode = "PRODUCT_INPUT_MISMATCH_TIME", description = "상품 경매 시간값 잘못입력", content = @Content),
+            @ApiResponse(responseCode = "400", description = "PRODUCT_ADD_FAILED : 상품 등록 실패<br>" +
+                    "PRODUCT_IMAGE_ADD_FAILED : 상품 이미지 등록 실패<br>" +
+                    "CATEGORY_NOT_MATCH_ID : 해당하는 카테고리 없음<br>" +
+                    "PRODUCT_INPUT_MISMATCH_TIME : 상품 경매 시간값 잘못 입력", content = @Content),
             @ApiResponse(responseCode = "200", description = "상품 등록 성공", content = @Content(schema = @Schema(implementation = ProductDTO.class)))
     })
     @Operation(summary = "Product 등록",
@@ -62,8 +62,8 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "PRODUCT_ACCESS_DENIED_SELECT", description = "상품 조회 권한없음", content = @Content),
-            @ApiResponse(responseCode = "PRODUCT_NOT_MATCH_ID", description = "상품 조회 실패", content = @Content),
+            @ApiResponse(responseCode = "400", description = "PRODUCT_ACCESS_DENIED_SELECT : 상품 조회 권한 없음<br>" +
+                    "PRODUCT_NOT_MATCH_ID : 상품 조회 실패", content = @Content),
             @ApiResponse(responseCode = "200", description = "상품 조회 성공", content = @Content(schema = @Schema(implementation = ProductDTO.class)))
     })
     @Operation(summary = "Product 조회",
@@ -83,7 +83,7 @@ public class ProductController {
     @GetMapping("/users")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "PRODUCT_NOT_MATCH_ID", description = "자신의 상품 조회 실패", content = @Content),
+            @ApiResponse(responseCode = "400", description = "PRODUCT_NOT_MATCH_ID : 자신의 상품 조회 실패", content = @Content),
             @ApiResponse(responseCode = "200", description = "자신의 상품 조회 성공", content = @Content(schema = @Schema(implementation = ProductDTO.class)))
     })
     @Operation(summary = "판매자의 Product 조회",
@@ -101,9 +101,9 @@ public class ProductController {
     @PatchMapping("/{productId}")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "PRODUCT_UPDATE_FAILED_BY_STATUS", description = "상품이 시작되어 수정 실패", content = @Content),
-            @ApiResponse(responseCode = "PRODUCT_UPDATE_FAILED", description = "상품 수정 실패", content = @Content),
-            @ApiResponse(responseCode = "PRODUCT_ACCESS_DENIED", description = "상품 수정의 권한이 없음", content = @Content),
+            @ApiResponse(responseCode = "400", description = "PRODUCT_UPDATE_FAILED_BY_STATUS : 상품이 시작되어 수정 실패<br>" +
+                    "PRODUCT_UPDATE_FAILED : 상품 수정 실패<br>" +
+                    "PRODUCT_ACCESS_DENIED : 상품 수정의 권한이 없음", content = @Content),
             @ApiResponse(responseCode = "200", description = "상품 수정 성공", content = @Content(schema = @Schema(implementation = ProductDTO.class)))
     })
     @Operation(summary = "Product 수정",
@@ -124,10 +124,10 @@ public class ProductController {
     @DeleteMapping("/withdraw/{productId}")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "PRODUCT_UPDATE_FAILED_BY_STATUS", description = "상품의 상태로 인한 삭제 실패", content = @Content),
-            @ApiResponse(responseCode = "PRODUCT_DELETE_FAILED", description = "상품의 삭제 실패", content = @Content),
-            @ApiResponse(responseCode = "COMMON_ACCESS_DENIED", description = "상품의 권한 없음", content = @Content),
-            @ApiResponse(responseCode = "PRODUCT_IMAGE_DELETE_FAILED", description = "상품의 이미지 삭제 실패", content = @Content),
+            @ApiResponse(responseCode = "400", description = "PRODUCT_UPDATE_FAILED_BY_STATUS : 상품의 상태로 인한 삭제 실패<br>" +
+                    "PRODUCT_DELETE_FAILED : 상품의 삭제 실패<br>" +
+                    "COMMON_ACCESS_DENIED : 상품의 권한 없음<br>" +
+                    "PRODUCT_IMAGE_DELETE_FAILED : 상품의 이미지 삭제 실패", content = @Content),
             @ApiResponse(responseCode = "200", description = "자신의 상품 삭제 성공", content = @Content(schema = @Schema(implementation = ProductDTO.class)))
     })
     @Operation(summary = "판매자의 Product 삭제",
@@ -154,7 +154,7 @@ public class ProductController {
     @PostMapping("/comments/{productId}")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "PRODUCT_COMMENT_ADD_FAILED", description = "상품 댓글 등록 실패", content = @Content),
+            @ApiResponse(responseCode = "400", description = "PRODUCT_COMMENT_ADD_FAILED : 상품 댓글 등록 실패", content = @Content),
             @ApiResponse(responseCode = "200", description = "상품 댓글 등록 성공", content = @Content(schema = @Schema(implementation = ProductCommentDTO.class)))
     })
     @Operation(summary = "Product 댓글 등록",

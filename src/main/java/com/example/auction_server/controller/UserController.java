@@ -41,11 +41,11 @@ public class UserController {
 
     @PostMapping
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_ADD_FAILED", description = "회원가입 오류", content = @Content),
-            @ApiResponse(responseCode = "COMMON_NOT_MATCHING_MAPPER", description = "매핑 오류", content = @Content),
-            @ApiResponse(responseCode = "USER_DUPLICATE_ID", description = "user Id 중복", content = @Content),
-            @ApiResponse(responseCode = "USER_DUPLICATE_EMAIL", description = "user email 중복", content = @Content),
-            @ApiResponse(responseCode = "USER_USER_ACCESS_DENIED", description = "user type이 ADMIN으로 가입시 실패", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_ADD_FAILED : 회원가입 오류<br>" +
+                    "COMMON_NOT_MATCHING_MAPPER : 매핑 오류<br>" +
+                    "USER_DUPLICATE_ID : user Id 중복<br>" +
+                    "USER_DUPLICATE_EMAIL : user email 중복<br>" +
+                    "USER_USER_ACCESS_DENIED : user type이 ADMIN으로 가입시 실패", content = @Content),
             @ApiResponse(responseCode = "200", description = "회원가입 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "User 회원가입",
@@ -63,9 +63,9 @@ public class UserController {
 
     @GetMapping("/verify-email")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_NOT_MATCH", description = "해당 유저가 없음", content = @Content),
-            @ApiResponse(responseCode = "USER_UPDATE_FAILED_TYPE", description = "타입 업데이트 오류", content = @Content),
-            @ApiResponse(responseCode = "EMAIL_CACHE_TTL_OUT", description = "Token TTL 시간 만료", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_NOT_MATCH : 해당 유저가 없음<br>" +
+                    "USER_UPDATE_FAILED_TYPE : 타입 업데이트 오류<br>" +
+                    "EMAIL_CACHE_TTL_OUT : Token TTL 시간 만료", content = @Content),
             @ApiResponse(responseCode = "200", description = "회원 타입 변경 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "User Type 업데이트",
@@ -84,9 +84,9 @@ public class UserController {
 
     @PostMapping("/admin")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_ADD_FAILED", description = "회원가입 오류", content = @Content),
-            @ApiResponse(responseCode = "COMMON_NOT_MATCHING_MAPPER", description = "매핑 오류", content = @Content),
-            @ApiResponse(responseCode = "USER_DUPLICATE_ID", description = "user Id 중복", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_ADD_FAILED : 회원가입 오류<br>" +
+                    "COMMON_NOT_MATCHING_MAPPER : 매핑 오류<br>" +
+                    "USER_DUPLICATE_ID : user Id 중복", content = @Content),
             @ApiResponse(responseCode = "200", description = "관리자 회원가입 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "User Admin 회원가입",
@@ -104,10 +104,10 @@ public class UserController {
 
     @PostMapping("/login")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_NOT_MATCH_LOGIN", description = "ID or Password 불일치", content = @Content),
-            @ApiResponse(responseCode = "USER_NOT_MATCH_TYPE", description = "이상 유저 타입으로 인한 로그인 불가", content = @Content),
-            @ApiResponse(responseCode = "USER_UPDATE_FAILED_UPDATE_TIME", description = "유저 마지막 로그인 시간 업데이트 실패", content = @Content),
-            @ApiResponse(responseCode = "COMMON_NOT_MATCHING_MAPPER", description = "매핑 오류", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_NOT_MATCH_LOGIN : ID or Password 불일치<br>" +
+                    "USER_NOT_MATCH_TYPE : 이상 유저 타입으로 인한 로그인 불가<br>" +
+                    "USER_UPDATE_FAILED_UPDATE_TIME : 유저 마지막 로그인 시간 업데이트 실패<br>" +
+                    "COMMON_NOT_MATCHING_MAPPER : 매핑 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "회원 로그인 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "User 로그인",
@@ -126,10 +126,10 @@ public class UserController {
     @PostMapping("/send-email")
     @LoginCheck(types = LoginCheck.LoginType.UNAUTHORIZED_USER)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_NOT_MATCH", description = "해당 유저가 없음", content = @Content),
-            @ApiResponse(responseCode = "USER_NOT_MATCH_TYPE", description = "이상 유저 타입으로 인한 로그인 불가", content = @Content),
-            @ApiResponse(responseCode = "COMMON_NOT_MATCHING_MAPPER", description = "매핑 실패", content = @Content),
-            @ApiResponse(responseCode = "EMAIL_SEND_FAILED", description = "이메일 전송 실패", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_NOT_MATCH : 해당 유저가 없음<br>" +
+                    "USER_NOT_MATCH_TYPE : 이상 유저 타입으로 인한 이메일 전송 불가<br>" +
+                    "EMAIL_SEND_FAILED : 이메일 전송 실패<br>" +
+                    "COMMON_NOT_MATCHING_MAPPER : 매핑 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "이메일 전송 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "User Email 발송",
@@ -152,9 +152,9 @@ public class UserController {
             LoginCheck.LoginType.UNAUTHORIZED_USER})
     @GetMapping
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_NOT_MATCH", description = "해당 유저가 없음", content = @Content),
-            @ApiResponse(responseCode = "USER_NOT_MATCH_TYPE", description = "이상 유저 타입으로 인한 로그인 불가", content = @Content),
-            @ApiResponse(responseCode = "COMMON_NOT_MATCHING_MAPPER", description = "매핑 실패", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_NOT_MATCH : 해당 유저가 없음<br>" +
+                    "USER_NOT_MATCH_TYPE : 이상 유저 타입으로 인한 조회 불가<br>" +
+                    "COMMON_NOT_MATCHING_MAPPER : 매핑 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "유저 조회 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "User 조회",
@@ -173,10 +173,10 @@ public class UserController {
             LoginCheck.LoginType.UNAUTHORIZED_USER})
     @PatchMapping
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_NOT_MATCH", description = "해당 유저가 없음", content = @Content),
-            @ApiResponse(responseCode = "COMMON_NOT_MATCHING_MAPPER", description = "매핑 실패", content = @Content),
-            @ApiResponse(responseCode = "USER_UPDATE_FAILED", description = "유저 정보 업데이트 실패", content = @Content),
-            @ApiResponse(responseCode = "USER_DUPLICATE_EMAIL", description = "user email 중복", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_NOT_MATCH : 해당 유저가 없음<br>" +
+                    "USER_UPDATE_FAILED : 유저 정보 업데이트 실패<br>" +
+                    "USER_DUPLICATE_EMAIL : user email 중복<br>" +
+                    "COMMON_NOT_MATCHING_MAPPER : 매핑 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "회원 정보 업데이트 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "User 정보 수정",
@@ -195,9 +195,9 @@ public class UserController {
     @LoginCheck(types = {LoginCheck.LoginType.ADMIN})
     @PatchMapping("/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_NOT_MATCH", description = "해당 유저가 없음", content = @Content),
-            @ApiResponse(responseCode = "COMMON_NOT_MATCHING_MAPPER", description = "매핑 실패", content = @Content),
-            @ApiResponse(responseCode = "USER_UPDATE_FAILED", description = "유저 정보 업데이트 실패", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_NOT_MATCH : 해당 유저가 없음<br>" +
+                    "USER_UPDATE_FAILED : 유저 정보 업데이트 실패<br>" +
+                    "COMMON_NOT_MATCHING_MAPPER : 매핑 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "회원 정보 업데이트 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "Admin으로 인한 User 정보 수정",
@@ -218,9 +218,9 @@ public class UserController {
     @LoginCheck(types = {LoginCheck.LoginType.USER, LoginCheck.LoginType.UNAUTHORIZED_USER, LoginCheck.LoginType.ADMIN})
     @PatchMapping("/withdraw")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_NOT_MATCH", description = "해당 유저가 없음", content = @Content),
-            @ApiResponse(responseCode = "PRODUCT_UPDATE_FAILED_BY_USER_TYPE", description = "이상 유저 타입으로 인한 삭제 오류", content = @Content),
-            @ApiResponse(responseCode = "USER_UPDATE_FAILED_DELETE", description = "유저 삭제 오류", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_NOT_MATCH : 해당 유저가 없음<br>" +
+                    "PRODUCT_UPDATE_FAILED_BY_USER_TYPE : 이상 유저 타입으로 인한 삭제 오류<br>" +
+                    "USER_UPDATE_FAILED_DELETE : 유저 삭제 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "유저 삭제 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "User 삭제",
@@ -242,9 +242,9 @@ public class UserController {
     @LoginCheck(types = {LoginCheck.LoginType.ADMIN})
     @PatchMapping("/withdraw/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_NOT_MATCH", description = "해당 유저가 없음", content = @Content),
-            @ApiResponse(responseCode = "PRODUCT_UPDATE_FAILED_BY_USER_TYPE", description = "이상 유저 타입으로 인한 삭제 오류", content = @Content),
-            @ApiResponse(responseCode = "USER_UPDATE_FAILED_DELETE", description = "유저 삭제 오류", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_NOT_MATCH : 해당 유저가 없음<br>" +
+                    "PRODUCT_UPDATE_FAILED_BY_USER_TYPE : 이상 유저 타입으로 인한 삭제 오류<br>" +
+                    "USER_UPDATE_FAILED_DELETE : 유저 삭제 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "유저 삭제 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "Admin으로 인한 User 삭제",
@@ -266,7 +266,7 @@ public class UserController {
             LoginCheck.LoginType.UNAUTHORIZED_USER})
     @PostMapping("/logout")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "USER_LOGOUT_FAILED", description = "로그아웃 실패", content = @Content),
+            @ApiResponse(responseCode = "400", description = "USER_LOGOUT_FAILED : 로그아웃 실패", content = @Content),
             @ApiResponse(responseCode = "200", description = "회원 로그아웃 성공", content = @Content(schema = @Schema(implementation = UserDTO.class)))
     })
     @Operation(summary = "User Logout",

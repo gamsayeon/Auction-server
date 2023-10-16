@@ -35,9 +35,9 @@ public class CategoryController {
     @PostMapping
     @LoginCheck(types = LoginCheck.LoginType.ADMIN)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "COMMON_NOT_MATCHING_MAPPER", description = "매핑 실패", content = @Content),
-            @ApiResponse(responseCode = "CATEGORY_ADD_FAILED", description = "카테고리 등록 오류", content = @Content),
-            @ApiResponse(responseCode = "CATEGORY_DUPLICATE_NAME", description = "카테고리 중복 오류", content = @Content),
+            @ApiResponse(responseCode = "400", description = "COMMON_NOT_MATCHING_MAPPER : 매핑 실패<br>" +
+                    "CATEGORY_ADD_FAILED : 카테고리 등록 오류<br>" +
+                    "CATEGORY_DUPLICATE_NAME : 카테고리 중복 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "카테고리 등록 성공", content = @Content(schema = @Schema(implementation = CategoryDTO.class)))
     })
     @Operation(summary = "Category 등록",
@@ -56,9 +56,9 @@ public class CategoryController {
     @PatchMapping("/{categoryId}")
     @LoginCheck(types = LoginCheck.LoginType.ADMIN)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "CATEGORY_NOT_MATCH_ID", description = "해당하는 카테고리 없음", content = @Content),
-            @ApiResponse(responseCode = "CATEGORY_UPDATE_FAILED", description = "카테고리 수정 실패", content = @Content),
-            @ApiResponse(responseCode = "CATEGORY_DUPLICATE_NAME", description = "카테고리 중복 오류", content = @Content),
+            @ApiResponse(responseCode = "400", description = "CATEGORY_NOT_MATCH_ID : 해당하는 카테고리 없음<br>" +
+                    "CATEGORY_UPDATE_FAILED : 카테고리 수정 실패<br>" +
+                    "CATEGORY_DUPLICATE_NAME : 카테고리 중복 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "카테고리 수정 성공", content = @Content(schema = @Schema(implementation = CategoryDTO.class)))
     })
     @Operation(summary = "Category 수정",
@@ -79,8 +79,8 @@ public class CategoryController {
 
     @GetMapping("/{categoryId}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "CATEGORY_NOT_MATCH_ID", description = "해당하는 카테고리 없음", content = @Content),
-            @ApiResponse(responseCode = "CATEGORY_DUPLICATE_NAME", description = "카테고리 중복 오류", content = @Content),
+            @ApiResponse(responseCode = "400", description = "CATEGORY_NOT_MATCH_ID : 해당하는 카테고리 없음<br>" +
+                    "CATEGORY_DUPLICATE_NAME : 카테고리 중복 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "카테고리 조회 성공", content = @Content(schema = @Schema(implementation = CategoryDTO.class)))
     })
     @Operation(summary = "Category 조회",
@@ -100,9 +100,9 @@ public class CategoryController {
     @DeleteMapping("/{categoryId}")
     @LoginCheck(types = LoginCheck.LoginType.ADMIN)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "CATEGORY_NOT_MATCH_ID", description = "해당하는 카테고리 없음", content = @Content),
-            @ApiResponse(responseCode = "CATEGORY_DELETE_FAILED", description = "카테고리 삭제 실패", content = @Content),
-            @ApiResponse(responseCode = "CATEGORY_DUPLICATE_NAME", description = "카테고리 중복 오류", content = @Content),
+            @ApiResponse(responseCode = "400", description = "CATEGORY_NOT_MATCH_ID : 해당하는 카테고리 없음<br>" +
+                    "CATEGORY_DELETE_FAILED : 카테고리 삭제 실패<br>" +
+                    "CATEGORY_DUPLICATE_NAME : 카테고리 중복 오류", content = @Content),
             @ApiResponse(responseCode = "200", description = "카테고리 삭제 성공", content = @Content(schema = @Schema(implementation = CategoryDTO.class)))
     })
     @Operation(summary = "Category 삭제",
