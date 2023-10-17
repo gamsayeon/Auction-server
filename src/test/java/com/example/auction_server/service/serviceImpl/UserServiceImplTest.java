@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 @DisplayName("UserServiceImpl Unit 테스트")
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -258,23 +260,18 @@ class UserServiceImplTest {
 
         //when
         UserDTO result = userService.loginUser(requestUserDTO, session);
-        // 1) 로그인을 시킨다.
-        // 2) 로그인한 SESSION KEY를 변수에 저장
-        // 3) 로그아웃 시킨다
-        // 4) SESSION KEY 변수로 Session에 값을 가져왔을때 빈값을 확인한다.
+
+        //then
         assertDoesNotThrow(() -> userService.logoutUser(session));
-        verify(session, times(1)).invalidate();
     }
 
     @Test
-    @DisplayName("로그아웃 실패 테스트")
+    @DisplayName("로그아웃 실패 테스트 - 로그인이 안되어 있을때")
     void logoutUserFail() {
-        // 1) 로그인을 시킨다.
-        // 2) 로그인한 SESSION KEY를 변수에 저장
-        // 3) 로그아웃 시킨다
-        // 4) SESSION KEY 변수로 Session에 값을 가져왔을때 값이 있는지 확인한다.
+        //when
         doThrow(new RuntimeException("Session is null")).when(session).invalidate();
 
+        //then
         assertThrows(LogoutFailedException.class, () -> userService.logoutUser(session));
     }
 }

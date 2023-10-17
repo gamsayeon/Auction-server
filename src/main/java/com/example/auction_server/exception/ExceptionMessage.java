@@ -37,6 +37,7 @@ public class ExceptionMessage {
         exceptionMessages.put("CATEGORY_DELETE_FAILED", "카테고리를 삭제하지 못했습니다.");
         //Product
         exceptionMessages.put("PRODUCT_ADD_FAILED", "상품등록에 실패했습니다. 다시시도해주세요.");
+        exceptionMessages.put("PRODUCT_SELECT_FAILED_BY_SALE_ID", "해당 유저의 상품을 찾지 못했습니다.");
         exceptionMessages.put("PRODUCT_UPDATE_FAILED_BY_STATUS", "해당 상품은 경매가 시작되여 수정이 불가능합니다.");
         exceptionMessages.put("PRODUCT_UPDATE_FAILED", "상품을 수정하지 못했습니다.");
         exceptionMessages.put("PRODUCT_UPDATE_FAILED_BY_USER_TYPE", "이상이 있는 유저입니다.(회원 삭제, 이상유저 제재 등의 이유로 삭제 불가)");

@@ -23,7 +23,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
     private final ProductCommentMapper productCommentMapper;
 
     @Override
-    public ProductCommentDTO registerProduct(Long userId, Long productId, ProductCommentDTO productCommentDTO) {
+    public ProductCommentDTO registerProductComment(Long userId, Long productId, ProductCommentDTO productCommentDTO) {
         ProductComment productComment = productCommentMapper.convertToEntity(productCommentDTO);
         productComment.setProductId(productId);
         productComment.setUserId(userId);

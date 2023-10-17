@@ -13,7 +13,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
 
     List<Product> findBySaleId(Long saleId);
 
-    int deleteBySaleIdAndProductId(Long saleId, Long productId);
+    int deleteByProductId(Long productId);
 
     List<Product> findByProductStatus(ProductStatus productStatus);
 

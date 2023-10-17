@@ -13,8 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
@@ -33,12 +31,7 @@ public class BidServiceImpl implements BidService {
             logger.warn("경매가 시작되지 않았습니다.");
             throw new BidFailedNotStartException("BID_FAILED_NOT_START");
         } else {
-            Bid bid = Bid.builder()
-                    .buyerId(buyerId)
-                    .productId(productId)
-                    .bidTime(LocalDateTime.now())
-                    .price(bidDTO.getPrice())
-                    .build();
+            Bid bid = bidMapper.convertToEntity(bidDTO);
 
             rabbitMQService.enqueueMassage(bid);
 

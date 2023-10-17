@@ -72,8 +72,8 @@ class ProductRepositoryTest {
 
     @Test
     @DisplayName("상품 식별자와 판매자 식별자로 상품 삭제")
-    void deleteBySaleIdAndProductId() {
-        int deleteProduct = productRepository.deleteBySaleIdAndProductId(TEST_SALE_ID, savedProduct.getProductId());
+    void deleteByProductId() {
+        int deleteProduct = productRepository.deleteByProductId(savedProduct.getProductId());
 
         assertNull(productRepository.findByProductId(savedProduct.getProductId()));
         assertEquals(DELETE_SUCCESS, deleteProduct);

@@ -22,7 +22,6 @@ public class EmailServiceImpl implements EmailService {
     private final RedisTemplate<String, String> redisTemplate;
     private final AmazonSimpleEmailService amazonSimpleEmailService;
 
-    @Override
     @Cacheable(key = "#token", value = "userId")
     public String putCacheToken(String token, String userId) {
         return userId;

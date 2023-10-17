@@ -152,8 +152,8 @@ public class ProductServiceImpl implements ProductService {
             logger.info("상품을 정상적으로 조회했습니다.");
             return resultProductDTOs;
         } else {
-            logger.warn("해당 상품을 찾지 못했습니다.");
-            throw new NotMatchingException("PRODUCT_NOT_MATCH_ID", saleId);
+            logger.warn("해당 유저의 상품을 찾지 못했습니다.");
+            throw new NotMatchingException("PRODUCT_SELECT_FAILED_BY_SALE_ID", saleId);
         }
     }
 
@@ -190,37 +190,30 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void updateProductStatus() {
-        List<Product> resultProducts = productRepository.findByProductStatus(ProductStatus.PRODUCT_REGISTRATION);
+    public void updateProductStatus(ProductStatus productStatus) {
+        List<Product> resultProducts = productRepository.findByProductStatus(productStatus);
         for (Product product : resultProducts) {
-            if (product.getStartTime().compareTo(LocalDateTime.now()) <= 0) {  //경매 시작시간이 현재시간과 비교해서 과거인지 확인
-                product.setProductStatus(ProductStatus.AUCTION_PROCEEDING);
-                Product resultProduct = productRepository.save(product);
-                if (resultProduct == null) {
-                    logger.warn("경매 시작 상태로 수정하지 못했습니다.");
-                    throw new UpdateFailedException("PRODUCT_UPDATE_FAILED_STATUS", product.getProductId());
-                } else {
-                    logger.info("경매 상태를 AUCTION_PROCEEDING 로 성공적으로 바꿨습니다.");
-                    UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
-                    emailService.notifyAuction(recipientEmail.getEmail(), "경매 시작",
-                            resultProduct.getProductName() + "의 경매가 시작되었습니다.");
-                }
+            switch (product.getProductStatus()) {
+                case PRODUCT_REGISTRATION:
+                    if (product.getStartTime().compareTo(LocalDateTime.now()) <= 0) { //경매 시작시간이 현재시간과 비교해서 과거인지 확인
+                        product.setProductStatus(ProductStatus.AUCTION_PROCEEDING);
+                    }
+                    break;
+                case AUCTION_PROCEEDING:
+                    if (product.getEndTime().compareTo(LocalDateTime.now()) <= 0) {   //경매 마감시간이 현재시간과 비교해서 과거인지 확인
+                        product.setProductStatus(ProductStatus.AUCTION_END);
+                    }
+                    break;
             }
-        }
-        resultProducts = productRepository.findByProductStatus(ProductStatus.AUCTION_PROCEEDING);
-        for (Product product : resultProducts) {
-            if (product.getEndTime().compareTo(LocalDateTime.now()) <= 0) {   //경매 마감시간이 현재시간과 비교해서 과거인지 확인
-                product.setProductStatus(ProductStatus.AUCTION_END);
-                Product resultProduct = productRepository.save(product);
-                if (resultProduct == null) {
-                    logger.warn("경매 마감 상태로 수정하지 못했습니다.");
-                    throw new UpdateFailedException("PRODUCT_UPDATE_FAILED_STATUS", product.getProductId());
-                } else {
-                    logger.info("경매 상태를 AUCTION_END 로 성공적으로 바꿨습니다.");
-                    UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
-                    emailService.notifyAuction(recipientEmail.getEmail(), "경매 종료",
-                            resultProduct.getProductName() + "의 경매가 종료되었습니다.");
-                }
+            Product resultProduct = productRepository.save(product);
+            if (resultProduct == null) {
+                logger.warn("경매 상태를 수정하지 못했습니다.");
+                throw new UpdateFailedException("PRODUCT_UPDATE_FAILED_STATUS", product.getProductId());
+            } else {
+                logger.info("경매 상태를 성공적으로 변경했습니다.");
+                UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
+                emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
+                        resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
             }
         }
     }
@@ -230,12 +223,11 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(Long saleId, Long productId) {
         Product resultProduct = productRepository.findByProductId(productId);
         if (resultProduct.getProductStatus() != ProductStatus.PRODUCT_REGISTRATION) {
-            logger.warn("해당 상품은 경매가 시작되여 삭제가 불가능합니다.");
+            logger.warn("해당 상품은 경매가 시작되어 삭제가 불가능합니다.");
             throw new UpdateFailedException("PRODUCT_UPDATE_FAILED_BY_STATUS", resultProduct.getProductStatus());
         } else if (saleId == resultProduct.getSaleId()) {
             this.deleteProductImage(productId);
-            int resultDelete = productRepository.deleteBySaleIdAndProductId(saleId, productId);
-            if (resultDelete == DELETE_FAIL) {
+            if (productRepository.deleteByProductId(productId) == DELETE_FAIL) {
                 logger.warn("상품을 삭제 하지 못했습니다.");
                 throw new DeleteFailedException("PRODUCT_DELETE_FAILED", productId);
             } else {

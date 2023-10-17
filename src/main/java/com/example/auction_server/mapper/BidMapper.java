@@ -6,13 +6,20 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 @RequiredArgsConstructor
 public class BidMapper {
     private final ModelMapper modelMapper;
 
     public Bid convertToEntity(BidDTO bidDTO) {
-        Bid bid = modelMapper.map(bidDTO, Bid.class);
+        Bid bid = Bid.builder()
+                .buyerId(bidDTO.getBuyerId())
+                .productId(bidDTO.getProductId())
+                .bidTime(LocalDateTime.now())
+                .price(bidDTO.getPrice())
+                .build();
         return bid;
     }
 

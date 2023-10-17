@@ -5,6 +5,7 @@ import com.example.auction_server.dto.ProductCommentDTO;
 import com.example.auction_server.dto.ProductDTO;
 import com.example.auction_server.dto.SearchProductDTO;
 import com.example.auction_server.enums.ProductSortOrder;
+import com.example.auction_server.enums.ProductStatus;
 import com.example.auction_server.model.CommonResponse;
 import com.example.auction_server.service.serviceImpl.ProductCommentServiceImpl;
 import com.example.auction_server.service.serviceImpl.ProductServiceImpl;
@@ -148,7 +149,8 @@ public class ProductController {
     @Scheduled(cron = "${auction.time.interval}")
     public void updateProductAuctionStatus() {
         logger.debug("경매상태값을 수정합니다.");
-        productService.updateProductStatus();
+        productService.updateProductStatus(ProductStatus.PRODUCT_REGISTRATION);
+        productService.updateProductStatus(ProductStatus.AUCTION_PROCEEDING);
     }
 
     @PostMapping("/comments/{productId}")
@@ -168,7 +170,7 @@ public class ProductController {
                                                                                     HttpServletRequest request) {
         logger.info("상품 댓글을 등록합니다.");
         CommonResponse<ProductCommentDTO> response = new CommonResponse<>("SUCCESS", "상품에 댓글을 추가했습니다.",
-                request.getRequestURI(), productCommentService.registerProduct(loginId, productId, productCommentDTO));
+                request.getRequestURI(), productCommentService.registerProductComment(loginId, productId, productCommentDTO));
         return ResponseEntity.ok(response);
     }
 

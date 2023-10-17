@@ -12,12 +12,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+@ActiveProfiles("test")
 @DisplayName("CategoryServiceImpl Unit 테스트")
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTest {
@@ -29,6 +31,7 @@ class CategoryServiceImplTest {
     private CategoryMapper categoryMapper;
     private String TEST_CATEGORY_NAME = "testCategoryName";
     private int TEST_BID_MIN_PRICE = 1000;
+    private Long TEST_CATEGORY_ID = 1L;
     private CategoryDTO requestCategoryDTO;
     private CategoryUpdateDTO categoryUpdateDTO;
     private Category convertedBeforeResponseCategory;
@@ -47,7 +50,7 @@ class CategoryServiceImplTest {
                 .build();
 
         convertedBeforeResponseCategory = Category.builder()
-                .categoryId(1L)
+                .categoryId(TEST_CATEGORY_ID)
                 .categoryName(TEST_CATEGORY_NAME)
                 .bidMinPrice(TEST_BID_MIN_PRICE)
                 .build();
@@ -75,7 +78,7 @@ class CategoryServiceImplTest {
     void updateCategory() {
         //given
         Category categoryUpdate = Category.builder()
-                .categoryId(1L)
+                .categoryId(TEST_CATEGORY_ID)
                 .categoryName("update" + TEST_CATEGORY_NAME)
                 .bidMinPrice(TEST_BID_MIN_PRICE + 1000)
                 .build();
