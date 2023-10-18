@@ -29,6 +29,7 @@ class CategoryRepositoryTest {
 
     @BeforeEach
     public void generateTestCategory() {
+        //given
         Category category = Category.builder()
                 .categoryName(TEST_CATEGORY_NAME)
                 .bidMinPrice(TEST_BID_MIN_PRICE)
@@ -40,8 +41,10 @@ class CategoryRepositoryTest {
     @Test
     @DisplayName("카테고리 식별자로 카테고리 조회")
     void findByCategoryId() {
+        //when
         Optional<Category> findCategory = categoryRepository.findByCategoryId(savedCategoryId);
 
+        //then
         assertNotNull(findCategory);
         assertEquals(TEST_CATEGORY_NAME, findCategory.get().getCategoryName());
     }
@@ -49,8 +52,10 @@ class CategoryRepositoryTest {
     @Test
     @DisplayName("카테고리 식별자로 카테고리 삭제")
     void deleteByCategoryId() {
+        //when
         int deleteCategory = categoryRepository.deleteByCategoryId(savedCategoryId);
 
+        //then
         assertTrue(categoryRepository.findByCategoryId(savedCategoryId).isEmpty());
         assertEquals(DELETE_SUCCESS, deleteCategory);
     }
@@ -58,16 +63,20 @@ class CategoryRepositoryTest {
     @Test
     @DisplayName("카테고리명 중복 검사")
     void existsByCategoryName() {
-        Boolean existsCategoryName = categoryRepository.existsByCategoryName(TEST_CATEGORY_NAME);
+        //when
+        boolean existsCategoryName = categoryRepository.existsByCategoryName(TEST_CATEGORY_NAME);
 
-        assertEquals(true, existsCategoryName);
+        //then
+        assertTrue(existsCategoryName);
     }
 
     @Test
     @DisplayName("유효한 카테고리 식별자 확인")
     void existsByCategoryId() {
-        Boolean existsCategoryId = categoryRepository.existsByCategoryId(savedCategoryId);
+        //when
+        boolean existsCategoryId = categoryRepository.existsByCategoryId(savedCategoryId);
 
-        assertEquals(true, existsCategoryId);
+        //then
+        assertTrue(existsCategoryId);
     }
 }

@@ -25,6 +25,7 @@ class ProductImageRepositoryTest {
 
     @BeforeEach
     public void generateTestProduct() {
+        //given
         for (int i = 0; i < IMAGE_COUNT; i++) {
             ProductImage productImage = ProductImage.builder()
                     .productId(TEST_PRODUCT_ID)
@@ -38,8 +39,10 @@ class ProductImageRepositoryTest {
     @Test
     @DisplayName("상품 식별자로 상품이미지 조회")
     void findByProductId() {
+        //when
         List<ProductImage> findProductImages = productImageRepository.findByProductId(TEST_PRODUCT_ID);
 
+        //then
         assertNotNull(findProductImages);
         assertEquals(IMAGE_COUNT, findProductImages.size());
     }
@@ -47,8 +50,10 @@ class ProductImageRepositoryTest {
     @Test
     @DisplayName("상품 식별자로 상품이미지 삭제")
     void deleteAllByProductId() {
+        //when
         int deleteProductImage = productImageRepository.deleteAllByProductId(TEST_PRODUCT_ID);
 
+        //then
         assertEquals(IMAGE_COUNT, deleteProductImage);
         assertTrue(productImageRepository.findByProductId(TEST_PRODUCT_ID).isEmpty());
     }

@@ -32,6 +32,7 @@ class ProductSearchRepositoryTest {
 
     @BeforeEach
     public void generateTestProduct() {
+        //given
         for (int i = 0; i < PRODUCT_COUNT; i++) {
             Product product = Product.builder()
                     .saleId(TEST_SALE_ID + i)
@@ -53,40 +54,44 @@ class ProductSearchRepositoryTest {
     @Test
     @DisplayName("다양한 상품 검색 테스트")
     void searchProducts() {
-        //productName search
+        //productName search when
         List<Product> searchProducts = productSearchRepository.searchProducts("1", null, null,
                 null, 1, 10);
 
+        //productName search then
         assertNotNull(searchProducts);
         assertEquals(1, searchProducts.size());
         for (int i = 0; i < searchProducts.size(); i++) {
             assertTrue(searchProducts.get(i).getProductName().contains("1"));
         }
 
-        //saleId search
+        //saleId search when
         searchProducts = productSearchRepository.searchProducts(null, TEST_SALE_ID, null,
                 null, 1, 10);
 
+        //saleId search then
         assertNotNull(searchProducts);
         assertEquals(1, searchProducts.size());
         for (int i = 0; i < searchProducts.size(); i++) {
             assertEquals(TEST_SALE_ID, searchProducts.get(i).getSaleId());
         }
 
-        //categoryId search
+        //categoryId search when
         searchProducts = productSearchRepository.searchProducts(null, null, TEST_CATEGORY_ID,
                 null, 1, 10);
 
+        //categoryId search then
         assertNotNull(searchProducts);
         assertEquals(PRODUCT_COUNT, searchProducts.size());
         for (int i = 0; i < searchProducts.size(); i++) {
             assertEquals(TEST_CATEGORY_ID, searchProducts.get(i).getCategoryId());
         }
 
-        //explanation search
+        //explanation search when
         searchProducts = productSearchRepository.searchProducts(null, null, null,
                 TEST_EXPLANATION, 1, 10);
 
+        //explanation search then
         assertNotNull(searchProducts);
         assertEquals(PRODUCT_COUNT, searchProducts.size());
         for (int i = 0; i < searchProducts.size(); i++) {

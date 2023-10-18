@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -32,6 +33,7 @@ class ProductRepositoryTest {
 
     @BeforeEach
     public void generateTestProduct() {
+        //given
         for (int i = 0; i < PRODUCT_COUNT; i++) {
             Product product = Product.builder()
                     .saleId(TEST_SALE_ID)
@@ -53,8 +55,10 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("상품 식별자로 상품 조회")
     void findByProductId() {
+        //when
         Product findProduct = productRepository.findByProductId(savedProduct.getProductId());
 
+        //then
         assertNotNull(findProduct);
         assertEquals(savedProduct.getProductId(), findProduct.getProductId());
     }
@@ -62,8 +66,10 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("판매자 식별자로 상품 조회")
     void findBySaleId() {
+        //when
         List<Product> findProducts = productRepository.findBySaleId(TEST_SALE_ID);
 
+        //then
         assertNotNull(findProducts);
         for (Product findProduct : findProducts) {
             assertEquals(TEST_SALE_ID, findProduct.getSaleId());
@@ -73,8 +79,10 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("상품 식별자와 판매자 식별자로 상품 삭제")
     void deleteByProductId() {
+        //when
         int deleteProduct = productRepository.deleteByProductId(savedProduct.getProductId());
 
+        //then
         assertNull(productRepository.findByProductId(savedProduct.getProductId()));
         assertEquals(DELETE_SUCCESS, deleteProduct);
     }
@@ -82,11 +90,23 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("상품 상태를 기반으로 한 상품 조회")
     void findByProductStatus() {
+        //when
         List<Product> findProducts = productRepository.findByProductStatus(ProductStatus.PRODUCT_REGISTRATION);
 
+        //then
         assertNotNull(findProducts);
         for (Product findProduct : findProducts) {
             assertEquals(ProductStatus.PRODUCT_REGISTRATION, findProduct.getProductStatus());
         }
+    }
+
+    @Test
+    @DisplayName("상품 식별자로 유효한지")
+    void existsByProductId() {
+        //when
+        boolean existsProduct = productRepository.existsByProductId(savedProduct.getProductId());
+
+        //then
+        assertTrue(existsProduct);
     }
 }
