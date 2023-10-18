@@ -65,4 +65,4 @@
     - 상품의 경매 기록 확인
 ---
 # ERD(Entity Relationship Diagram)
-![img.png](img.png)
+![img](https://github.com/gamsayeon/Auction-Server/assets/75170367/064df78b-410b-4bb0-bb4e-8ba6f076f07a)
