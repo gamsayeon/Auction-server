@@ -55,9 +55,20 @@ public class BidController {
 
     @GetMapping("/buyer")
     @LoginCheck(types = LoginCheck.LoginType.USER)
-    public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidByBuyer(@Parameter(hidden = true) Long loginId,
-                                                                         @RequestParam(value = "productId", required = false) Long productId,
-                                                                         HttpServletRequest request) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "PRODUCT_NOT_MATCH_ID : 해당하는 상품을 찾지 못함<br>" +
+                    "BID_NULL_DATA : 아직 경매 이력이 없을시<br>" +
+                    "COMMON_ACCESS_DENIED : 해당하는 상품의 경매이력의 조회 권한이 없음", content = @Content),
+            @ApiResponse(responseCode = "200", description = "입찰 이력 조회 성공(구매자)", content = @Content(schema = @Schema(implementation = BidDTO.class)))
+    })
+    @Operation(summary = "Bid 이력 조회(구매자)",
+            description = "구매자가 자신의 경매 이력을 조회 합니다.]",
+            method = "GET",
+            tags = "Bid API",
+            operationId = "Select Bid from Buyer")
+    public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidFromBuyer(@Parameter(hidden = true) Long loginId,
+                                                                           @RequestParam(value = "productId", required = false) Long productId,
+                                                                           HttpServletRequest request) {
         logger.info("구매자의 경매 이력을 조회합니다.");
         CommonResponse<List<BidDTO>> response = new CommonResponse<>("SUCCESS", "경매를 조회했습니다.",
                 request.getRequestURI(), bidService.selectBidByBuyerId(loginId, productId));
@@ -66,8 +77,19 @@ public class BidController {
 
     @GetMapping("sale/{productId}")
     @LoginCheck(types = LoginCheck.LoginType.USER)
-    public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidBySale(@Parameter(hidden = true) Long loginId, @PathVariable("productId") Long productId,
-                                                                        HttpServletRequest request) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "PRODUCT_NOT_MATCH_ID : 해당하는 상품을 찾지 못함<br>" +
+                    "BID_NULL_DATA : 아직 경매 이력이 없을시", content = @Content),
+            @ApiResponse(responseCode = "200", description = "입찰 이력 조회 성공(판매자)", content = @Content(schema = @Schema(implementation = BidDTO.class)))
+    })
+    @Operation(summary = "Bid 이력 조회(판매자)",
+            description = "판매자가 자신의 경매 이력을 조회 합니다.]",
+            method = "GET",
+            tags = "Bid API",
+            operationId = "Select Bid from Sale")
+    @Parameter(name = "productId", description = "경매 이력을 조회할 상품 식별자", example = "1")
+    public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidFromSale(@Parameter(hidden = true) Long loginId, @PathVariable("productId") Long productId,
+                                                                          HttpServletRequest request) {
         logger.info("판맨자의 경매 이력을 조회합니다.");
         CommonResponse<List<BidDTO>> response = new CommonResponse<>("SUCCESS", "경매를 조회했습니다.",
                 request.getRequestURI(), bidService.selectBidBySaleId(loginId, productId));
