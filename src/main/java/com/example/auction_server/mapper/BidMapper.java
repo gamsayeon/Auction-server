@@ -7,16 +7,18 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class BidMapper {
     private final ModelMapper modelMapper;
 
-    public Bid convertToEntity(BidDTO bidDTO) {
+    public Bid convertToEntity(BidDTO bidDTO, Long productId, Long buyerId) {
         Bid bid = Bid.builder()
-                .buyerId(bidDTO.getBuyerId())
-                .productId(bidDTO.getProductId())
+                .buyerId(buyerId)
+                .productId(productId)
                 .bidTime(LocalDateTime.now())
                 .price(bidDTO.getPrice())
                 .build();
@@ -26,5 +28,13 @@ public class BidMapper {
     public BidDTO convertToDTO(Bid bid) {
         BidDTO bidDTO = modelMapper.map(bid, BidDTO.class);
         return bidDTO;
+    }
+
+    public List<BidDTO> convertToDTOList(List<Bid> bids) {
+        List<BidDTO> bidDTOs = new ArrayList<>();
+        for (Bid bid : bids) {
+            bidDTOs.add(modelMapper.map(bid, BidDTO.class));
+        }
+        return bidDTOs;
     }
 }

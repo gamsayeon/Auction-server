@@ -20,6 +20,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequestMapping("/bids")
 @RestController
 @Log4j2
@@ -48,6 +50,27 @@ public class BidController {
         logger.info("경매에 입찰합니다.");
         CommonResponse<BidDTO> response = new CommonResponse<>("SUCCESS", "경매에 입찰했습니다.",
                 request.getRequestURI(), bidService.registerBid(loginId, productId, bidDTO));
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/buyer")
+    @LoginCheck(types = LoginCheck.LoginType.USER)
+    public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidByBuyer(@Parameter(hidden = true) Long loginId,
+                                                                         @RequestParam(value = "productId", required = false) Long productId,
+                                                                         HttpServletRequest request) {
+        logger.info("구매자의 경매 이력을 조회합니다.");
+        CommonResponse<List<BidDTO>> response = new CommonResponse<>("SUCCESS", "경매를 조회했습니다.",
+                request.getRequestURI(), bidService.selectBidByBuyerId(loginId, productId));
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("sale/{productId}")
+    @LoginCheck(types = LoginCheck.LoginType.USER)
+    public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidBySale(@Parameter(hidden = true) Long loginId, @PathVariable("productId") Long productId,
+                                                                        HttpServletRequest request) {
+        logger.info("판맨자의 경매 이력을 조회합니다.");
+        CommonResponse<List<BidDTO>> response = new CommonResponse<>("SUCCESS", "경매를 조회했습니다.",
+                request.getRequestURI(), bidService.selectBidBySaleId(loginId, productId));
         return ResponseEntity.ok(response);
     }
 }

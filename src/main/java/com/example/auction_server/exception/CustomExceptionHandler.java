@@ -7,7 +7,6 @@ import jakarta.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -49,7 +48,8 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(value = {DuplicateException.class, AddFailedException.class, NotMatchingException.class,
-            InputMismatchException.class, UpdateFailedException.class})
+            InputMismatchException.class, UpdateFailedException.class, UserAccessDeniedException.class,
+            DeleteFailedException.class})
     @ResponseBody
     public ResponseEntity<Object> handleAuctionCommonException(AuctionCommonException ex, HttpServletRequest request) {
         String exceptionCode = ex.getMessage();

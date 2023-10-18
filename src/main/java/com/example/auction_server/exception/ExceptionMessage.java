@@ -57,6 +57,7 @@ public class ExceptionMessage {
         exceptionMessages.put("BID_INPUT_MISMATCH", "입력값을 잘못입력했습니다.");
         exceptionMessages.put("BID_ADD_FAILED", "입찰이 되지 않았습니다.");
         exceptionMessages.put("BID_FAILED_NOT_START", "경매가 시작되지 않았습니다.");
+        exceptionMessages.put("BID_NULL_DATA", "경매이력이 없습니다.");
     }
 
     public static String getExceptionMessage(String exceptionCode) {
