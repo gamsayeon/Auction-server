@@ -249,7 +249,7 @@ class ProductServiceImplTest {
         when(userRepository.findUserProjectionById(TEST_SALE_ID)).thenReturn(resultUserProjection);
 
         //when, then
-        assertDoesNotThrow(() -> productService.updateProductStatus(ProductStatus.PRODUCT_REGISTRATION));
+        assertDoesNotThrow(() -> productService.updateProductStatus());
     }
 
     @Test
@@ -315,7 +315,7 @@ class ProductServiceImplTest {
     @DisplayName("현재 상품의 입찰 최고가 검색")
     void currentBid() {
         //given
-        when(bidRepository.findMaxPriceByProductId(TEST_PRODUCT_ID)).thenReturn(null);
+        when(bidRepository.findTopByProductIdOrderByPriceDesc(TEST_PRODUCT_ID)).thenReturn(null);
         when(productRepository.findByProductId(TEST_PRODUCT_ID)).thenReturn(convertedBeforeResponseProduct);
 
         //when

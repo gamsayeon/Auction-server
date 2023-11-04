@@ -1,20 +1,19 @@
 package com.ccommit.auction_server.service.serviceImpl;
 
+import com.ccommit.auction_server.dto.ProductDTO;
+import com.ccommit.auction_server.dto.ProductImageDTO;
 import com.ccommit.auction_server.dto.SearchProductDTO;
 import com.ccommit.auction_server.enums.ProductSortOrder;
+import com.ccommit.auction_server.enums.ProductStatus;
 import com.ccommit.auction_server.exception.*;
 import com.ccommit.auction_server.mapper.ProductImageMapper;
 import com.ccommit.auction_server.mapper.ProductMapper;
+import com.ccommit.auction_server.model.PaymentRequest;
+import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.model.ProductImage;
 import com.ccommit.auction_server.projection.UserProjection;
 import com.ccommit.auction_server.repository.*;
 import com.ccommit.auction_server.service.ProductService;
-import com.ccommit.auction_server.dto.ProductDTO;
-import com.ccommit.auction_server.dto.ProductImageDTO;
-import com.ccommit.auction_server.enums.ProductStatus;
-import com.ccommit.auction_server.exception.*;
-import com.ccommit.auction_server.model.Product;
-import com.ccommit.auction_server.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +39,7 @@ public class ProductServiceImpl implements ProductService {
     private final BidRepository bidRepository;
     private final UserRepository userRepository;
     private final EmailServiceImpl emailService;
+    private final TossPaymentServiceImpl tossPaymentService;
     private static final Logger logger = LogManager.getLogger(ProductServiceImpl.class);
 
     @Override
@@ -192,7 +192,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public void updateProductStatus(ProductStatus productStatus) {
+    public void updateProductStatus() {
         List<Product> resultProducts = productRepository.findByProductStatus(ProductStatus.PRODUCT_REGISTRATION, ProductStatus.AUCTION_PROCEEDING);
         for (Product product : resultProducts) {
             switch (product.getProductStatus()) {
@@ -223,6 +223,12 @@ public class ProductServiceImpl implements ProductService {
                             UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
                             emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
                                     resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
+                            PaymentRequest paymentRequest = PaymentRequest.builder()
+                                    .amount(bidRepository.findTopByProductIdOrderByPriceDesc(product.getProductId()).getPrice())
+                                    .amountTaxFree(0)
+                                    .productDesc(product.getProductName())
+                                    .build();
+                            tossPaymentService.createPayment(paymentRequest, resultProduct.getProductId());
                         }
                     }
                     break;
@@ -377,7 +383,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public Integer currentBid(Long productId) {
-        Integer maxPriceProductId = bidRepository.findMaxPriceByProductId(productId);
+        Integer maxPriceProductId = bidRepository.findTopByProductIdOrderByPriceDesc(productId).getPrice();
         if (maxPriceProductId == null)
             maxPriceProductId = productRepository.findByProductId(productId).getStartPrice();
         return maxPriceProductId;
