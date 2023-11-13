@@ -1,4 +1,4 @@
-package com.ccommit.auction_server.model;
+package com.ccommit.auction_server.model.toss;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentRequest {
+public class PaymentCreateRequest {
     private String orderNo;
     private int amount;
     private int amountTaxFree;

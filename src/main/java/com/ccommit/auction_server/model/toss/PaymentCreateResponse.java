@@ -1,4 +1,4 @@
-package com.ccommit.auction_server.model;
+package com.ccommit.auction_server.model.toss;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentResponse {
+public class PaymentCreateResponse {
     @JsonProperty("code")
     private int code;
 

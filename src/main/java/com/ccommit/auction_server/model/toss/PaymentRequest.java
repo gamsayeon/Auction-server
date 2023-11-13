@@ -1,4 +1,4 @@
-package com.ccommit.auction_server.model;
+package com.ccommit.auction_server.model.toss;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentApproveRequest {
+public class PaymentRequest {
     private String apiKey;
     private String payToken;
 }

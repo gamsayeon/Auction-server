@@ -58,6 +58,11 @@ public class ExceptionMessage {
         exceptionMessages.put("BID_ADD_FAILED", "입찰이 되지 않았습니다.");
         exceptionMessages.put("BID_FAILED_NOT_START", "경매가 시작되지 않았습니다.");
         exceptionMessages.put("BID_NULL_DATA", "경매이력이 없습니다.");
+        //Payment
+        exceptionMessages.put("PAYMENT_NETWORK_CONNECTION_ERROR", "네트워크가 불안정합니다. 확인 후 재시도 해주세요.");
+        exceptionMessages.put("PAYMENT_AMOUNT_NOT_MATCH", "요청한 금액과 일치 하지 않습니다.");
+        exceptionMessages.put("PAYMENT_REFUNDS_FAILED", "환불에 실패하였습니다. 재시도 해주세요.");
+        exceptionMessages.put("PAYMENT_ADD_FAILED", "Payment 추가하지 못했습니다.");
     }
 
     public static String getExceptionMessage(String exceptionCode) {

@@ -1,6 +1,6 @@
-package com.ccommit.auction_server.model;
+package com.ccommit.auction_server.model.toss;
 
-import com.ccommit.auction_server.enums.PaymentMethod;
+import com.ccommit.auction_server.enums.PayMethod;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -35,7 +35,7 @@ public class PaymentApproveResponse {
     private int paidAmount;
 
     @JsonProperty("payMethod")
-    private PaymentMethod payMethod;
+    private PayMethod payMethod;
 
     @JsonProperty("payToken")
     private String payToken;
@@ -54,4 +54,17 @@ public class PaymentApproveResponse {
 
     @JsonProperty("paidPoint")
     private int paidPoint;
+
+    private String cashReceiptMgtKey;
+    private int cardCompanyCode;
+    private String cardCompanyName;
+    private String cardAuthorizationNo;
+    private int spreadOut;
+    private boolean noInterest;
+    private String salesCheckLinkUrl;
+    private String cardMethodType;
+    private String cardNumber;
+    private String cardUserType;
+    private String cardNum4Print;
+    private String cardBinNumber;
 }

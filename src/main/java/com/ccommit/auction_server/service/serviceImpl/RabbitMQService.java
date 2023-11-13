@@ -2,8 +2,8 @@ package com.ccommit.auction_server.service.serviceImpl;
 
 import com.ccommit.auction_server.enums.ProductStatus;
 import com.ccommit.auction_server.exception.AddFailedException;
+import com.ccommit.auction_server.exception.InputMismatchException;
 import com.ccommit.auction_server.model.Bid;
-import com.ccommit.auction_server.model.PaymentRequest;
 import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.projection.UserProjection;
 import com.ccommit.auction_server.repository.BidRepository;
@@ -13,15 +13,19 @@ import com.ccommit.auction_server.service.MQService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.rabbitmq.client.Channel;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 /***
  * 생성자 주입을 자동으로 처리 함
@@ -61,7 +65,7 @@ public class RabbitMQService implements MQService {
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.name}")
-    public void dequeueMassage(String jsonStr, Message message) {
+    public void dequeueMassage(String jsonStr, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             objectMapper.registerModule(new JavaTimeModule());
@@ -73,15 +77,10 @@ public class RabbitMQService implements MQService {
             if (resultBid == null) {
                 logger.warn("입찰이 되지 않았습니다.");
                 throw new AddFailedException("BID_ADD_FAILED", deserializedBid);
-            } else if(resultBid.getPrice() == product.getHighestPrice()){
+            } else if (resultBid.getPrice() == product.getHighestPrice()) {
                 product.setProductStatus(ProductStatus.AUCTION_END);
                 productRepository.save(product);
-                PaymentRequest paymentRequest = PaymentRequest.builder()
-                        .amount(resultBid.getPrice())
-                        .amountTaxFree(0)
-                        .productDesc(product.getProductName())
-                        .build();
-                tossPaymentService.createPayment(paymentRequest, resultBid.getProductId());
+                tossPaymentService.createPayment(resultBid.getPrice(), product.getProductName(), resultBid.getProductId());
             } else {
                 logger.info("정상적으로 입찰 되었습니다.");
                 UserProjection recipientEmail = userRepository.findUserProjectionById(resultBid.getBuyerId());
@@ -91,6 +90,8 @@ public class RabbitMQService implements MQService {
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+        } catch (InputMismatchException e) {
+            channel.basicReject(tag, false);
         }
     }
 

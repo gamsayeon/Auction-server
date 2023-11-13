@@ -1,6 +1,6 @@
 package com.ccommit.auction_server.enums;
 
-public enum PaymentMethod {
+public enum PayMethod {
     TOSS_MONEY,
     CARD
 }

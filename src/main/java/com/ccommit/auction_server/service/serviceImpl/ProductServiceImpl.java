@@ -8,7 +8,6 @@ import com.ccommit.auction_server.enums.ProductStatus;
 import com.ccommit.auction_server.exception.*;
 import com.ccommit.auction_server.mapper.ProductImageMapper;
 import com.ccommit.auction_server.mapper.ProductMapper;
-import com.ccommit.auction_server.model.PaymentRequest;
 import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.model.ProductImage;
 import com.ccommit.auction_server.projection.UserProjection;
@@ -223,12 +222,9 @@ public class ProductServiceImpl implements ProductService {
                             UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
                             emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
                                     resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
-                            PaymentRequest paymentRequest = PaymentRequest.builder()
-                                    .amount(bidRepository.findTopByProductIdOrderByPriceDesc(product.getProductId()).getPrice())
-                                    .amountTaxFree(0)
-                                    .productDesc(product.getProductName())
-                                    .build();
-                            tossPaymentService.createPayment(paymentRequest, resultProduct.getProductId());
+
+                            int price = bidRepository.findTopByProductIdOrderByPriceDesc(product.getProductId()).getPrice();
+                            tossPaymentService.createPayment(price, product.getProductName(), resultProduct.getProductId());
                         }
                     }
                     break;
