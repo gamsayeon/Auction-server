@@ -50,10 +50,12 @@
     - 최저, 최고 입찰가 순
 - 입찰 기능
     - 즉시 구매
+        - 즉시 구매가로 입찰시 Toss Payments 결제 요청 API, 승인 API 연동
     - 입찰
         - 최저 입찰 단가
         - 최고 입찰 단가
         - 입찰 단위
+        - 입찰 종료시 최고가 Toss Payments 결제 요청 API, 승인 API 연동
     - 히스토리 데이터 추가(입찰시간, 입찰자, 입찰가, 판매자, 즉시구매가)
 - 알림
     - 시작 및 종료 알림
@@ -63,6 +65,10 @@
 - 경매 이력 조회
     - 자신의 경매 기록 확인
     - 상품의 경매 기록 확인
+ - 결제관리
+    - 취소 API(Toss Payments 결제 취소 API 연동)
+    - 환불 API(Toss Payments 결제 환불 API 연동)
+    - 결제 이력 정보 조회 API
 ---
 # ERD(Entity Relationship Diagram)
 ![img](https://github.com/gamsayeon/Auction-Server/assets/75170367/064df78b-410b-4bb0-bb4e-8ba6f076f07a)
