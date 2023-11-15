@@ -74,11 +74,19 @@
 ![auction_server](https://github.com/gamsayeon/Auction-Server/assets/75170367/29ad36b5-ef34-4d4c-8438-99b0032643ce)
 ---
 # 시퀀스
-입찰 시퀀스
+<details><summary>Sequence Diagram</summary>
+    
+## 입찰 시퀀스
 ![입찰API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/f16b41a9-5384-47a3-9944-b15803d41ebc)
+ 
 
-결제 시퀀스
+## 결제 시퀀스
 ![결제API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/ca2aa8f7-df41-4c66-b04f-085e32061bb6)
 
-#성능테스트 계획서
-https://lean-pen-0eb.notion.site/b25e5f901d9f4bacae7fb39c1a48fea5?pvs=4
+</details>
+
+---
+
+# [성능테스트 계획서](https://lean-pen-0eb.notion.site/b25e5f901d9f4bacae7fb39c1a48fea5?pvs=4)
+
+---
