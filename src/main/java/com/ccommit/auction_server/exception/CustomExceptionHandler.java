@@ -28,6 +28,7 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
     public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
         logger.error(ex.getMessage());
         String errorMessage = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
@@ -49,7 +50,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(value = {DuplicateException.class, AddFailedException.class, NotMatchingException.class,
             InputMismatchException.class, UpdateFailedException.class, UserAccessDeniedException.class,
-            DeleteFailedException.class})
+            DeleteFailedException.class, EnumConvertersException.class})
     @ResponseBody
     public ResponseEntity<Object> handleAuctionCommonException(AuctionCommonException ex, HttpServletRequest request) {
         String exceptionCode = ex.getMessage();

@@ -9,7 +9,9 @@ import com.ccommit.auction_server.projection.UserProjection;
 import com.ccommit.auction_server.repository.BidRepository;
 import com.ccommit.auction_server.repository.ProductRepository;
 import com.ccommit.auction_server.repository.UserRepository;
+import com.ccommit.auction_server.service.EmailService;
 import com.ccommit.auction_server.service.MQService;
+import com.ccommit.auction_server.service.PaymentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -31,19 +33,19 @@ import java.io.IOException;
  * 생성자 주입을 자동으로 처리 함
  */
 
-@Profile({"dev"})
+@Profile({"dev", "test", "performance"})
 @RequiredArgsConstructor
 @Service
-public class RabbitMQService implements MQService {
+public class RabbitMQServiceImpl implements MQService {
     private final BidPriceValidServiceImpl bidPriceValidService;
     private final UserRepository userRepository;
-    private final EmailServiceImpl emailService;
+    private final EmailService emailService;
     private final RabbitTemplate rabbitTemplate;
     private final ProductRepository productRepository;
     private final BidRepository bidRepository;
 
-    private final TossPaymentServiceImpl tossPaymentService;
-    private static final Logger logger = LogManager.getLogger(RabbitMQService.class);
+    private final PaymentService tossPaymentService;
+    private static final Logger logger = LogManager.getLogger(RabbitMQServiceImpl.class);
 
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
@@ -92,6 +94,10 @@ public class RabbitMQService implements MQService {
             e.printStackTrace();
         } catch (InputMismatchException e) {
             channel.basicReject(tag, false);
+        } catch (Exception e) {
+            // TODO: 메세지 큐에서 정상 DEQUE 되었으나, DB 네트워크 오류로 장애시 데드레터큐에 INSERT 후
+            // 수동으로 퍼지하여 재처리 가능하게 개발
+            // 우선순위큐(자료구조)
         }
     }
 

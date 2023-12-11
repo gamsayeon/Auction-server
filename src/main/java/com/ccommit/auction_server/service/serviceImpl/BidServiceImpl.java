@@ -9,7 +9,9 @@ import com.ccommit.auction_server.model.Bid;
 import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.repository.BidRepository;
 import com.ccommit.auction_server.repository.ProductRepository;
+import com.ccommit.auction_server.service.BidPriceValidService;
 import com.ccommit.auction_server.service.BidService;
+import com.ccommit.auction_server.service.MQService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,10 +23,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final BidMapper bidMapper;
-    private final RabbitMQService rabbitMQService;
+    private final MQService rabbitMQService;
     private final BidRepository bidRepository;
     private final ProductRepository productRepository;
-    private final BidPriceValidServiceImpl bidPriceValidService;
+    private final BidPriceValidService bidPriceValidService;
     private static final Logger logger = LogManager.getLogger(BidServiceImpl.class);
 
     @Override

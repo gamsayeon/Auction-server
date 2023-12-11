@@ -9,6 +9,7 @@ import com.ccommit.auction_server.projection.UserProjection;
 import com.ccommit.auction_server.repository.BidRepository;
 import com.ccommit.auction_server.repository.PaymentRepository;
 import com.ccommit.auction_server.repository.UserRepository;
+import com.ccommit.auction_server.service.EmailService;
 import com.ccommit.auction_server.service.PaymentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,7 +51,7 @@ public class TossPaymentServiceImpl implements PaymentService {
     private String retCancelURL;
 
     final Integer RESPONSE_SUCCESS_CODE = 0;
-    private final EmailServiceImpl emailService;
+    private final EmailService emailService;
     private final BidRepository bidRepository;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
@@ -172,7 +173,11 @@ public class TossPaymentServiceImpl implements PaymentService {
             responseBody = this.getOutputConnection(connection, jsonStr, responseBody);
 
             paymentApproveResponse = objectMapper.readValue(responseBody.toString(), PaymentApproveResponse.class);
-            if (paymentApproveResponse.getCode() == RESPONSE_SUCCESS_CODE && payment.getPaymentAmount() == paymentApproveResponse.getAmount()) {
+            if (payment.getPaymentStatus() != PaymentStatus.PAY_STANDBY) {
+                logger.warn("결제 상태가 결제대기 상태가 아닙니다.");
+                throw new PaymentFailedException("PAYMENT_STATUS_FAILED", payment.getPaymentStatus());
+            } else if (paymentApproveResponse.getCode() == RESPONSE_SUCCESS_CODE &&
+                    payment.getPaymentAmount() == paymentApproveResponse.getAmount()) {
                 payment.setPaymentDate(LocalDateTime.now());
                 payment.setPayMethod(paymentApproveResponse.getPayMethod());
                 payment.setPaymentStatus(PaymentStatus.PAY_COMPLETE);
@@ -184,7 +189,7 @@ public class TossPaymentServiceImpl implements PaymentService {
             } else {
                 this.closePayment(orderNo);
                 logger.warn("요청한 금액과 결제금액이 다릅니다.");
-                throw new PaymentFailedException("PAYMENT_AMOUNT_NOT_MATCH");
+                throw new PaymentFailedException("PAYMENT_AMOUNT_NOT_MATCH", payment.getPaymentAmount());
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -265,7 +270,7 @@ public class TossPaymentServiceImpl implements PaymentService {
                 }
             } else {
                 logger.warn("환불에 실패 했습니다.");
-                throw new PaymentFailedException("PAYMENT_REFUNDS_FAILED");
+                throw new PaymentFailedException("PAYMENT_REFUNDS_FAILED", payment.getPaymentAmount());
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
