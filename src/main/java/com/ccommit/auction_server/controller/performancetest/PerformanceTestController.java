@@ -42,9 +42,10 @@ public class PerformanceTestController {
     @PostMapping
     @Transactional
     public ResponseEntity<CommonResponse<String>> generatedUsersAndCategory() {
-        //성능테스트용 user, category 20개 랜덤 추가
+        faker = new Faker();
+
+        //성능테스트용 user 20개 랜덤 추가
         for (int i = 1; i <= 20; i++) {
-            faker = new Faker();
             String userId = faker.name().username();
             userService.registerUser(UserDTO.builder()
                     .userId(userId)
@@ -56,6 +57,8 @@ public class PerformanceTestController {
                     .build());
             userService.updateUserType(userId);
         }
+
+        //성능테스트용 category 50개 랜덤 추가
         for (int i = 1; i <= 50; i++) {
             String department;
             do {
@@ -67,7 +70,7 @@ public class PerformanceTestController {
                     .bidMinPrice(faker.number().numberBetween(1000, 50000))
                     .build());
         }
-        CommonResponse<String> response = new CommonResponse<>("SUCCESS", "성능테스트용 user,category 20개를 추가하였습니다.", null);
+        CommonResponse<String> response = new CommonResponse<>("SUCCESS", "성능테스트용 user 20개 ,category 50개를 추가하였습니다.", null);
         return ResponseEntity.ok(response);
     }
 
@@ -82,7 +85,7 @@ public class PerformanceTestController {
             String generatedProductName = faker.commerce().productName();
             Long generatedSaleId = Double.valueOf(Math.random() * 20 + 1).longValue();
             String generatedExplanation = faker.lorem().sentence();
-            Long generatedCategoryId = Double.valueOf(Math.random() * 20 + 1).longValue();
+            Long generatedCategoryId = Double.valueOf(Math.random() * 50 + 1).longValue();
             int generatedStartPrice = faker.number().numberBetween(1000, 100000);
 
             productService.registerProduct(generatedSaleId, ProductDTO.builder()

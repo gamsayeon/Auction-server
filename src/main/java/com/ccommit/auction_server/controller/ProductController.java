@@ -18,18 +18,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/products")
-@Log4j2
 @RequiredArgsConstructor
 @Tag(name = "Product API", description = "Product 관련 API")
 public class ProductController {
@@ -145,7 +142,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @Scheduled(cron = "${auction.time.interval}")
+    //    @Scheduled(cron = "${auction.productState.scheduling.updateTime}")
     public void updateProductAuctionStatus() {
         logger.debug("경매상태값을 수정합니다.");
         productService.updateProductStatus();

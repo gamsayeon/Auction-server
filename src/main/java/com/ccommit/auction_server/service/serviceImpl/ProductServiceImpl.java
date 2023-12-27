@@ -10,7 +10,7 @@ import com.ccommit.auction_server.exception.*;
 import com.ccommit.auction_server.mapper.ProductImageMapper;
 import com.ccommit.auction_server.mapper.ProductMapper;
 import com.ccommit.auction_server.model.Bid;
-import com.ccommit.auction_server.model.DocumentProduct;
+import com.ccommit.auction_server.model.ELK.DocumentProduct;
 import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.model.ProductImage;
 import com.ccommit.auction_server.projection.UserProjection;
@@ -308,12 +308,12 @@ public class ProductServiceImpl implements ProductService {
         switch (sortOrder) {
             case BIDDER_COUNT_DESC:             //입찰자가 많은 순
                 Collections.sort(products, (p1, p2) -> {
-                    Long productId1 = p1.getProductId();
-                    Long productId2 = p2.getProductId();
+                    int bidCount1 = p1.getBidCount();
+                    int bidCount2 = p2.getBidCount();
 
-                    if (bidRepository.countByProductId(productId1) > bidRepository.countByProductId(productId2)) {
+                    if (bidCount1 > bidCount2) {
                         return -1; // p1이 p2보다 작으면 음수 값 반환
-                    } else if (bidRepository.countByProductId(productId1) < bidRepository.countByProductId(productId2)) {
+                    } else if (bidCount1 < bidCount2) {
                         return 1; // p1이 p2보다 크면 양수 값 반환
                     } else {
                         return 0; // p1과 p2가 같으면 0 반환
@@ -348,12 +348,12 @@ public class ProductServiceImpl implements ProductService {
                 break;
             case BID_PRICE_DESC:             //최고 입찰가 순
                 Collections.sort(products, (p1, p2) -> {
-                    Integer maxPriceProductId1 = this.currentBid(p1.getProductId());
-                    Integer maxPriceProductId2 = this.currentBid(p2.getProductId());
+                    Integer maxBidPriceProductId1 = p1.getMaxBidPrice();
+                    Integer maxBidPriceProductId2 = p2.getMaxBidPrice();
 
-                    if (maxPriceProductId1 > maxPriceProductId2) {
+                    if (maxBidPriceProductId1 > maxBidPriceProductId2) {
                         return -1; // p1이 p2보다 작으면 음수 값 반환
-                    } else if (maxPriceProductId1 < maxPriceProductId2) {
+                    } else if (maxBidPriceProductId1 < maxBidPriceProductId2) {
                         return 1; // p1이 p2보다 크면 양수 값 반환
                     } else {
                         return 0; // p1과 p2가 같으면 0 반환
@@ -362,12 +362,12 @@ public class ProductServiceImpl implements ProductService {
                 break;
             case BID_PRICE_ASC:             //최저 입찰가 순
                 Collections.sort(products, (p1, p2) -> {
-                    Integer maxPriceProductId1 = this.currentBid(p1.getProductId());
-                    Integer maxPriceProductId2 = this.currentBid(p2.getProductId());
+                    Integer maxBidPriceProductId1 = p1.getMaxBidPrice();
+                    Integer maxBidPriceProductId2 = p2.getMaxBidPrice();
 
-                    if (maxPriceProductId1 < maxPriceProductId2) {
+                    if (maxBidPriceProductId1 < maxBidPriceProductId2) {
                         return -1; // p1이 p2보다 작으면 음수 값 반환
-                    } else if (maxPriceProductId1 > maxPriceProductId2) {
+                    } else if (maxBidPriceProductId1 > maxBidPriceProductId2) {
                         return 1; // p1이 p2보다 크면 양수 값 반환
                     } else {
                         return 0; // p1과 p2가 같으면 0 반환

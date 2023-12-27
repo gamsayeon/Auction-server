@@ -53,11 +53,11 @@ public class RabbitMQServiceImpl implements MQService {
     @Value("${rabbitmq.routing.key}")
     private String routingKey;
 
-
     @Override
     public void enqueueMassage(Bid bid) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
+            //LocalDateTime을 JSON으로 변환하거나 JSON에서 해당 클래스로 역직렬화하기 위해 모듈을 등록하는 코드
             objectMapper.registerModule(new JavaTimeModule());
             String jsonStr = objectMapper.writeValueAsString(bid);
             rabbitTemplate.convertAndSend(exchangeName, routingKey, jsonStr);
@@ -66,6 +66,7 @@ public class RabbitMQServiceImpl implements MQService {
         }
     }
 
+    @Override
     @RabbitListener(queues = "${rabbitmq.queue.name}")
     public void dequeueMassage(String jsonStr, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -93,11 +94,8 @@ public class RabbitMQServiceImpl implements MQService {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         } catch (InputMismatchException e) {
+            //유효성 검사 실패로 인한 exception 발생시 큐에 메세지가 남아있어 해당 메세지 재처리안함(flase)
             channel.basicReject(tag, false);
-        } catch (Exception e) {
-            // TODO: 메세지 큐에서 정상 DEQUE 되었으나, DB 네트워크 오류로 장애시 데드레터큐에 INSERT 후
-            // 수동으로 퍼지하여 재처리 가능하게 개발
-            // 우선순위큐(자료구조)
         }
     }
 

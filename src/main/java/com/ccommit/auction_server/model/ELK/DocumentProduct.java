@@ -1,18 +1,18 @@
-package com.ccommit.auction_server.model;
+package com.ccommit.auction_server.model.ELK;
 
 import com.ccommit.auction_server.enums.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDateTime;
 
 @Document(indexName = "product_index")
 @Getter
 @Setter
+@Setting(settingPath = "/static/elastic/elastic-settings.json")
+@Mapping(mappingPath = "/static/elastic/product-mappings.json")
 public class DocumentProduct {
     @Id
     private String id;
@@ -49,4 +49,10 @@ public class DocumentProduct {
 
     @Field(name = "product_status")
     private ProductStatus productStatus;
+
+    @Field(type = FieldType.Double, name = "max_bid_price")
+    private int maxBidPrice;
+
+    @Field(type = FieldType.Integer, name = "bid_count")
+    private int bidCount;
 }

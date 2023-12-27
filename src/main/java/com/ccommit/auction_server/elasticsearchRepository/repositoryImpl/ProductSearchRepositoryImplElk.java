@@ -1,7 +1,7 @@
 package com.ccommit.auction_server.elasticsearchRepository.repositoryImpl;
 
 import com.ccommit.auction_server.elasticsearchRepository.ProductSearchRepository;
-import com.ccommit.auction_server.model.DocumentProduct;
+import com.ccommit.auction_server.model.ELK.DocumentProduct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -50,9 +50,6 @@ public class ProductSearchRepositoryImplElk implements ProductSearchRepository {
             baseCriteria = baseCriteria.and("explanation").is(explanation);
         }
         CriteriaQuery query = new CriteriaQuery(baseCriteria);
-
-        System.out.println("Elasticsearch Query: " + query.toString());
-
 
         return query;
     }

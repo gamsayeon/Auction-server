@@ -1,7 +1,7 @@
 package com.ccommit.auction_server.repository;
 
 import com.ccommit.auction_server.elasticsearchRepository.ProductSearchRepository;
-import com.ccommit.auction_server.model.DocumentProduct;
+import com.ccommit.auction_server.model.ELK.DocumentProduct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
