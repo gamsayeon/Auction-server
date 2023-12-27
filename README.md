@@ -56,6 +56,8 @@
         - 최고 입찰 단가
         - 입찰 단위
         - 입찰 종료시 최고가 Toss Payments 결제 요청 API, 승인 API 연동
+        - 유효성 체크
+            - 물품id, 입찰자id, 가격 3가지로 이전 요청이 있는지 확인
     - 히스토리 데이터 추가(입찰시간, 입찰자, 입찰가, 판매자, 즉시구매가)
 - 알림
     - 시작 및 종료 알림
@@ -69,6 +71,8 @@
     - 취소 API(Toss Payments 결제 취소 API 연동)
     - 환불 API(Toss Payments 결제 환불 API 연동)
     - 결제 이력 정보 조회 API
+    - 유효성 체크
+        - 가격, 물품 상태 확인
 ---
 # ERD(Entity Relationship Diagram)
 ![auction_server](https://github.com/gamsayeon/Auction-Server/assets/75170367/29ad36b5-ef34-4d4c-8438-99b0032643ce)
