@@ -1,7 +1,7 @@
 package com.ccommit.auction_server.controller;
 
-import com.ccommit.auction_server.dto.BidDTO;
 import com.ccommit.auction_server.aop.LoginCheck;
+import com.ccommit.auction_server.dto.BidDTO;
 import com.ccommit.auction_server.model.CommonResponse;
 import com.ccommit.auction_server.service.serviceImpl.BidServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,7 +53,7 @@ public class BidController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/history")
+    @GetMapping("/histories")
     @LoginCheck(types = LoginCheck.LoginType.USER)
     public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidByUser(@Parameter(hidden = true) Long loginId,
                                                                         @RequestParam(value = "productId", required = false) Long productId,
@@ -64,7 +64,7 @@ public class BidController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/history/{productId}")
+    @GetMapping("/histories/{productId}")
     public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidByProduct(@PathVariable("productId") Long productId,
                                                                            HttpServletRequest request) {
         logger.info("판맨자의 경매 이력을 조회합니다.");

@@ -1,12 +1,13 @@
 package com.ccommit.auction_server.service.serviceImpl;
 
+import com.ccommit.auction_server.exception.InputMismatchException;
+import com.ccommit.auction_server.model.Bid;
 import com.ccommit.auction_server.model.Category;
+import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.repository.BidRepository;
 import com.ccommit.auction_server.repository.CategoryRepository;
-import com.ccommit.auction_server.service.BidPriceValidService;
-import com.ccommit.auction_server.exception.InputMismatchException;
-import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.repository.ProductRepository;
+import com.ccommit.auction_server.service.BidPriceValidService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,10 +30,13 @@ public class BidPriceValidServiceImpl implements BidPriceValidService {
         Optional<Category> category = categoryRepository.findByCategoryId(product.getCategoryId());
         int minBidPriceUnit = category.get().getBidMinPrice();
 
-        Integer currentPrice = bidRepository.findMaxPriceByProductId(productId);
-        if (currentPrice == null) {
+        Bid bid = bidRepository.findTopByProductIdOrderByPriceDesc(productId);
+        if (bid == null) {
             int startPrice = product.getStartPrice();
-            if (startPrice == price) {
+            if(price > product.getHighestPrice()){
+                logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
+                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
+            } else if (startPrice == price) {
                 return;
             } else if (price - startPrice > minBidPriceUnit) {
                 return;
@@ -44,7 +48,11 @@ public class BidPriceValidServiceImpl implements BidPriceValidService {
                 throw new InputMismatchException("BID_INPUT_MISMATCH", price);
             }
         } else {
-            if (price - currentPrice > minBidPriceUnit) {
+            Integer currentPrice = bid.getPrice();
+            if(price > product.getHighestPrice()){
+                logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
+                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
+            } else if (price - currentPrice > minBidPriceUnit) {
                 return;
             } else if (currentPrice >= price) {
                 logger.warn("입찰 가격을 잘못 입력하였습니다.", price);

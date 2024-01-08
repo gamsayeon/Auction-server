@@ -5,7 +5,6 @@ import com.ccommit.auction_server.dto.ProductCommentDTO;
 import com.ccommit.auction_server.dto.ProductDTO;
 import com.ccommit.auction_server.dto.SearchProductDTO;
 import com.ccommit.auction_server.enums.ProductSortOrder;
-import com.ccommit.auction_server.enums.ProductStatus;
 import com.ccommit.auction_server.model.CommonResponse;
 import com.ccommit.auction_server.service.serviceImpl.ProductCommentServiceImpl;
 import com.ccommit.auction_server.service.serviceImpl.ProductServiceImpl;
@@ -149,8 +148,7 @@ public class ProductController {
     @Scheduled(cron = "${auction.time.interval}")
     public void updateProductAuctionStatus() {
         logger.debug("경매상태값을 수정합니다.");
-        productService.updateProductStatus(ProductStatus.PRODUCT_REGISTRATION);
-        productService.updateProductStatus(ProductStatus.AUCTION_PROCEEDING);
+        productService.updateProductStatus();
     }
 
     @PostMapping("/comments/{productId}")

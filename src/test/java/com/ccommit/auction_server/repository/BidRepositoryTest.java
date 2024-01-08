@@ -45,7 +45,7 @@ class BidRepositoryTest {
     @DisplayName("상품의 입찰 최댓값 조회")
     void findMaxPriceByProductId() {
         //when
-        Integer findMaxBid = bidRepository.findMaxPriceByProductId(TEST_BUYER_ID);
+        Integer findMaxBid = bidRepository.findTopByProductIdOrderByPriceDesc(TEST_BUYER_ID).getPrice();
 
         //then
         assertNotNull(findMaxBid);

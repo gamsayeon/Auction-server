@@ -1,10 +1,10 @@
 package com.ccommit.auction_server.service.serviceImpl;
 
+import com.ccommit.auction_server.enums.ProductStatus;
 import com.ccommit.auction_server.model.Category;
+import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.repository.BidRepository;
 import com.ccommit.auction_server.repository.CategoryRepository;
-import com.ccommit.auction_server.enums.ProductStatus;
-import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -73,7 +73,7 @@ class BidPriceValidServiceImplTest {
         //given
         when(productRepository.findByProductId(TEST_PRODUCT_ID)).thenReturn(product);
         when(categoryRepository.findByCategoryId(TEST_CATEGORY_ID)).thenReturn(Optional.of(category));
-        when(bidRepository.findMaxPriceByProductId(TEST_PRODUCT_ID)).thenReturn(TEST_CURRENT_PRICE);
+        when(bidRepository.findTopByProductIdOrderByPriceDesc(TEST_PRODUCT_ID).getPrice()).thenReturn(TEST_CURRENT_PRICE);
 
         //when, then
         assertDoesNotThrow(() -> bidPriceValidService.validBidPrice(TEST_PRODUCT_ID, TEST_PRICE));
