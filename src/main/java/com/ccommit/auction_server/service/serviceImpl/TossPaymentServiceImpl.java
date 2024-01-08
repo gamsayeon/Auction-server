@@ -184,7 +184,7 @@ public class TossPaymentServiceImpl implements PaymentService {
             } else {
                 this.closePayment(orderNo);
                 logger.warn("요청한 금액과 결제금액이 다릅니다.");
-                throw new PaymentFailedException("PAYMENT_AMOUNT_NOT_MATCH");
+                throw new PaymentFailedException("PAYMENT_AMOUNT_NOT_MATCH", payment.getPaymentAmount());
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -264,8 +264,8 @@ public class TossPaymentServiceImpl implements PaymentService {
                     throw new AddFailedException("PAYMENT_ADD_FAILED", resultPayment);
                 }
             } else {
-                logger.warn("환불에 실패 했습니다.");
-                throw new PaymentFailedException("PAYMENT_REFUNDS_FAILED");
+                logger.warn("금액 불일치로 인해 환불에 실패 했습니다.");
+                throw new PaymentFailedException("PAYMENT_REFUNDS_FAILED", payment.getPaymentAmount());
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
