@@ -1,6 +1,7 @@
 package com.ccommit.auction_server.repository;
 
-import com.ccommit.auction_server.elasticsearchRepository.ProductSearchRepository;
+import com.ccommit.auction_server.elasticsearchRepository.repositoryImpl.ProductSearchRepositoryImplElk;
+import com.ccommit.auction_server.enums.ProductSortOrder;
 import com.ccommit.auction_server.model.ELK.DocumentProduct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +22,7 @@ import static org.junit.Assert.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ProductSearchRepositoryImplElkTest {
     @Autowired
-    private ProductSearchRepository productSearchRepository;
+    private ProductSearchRepositoryImplElk productSearchRepository;
     private Long TEST_SALE_ID = 500L;
     private Long TEST_CATEGORY_ID = 500L;
     private int PRODUCT_COUNT = 5;
@@ -54,10 +55,9 @@ class ProductSearchRepositoryImplElkTest {
     @DisplayName("다양한 상품 검색 테스트")
     void searchProducts() {
         Pageable pageable = PageRequest.of(1, 10);
-
         //productName search when
         Page<DocumentProduct> searchResult = productSearchRepository.searchProducts("1", null, null,
-                null, pageable);
+                null, pageable, ProductSortOrder.BIDDER_COUNT_DESC);
         List<DocumentProduct> searchResultList = searchResult.getContent();
 
         //productName search then
@@ -69,7 +69,7 @@ class ProductSearchRepositoryImplElkTest {
 
         //saleId search when
         searchResult = productSearchRepository.searchProducts(null, TEST_SALE_ID, null,
-                null, pageable);
+                null, pageable, ProductSortOrder.BID_PRICE_ASC);
         searchResultList = searchResult.getContent();
 
         //saleId search then
@@ -81,7 +81,7 @@ class ProductSearchRepositoryImplElkTest {
 
         //categoryId search when
         searchResult = productSearchRepository.searchProducts(null, null, TEST_CATEGORY_ID,
-                null, pageable);
+                null, pageable, ProductSortOrder.BID_PRICE_ASC);
         searchResultList = searchResult.getContent();
 
         //categoryId search then
@@ -93,7 +93,7 @@ class ProductSearchRepositoryImplElkTest {
 
         //explanation search when
         searchResult = productSearchRepository.searchProducts(null, null, null,
-                TEST_EXPLANATION, pageable);
+                TEST_EXPLANATION, pageable, ProductSortOrder.BID_PRICE_ASC);
         searchResultList = searchResult.getContent();
 
         //explanation search then

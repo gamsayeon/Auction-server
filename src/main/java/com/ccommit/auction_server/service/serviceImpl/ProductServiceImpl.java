@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -279,10 +278,8 @@ public class ProductServiceImpl implements ProductService {
                                              String explanation, int page, int pageSize, ProductSortOrder sortOrder) {
         Pageable pageable = PageRequest.of(page, pageSize);
 
-        Page<DocumentProduct> searchResult = productSearchRepository.searchProducts(productName, saleId, categoryId, explanation, pageable);
+        Page<DocumentProduct> searchResult = productSearchRepository.searchProducts(productName, saleId, categoryId, explanation, pageable, sortOrder);
         List<DocumentProduct> searchResultList = searchResult.getContent();
-
-        searchResultList = this.sortProducts(sortOrder, searchResultList);
 
         List<ProductDTO> productDTOs = new ArrayList<>();
         for (DocumentProduct documentProduct : searchResultList) {
@@ -301,95 +298,6 @@ public class ProductServiceImpl implements ProductService {
                 .productDTOs(productDTOs)
                 .build();
         return searchProductDTD;
-    }
-
-    public List<DocumentProduct> sortProducts(ProductSortOrder sortOrder, List<DocumentProduct> documentProducts) {
-        List<DocumentProduct> products = new ArrayList<>(documentProducts);
-        switch (sortOrder) {
-            case BIDDER_COUNT_DESC:             //입찰자가 많은 순
-                Collections.sort(products, (p1, p2) -> {
-                    int bidCount1 = p1.getBidCount();
-                    int bidCount2 = p2.getBidCount();
-
-                    if (bidCount1 > bidCount2) {
-                        return -1; // p1이 p2보다 작으면 음수 값 반환
-                    } else if (bidCount1 < bidCount2) {
-                        return 1; // p1이 p2보다 크면 양수 값 반환
-                    } else {
-                        return 0; // p1과 p2가 같으면 0 반환
-                    }
-                });
-                break;
-            case HIGHEST_PRICE_DESC:     // 최고 즉시 구매가 순
-                Collections.sort(products, (p1, p2) -> {
-                    double highestPrice1 = p1.getHighestPrice();
-                    double highestPrice2 = p2.getHighestPrice();
-                    if (highestPrice1 < highestPrice2) {
-                        return -1; // p1이 p2보다 작으면 음수 값 반환
-                    } else if (highestPrice1 > highestPrice2) {
-                        return 1; // p1이 p2보다 크면 양수 값 반환
-                    } else {
-                        return 0; // p1과 p2가 같으면 0 반환
-                    }
-                });
-                break;
-            case HIGHEST_PRICE_ASC:     // 최저 즉시 구매가 순
-                Collections.sort(products, (p1, p2) -> {
-                    double highestPrice1 = p1.getHighestPrice();
-                    double highestPrice2 = p2.getHighestPrice();
-                    if (highestPrice1 < highestPrice2) {
-                        return 1; // 역순: p1이 p2보다 작으면 양수 값 반환
-                    } else if (highestPrice1 > highestPrice2) {
-                        return -1; // 역순: p1이 p2보다 크면 음수 값 반환
-                    } else {
-                        return 0; // p1과 p2가 같으면 0 반환
-                    }
-                });
-                break;
-            case BID_PRICE_DESC:             //최고 입찰가 순
-                Collections.sort(products, (p1, p2) -> {
-                    Integer maxBidPriceProductId1 = p1.getMaxBidPrice();
-                    Integer maxBidPriceProductId2 = p2.getMaxBidPrice();
-
-                    if (maxBidPriceProductId1 > maxBidPriceProductId2) {
-                        return -1; // p1이 p2보다 작으면 음수 값 반환
-                    } else if (maxBidPriceProductId1 < maxBidPriceProductId2) {
-                        return 1; // p1이 p2보다 크면 양수 값 반환
-                    } else {
-                        return 0; // p1과 p2가 같으면 0 반환
-                    }
-                });
-                break;
-            case BID_PRICE_ASC:             //최저 입찰가 순
-                Collections.sort(products, (p1, p2) -> {
-                    Integer maxBidPriceProductId1 = p1.getMaxBidPrice();
-                    Integer maxBidPriceProductId2 = p2.getMaxBidPrice();
-
-                    if (maxBidPriceProductId1 < maxBidPriceProductId2) {
-                        return -1; // p1이 p2보다 작으면 음수 값 반환
-                    } else if (maxBidPriceProductId1 > maxBidPriceProductId2) {
-                        return 1; // p1이 p2보다 크면 양수 값 반환
-                    } else {
-                        return 0; // p1과 p2가 같으면 0 반환
-                    }
-                });
-                break;
-            case NEWEST_FIRST:                  //등록일 최신 순
-                Collections.sort(products, (p1, p2) -> {
-                    LocalDateTime registerTime1 = p1.getProductRegisterTime();
-                    LocalDateTime registerTime2 = p2.getProductRegisterTime();
-                    return registerTime1.compareTo(registerTime2);
-                });
-                break;
-            case OLDEST_FIRST:                  //등록일 과거 순
-                Collections.sort(products, (p1, p2) -> {
-                    LocalDateTime registerTime1 = p1.getProductRegisterTime();
-                    LocalDateTime registerTime2 = p2.getProductRegisterTime();
-                    return registerTime2.compareTo(registerTime1);
-                });
-                break;
-        }
-        return products;
     }
 
     public Integer currentBid(Long productId) {

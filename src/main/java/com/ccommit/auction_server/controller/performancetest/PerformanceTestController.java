@@ -42,10 +42,10 @@ public class PerformanceTestController {
     @PostMapping
     @Transactional
     public ResponseEntity<CommonResponse<String>> generatedUsersAndCategory() {
-        faker = new Faker();
 
         //성능테스트용 user 20개 랜덤 추가
         for (int i = 1; i <= 20; i++) {
+            faker = new Faker();
             String userId = faker.name().username();
             userService.registerUser(UserDTO.builder()
                     .userId(userId)
@@ -60,6 +60,7 @@ public class PerformanceTestController {
 
         //성능테스트용 category 50개 랜덤 추가
         for (int i = 1; i <= 50; i++) {
+            faker = new Faker();
             String department;
             do {
                 department = faker.commerce().department();

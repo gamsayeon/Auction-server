@@ -4,6 +4,7 @@ import com.ccommit.auction_server.enums.PaymentStatus;
 import com.ccommit.auction_server.exception.AddFailedException;
 import com.ccommit.auction_server.exception.NetworkConnectionException;
 import com.ccommit.auction_server.exception.PaymentFailedException;
+import com.ccommit.auction_server.model.Payment;
 import com.ccommit.auction_server.model.toss.*;
 import com.ccommit.auction_server.projection.UserProjection;
 import com.ccommit.auction_server.repository.BidRepository;
@@ -269,7 +270,7 @@ public class TossPaymentServiceImpl implements PaymentService {
                     throw new AddFailedException("PAYMENT_ADD_FAILED", resultPayment);
                 }
             } else {
-                logger.warn("환불에 실패 했습니다.");
+                logger.warn("금액 불일치로 인해 환불에 실패 했습니다.");
                 throw new PaymentFailedException("PAYMENT_REFUNDS_FAILED", payment.getPaymentAmount());
             }
         } catch (JsonProcessingException e) {

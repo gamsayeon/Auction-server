@@ -142,6 +142,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    // TODO: 성능테스트시 불필요한 Schedule 이기에 주석 처리 하였습니다.
     //    @Scheduled(cron = "${auction.productState.scheduling.updateTime}")
     public void updateProductAuctionStatus() {
         logger.debug("경매상태값을 수정합니다.");
