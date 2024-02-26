@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -143,7 +144,7 @@ public class ProductController {
     }
 
     // TODO: 성능테스트시 불필요한 Schedule 이기에 주석 처리 하였습니다.
-    //    @Scheduled(cron = "${auction.productState.scheduling.updateTime}")
+        @Scheduled(cron = "${auction.productState.scheduling.updateTime}")
     public void updateProductAuctionStatus() {
         logger.debug("경매상태값을 수정합니다.");
         productService.updateProductStatus();

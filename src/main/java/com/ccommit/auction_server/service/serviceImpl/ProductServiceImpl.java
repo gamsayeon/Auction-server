@@ -10,7 +10,7 @@ import com.ccommit.auction_server.exception.*;
 import com.ccommit.auction_server.mapper.ProductImageMapper;
 import com.ccommit.auction_server.mapper.ProductMapper;
 import com.ccommit.auction_server.model.Bid;
-import com.ccommit.auction_server.model.ELK.DocumentProduct;
+import com.ccommit.auction_server.model.elk.DocumentProduct;
 import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.model.ProductImage;
 import com.ccommit.auction_server.projection.UserProjection;

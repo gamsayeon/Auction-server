@@ -25,7 +25,7 @@ public class UserDTO {
     @NotBlank(groups = {SignUp.class, AdminSignUp.class, UpdateUser.class, Login.class})
     @Pattern(groups = {SignUp.class, AdminSignUp.class, UpdateUser.class, Login.class},
             regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{3,20}$",
-            message = "비밀번호는 3자기 이상 20자리 이하로 숫자와 영어, 특수기호(!@#$%^&*)를 각 하나이상 포함해주세요")
+            message = "비밀번호는 3자리 이상 20자리 이하로 숫자와 영어, 특수기호(!@#$%^&*)를 각 하나이상 포함해주세요")
     @Schema(name = "password", description = "유저 비밀번호", example = "testPassword1!")
     private String password;
 

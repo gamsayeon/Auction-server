@@ -1,4 +1,4 @@
-package com.ccommit.auction_server.model.ELK;
+package com.ccommit.auction_server.model.elk;
 
 import com.ccommit.auction_server.enums.ProductStatus;
 import lombok.Getter;

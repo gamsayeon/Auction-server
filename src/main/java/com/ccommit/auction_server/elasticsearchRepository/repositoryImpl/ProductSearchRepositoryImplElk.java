@@ -2,7 +2,7 @@ package com.ccommit.auction_server.elasticsearchRepository.repositoryImpl;
 
 import com.ccommit.auction_server.elasticsearchRepository.ProductSearchRepository;
 import com.ccommit.auction_server.enums.ProductSortOrder;
-import com.ccommit.auction_server.model.ELK.DocumentProduct;
+import com.ccommit.auction_server.model.elk.DocumentProduct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

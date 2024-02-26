@@ -7,7 +7,7 @@ import com.ccommit.auction_server.exception.BidFailedNotStartException;
 import com.ccommit.auction_server.exception.NotMatchingException;
 import com.ccommit.auction_server.mapper.BidMapper;
 import com.ccommit.auction_server.model.Bid;
-import com.ccommit.auction_server.model.ELK.DocumentBid;
+import com.ccommit.auction_server.model.elk.DocumentBid;
 import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.repository.ProductRepository;
 import com.ccommit.auction_server.service.BidPriceValidService;

@@ -1,6 +1,6 @@
 package com.ccommit.auction_server.elasticsearchRepository;
 
-import com.ccommit.auction_server.model.ELK.DocumentBid;
+import com.ccommit.auction_server.model.elk.DocumentBid;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 

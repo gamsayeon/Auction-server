@@ -2,7 +2,7 @@ package com.ccommit.auction_server.mapper;
 
 import com.ccommit.auction_server.dto.BidDTO;
 import com.ccommit.auction_server.model.Bid;
-import com.ccommit.auction_server.model.ELK.DocumentBid;
+import com.ccommit.auction_server.model.elk.DocumentBid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

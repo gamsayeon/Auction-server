@@ -1,0 +1,5 @@
+# elasticsearch.yml
+
+# Elasticsearch 설정 옵션 추가
+cluster.name: my_cluster
+network.host: 0.0.0.0
