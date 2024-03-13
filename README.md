@@ -75,7 +75,8 @@
         - 가격, 물품 상태 확인
 ---
 # ERD(Entity Relationship Diagram)
-![auction_server](https://github.com/gamsayeon/Auction-Server/assets/75170367/29ad36b5-ef34-4d4c-8438-99b0032643ce)
+![image](https://github.com/gamsayeon/Auction-Server/assets/75170367/702e5de8-6714-4f92-97ef-62d357e902d0)
+
 ---
 # 시퀀스
 <details><summary>Sequence Diagram</summary>
