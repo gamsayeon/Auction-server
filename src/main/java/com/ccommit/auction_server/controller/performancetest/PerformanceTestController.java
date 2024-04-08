@@ -44,7 +44,7 @@ public class PerformanceTestController {
     public ResponseEntity<CommonResponse<String>> generatedUsersAndCategory() {
 
         //성능테스트용 user 20개 랜덤 추가
-        for (int i = 1; i <= 20; i++) {
+        for (int i = 1; i <= 30; i++) {
             faker = new Faker();
             String userId = faker.name().username();
             userService.registerUser(UserDTO.builder()

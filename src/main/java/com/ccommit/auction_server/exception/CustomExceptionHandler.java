@@ -27,7 +27,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
-        logger.error(ex.getMessage());
+            logger.error(ex.getMessage());
         String errorMessage = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         CommonResponse commonResponse = new CommonResponse("COMMON_VALID",
                 errorMessage, request.getServletPath());

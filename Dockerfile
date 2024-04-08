@@ -1,8 +1,8 @@
 # Amazon Corretto 17을 베이스 이미지로 사용
 FROM amazoncorretto:17
 
-# 작업 디렉토리를 /docker으로 설정
-WORKDIR /docker/src/docker/spring-boot
+# 개발 환경에서 실행하려면 환경 변수를 설정합니다.
+ENV SPRING_PROFILES_ACTIVE=dev
 
 # Gradle Wrapper를 복사하여 사용
 COPY gradlew .
@@ -10,8 +10,6 @@ COPY gradle gradle
 
 # Gradle 프로젝트 파일들을 복사
 COPY . .
-
-# RUN sleep 30;
 
 # Gradle Wrapper를 초기화하고 종속성을 다운로드
 RUN ./gradlew clean build -x test

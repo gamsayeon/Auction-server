@@ -49,6 +49,7 @@ public class BidPriceValidServiceImpl implements BidPriceValidService {
             }
         } else {
             Integer currentPrice = bid.getPrice();
+            System.out.println(currentPrice + " 비교값 : " + price);
             if(price > product.getHighestPrice()){
                 logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
                 throw new InputMismatchException("BID_INPUT_MISMATCH", price);

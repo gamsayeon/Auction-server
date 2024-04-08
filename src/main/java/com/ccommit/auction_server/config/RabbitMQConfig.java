@@ -1,9 +1,6 @@
 package com.ccommit.auction_server.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -43,7 +40,10 @@ public class RabbitMQConfig {
      */
     @Bean
     public Queue queue() {
-        return new Queue(queueName);
+        // 우선순위 큐를 사용하도록 설정
+        return QueueBuilder.durable(queueName)
+                .withArgument("x-max-priority", 255) // 우선순위 개수 설정
+                .build();
     }
 
     /**
@@ -60,7 +60,7 @@ public class RabbitMQConfig {
      * 주어진 큐와 익스체인지를 바인딩하고 라우팅 키를 사용하여 Binding 빈을 생성
      *
      * @param queue    바인딩할 Queue
-     * @param exchange 바인딩할 TopicExchange
+     * @param exchange 바인딩할 DirectExchange
      * @return Binding 빈 객체
      */
     @Bean
@@ -75,11 +75,17 @@ public class RabbitMQConfig {
      */
     @Bean
     public ConnectionFactory connectionFactory() {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+        CustomCachingConnectionFactory  connectionFactory = new CustomCachingConnectionFactory();
         connectionFactory.setHost(rabbitmqHost);
         connectionFactory.setPort(rabbitmqPort);
         connectionFactory.setUsername(rabbitmqUsername);
         connectionFactory.setPassword(rabbitmqPassword);
+        // QoS 설정
+        connectionFactory.setCacheMode(CachingConnectionFactory.CacheMode.CONNECTION);
+        connectionFactory.setConnectionCacheSize(30);
+        connectionFactory.setConnectionLimit(30);
+        connectionFactory.setChannelCheckoutTimeout(10000); // 채널 체크아웃 시간 (밀리초)
+        connectionFactory.setChannelCacheSize(100); // 채널 캐시 크기 (메시지 수)
         return connectionFactory;
     }
 

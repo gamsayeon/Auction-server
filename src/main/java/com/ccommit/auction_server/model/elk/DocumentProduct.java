@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Document(indexName = "product_index")
 @Getter
 @Setter
-@Setting(settingPath = "/static/elastic/elastic-settings.json")
-@Mapping(mappingPath = "/static/elastic/product-mappings.json")
+//@Setting(settingPath = "/static/elastic/elastic-settings.json")
+//@Mapping(mappingPath = "/static/elastic/product-mappings.json")
 public class DocumentProduct {
     @Id
     private String id;

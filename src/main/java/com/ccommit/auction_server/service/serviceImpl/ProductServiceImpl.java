@@ -168,13 +168,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductDTO updateProduct(Long saleId, Long productId, ProductDTO productDTO) {
+    public ProductDTO updateProduct(Long loginId, Long productId, ProductDTO productDTO) {
         Product resultProduct = productRepository.findByProductId(productId);
         if (resultProduct.getProductStatus() != ProductStatus.PRODUCT_REGISTRATION) {
             logger.warn("해당 상품은 경매가 시작되여 수정이 불가능합니다.");
             throw new UpdateFailedException("PRODUCT_UPDATE_FAILED_BY_STATUS", resultProduct.getProductStatus());
         }
-        if (resultProduct.getSaleId() == saleId) {
+        if (resultProduct.getSaleId() == loginId) {
             this.validatorProduct(productDTO);
             Product product = productMapper.convertToEntity(productDTO);
             product.setProductId(resultProduct.getProductId());
@@ -193,7 +193,7 @@ public class ProductServiceImpl implements ProductService {
             return resultProductDTO;
         } else {
             logger.warn("권한이 없어 해당 상품을 수정하지 못합니다.");
-            throw new UserAccessDeniedException("PRODUCT_ACCESS_DENIED", saleId);
+            throw new UserAccessDeniedException("PRODUCT_ACCESS_DENIED", loginId);
         }
     }
 
@@ -213,8 +213,8 @@ public class ProductServiceImpl implements ProductService {
                         } else {
                             logger.info("경매 상태를 성공적으로 변경했습니다.");
                             UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
-                            emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
-                                    resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
+//                            emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
+//                                    resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
                         }
                     }
                     break;
@@ -228,8 +228,8 @@ public class ProductServiceImpl implements ProductService {
                         } else {
                             logger.info("경매 상태를 성공적으로 변경했습니다.");
                             UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
-                            emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
-                                    resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
+//                            emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
+//                                    resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
 
                             int price = bidRepository.findTopByProductIdOrderByPriceDesc(product.getProductId()).getPrice();
                             tossPaymentService.createPayment(price, product.getProductName(), resultProduct.getProductId());

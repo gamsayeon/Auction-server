@@ -38,20 +38,20 @@
     </Appenders>
 
     <Loggers>
-        <!-- INFO level logger -->
-        <Logger name="com.ccommit.auction_server" level="debug" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
+<!--        &lt;!&ndash; INFO level logger &ndash;&gt;-->
+<!--        <Logger name="com.ccommit.auction_server" level="debug" additivity="false">-->
+<!--            <AppenderRef ref="Console"/>-->
+<!--            <AppenderRef ref="RollingFile"/>-->
+<!--        </Logger>-->
 
-        <!-- DEBUG level logger -->
-        <Logger name="com.ccommit.auction_server" level="debug" additivity="false">
-            <AppenderRef ref="Console"/>
-            <AppenderRef ref="RollingFile"/>
-        </Logger>
+<!--        &lt;!&ndash; DEBUG level logger &ndash;&gt;-->
+<!--        <Logger name="com.ccommit.auction_server" level="debug" additivity="false">-->
+<!--            <AppenderRef ref="Console"/>-->
+<!--            <AppenderRef ref="RollingFile"/>-->
+<!--        </Logger>-->
 
         <!-- Root logger -->
-        <Root level="info">
+        <Root level="warn">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Root>

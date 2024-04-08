@@ -4,6 +4,7 @@ import com.ccommit.auction_server.dto.BidDTO;
 import com.ccommit.auction_server.elasticsearchRepository.BidSelectRepository;
 import com.ccommit.auction_server.enums.ProductStatus;
 import com.ccommit.auction_server.exception.BidFailedNotStartException;
+import com.ccommit.auction_server.exception.InputMismatchException;
 import com.ccommit.auction_server.exception.NotMatchingException;
 import com.ccommit.auction_server.mapper.BidMapper;
 import com.ccommit.auction_server.model.Bid;
@@ -18,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,19 +34,25 @@ public class BidServiceImpl implements BidService {
 
     @Override
     public BidDTO registerBid(Long buyerId, Long productId, BidDTO bidDTO) {
-        Product product = productRepository.findByProductId(productId);
-        bidPriceValidService.validBidPrice(productId, bidDTO.getPrice());
+        Bid bid = null;
+        try {
+            Product product = productRepository.findByProductId(productId);
+            bidPriceValidService.validBidPrice(productId, bidDTO.getPrice());
 
-        if (product.getProductStatus() != ProductStatus.AUCTION_PROCEEDING) {
-            logger.warn("경매가 시작되지 않았습니다.");
-            throw new BidFailedNotStartException("BID_FAILED_NOT_START");
-        } else {
-            Bid bid = bidMapper.convertToEntity(bidDTO, productId, buyerId);
+            if (product.getProductStatus() != ProductStatus.AUCTION_PROCEEDING) {
+                logger.warn("경매가 시작되지 않았습니다.");
+                throw new BidFailedNotStartException("BID_FAILED_NOT_START");
+            } else {
+                bid = bidMapper.convertToEntity(bidDTO, productId, buyerId);
+                bid.setBidTime(LocalDateTime.now());
+                rabbitMQService.enqueueMassage(bid);
+//                RabbitMQServiceImpl.multiEnqueueMassageTest(bid);
 
-            rabbitMQService.enqueueMassage(bid);
-
-            return bidMapper.convertToDTO(bid);
+            }
+        }catch(InputMismatchException e){
+            e.printStackTrace();
         }
+        return bidMapper.convertToDTO(bid);
     }
 
     @Override
@@ -68,7 +76,7 @@ public class BidServiceImpl implements BidService {
             logger.warn("해당하는 상품을 찾지 못했습니다.");
             throw new NotMatchingException("PRODUCT_NOT_MATCH_ID", productId);
         }
-        List<DocumentBid> bids = bidSelectRepository.findByProductId(productId);
+        List<DocumentBid> bids = bidSelectRepository.findByProductIdOrderByPriceDesc(productId);
 
         return bidMapper.convertToSelectBidDTOList(bids);
     }

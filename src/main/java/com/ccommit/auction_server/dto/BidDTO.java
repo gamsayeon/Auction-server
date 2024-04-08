@@ -23,7 +23,7 @@ public class BidDTO {
     @Schema(name = "bidTime", description = "입찰시간")
     private LocalDateTime bidTime;
 
-    @Min(value = 1000)
+//    @Min(value = 1000)
     @NotNull
     @Schema(name = "price", description = "입찰 가격", example = "3000")
     private int price;
