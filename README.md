@@ -9,14 +9,19 @@
 - 프로토타입 : https://ovenapp.io/view/sb7Z9CpgM2xzq7HRLyYAyNr6enzrarx3/
 ---
 # 목적
-- 대용량 트래픽을 고려한 어플리케이션(초당 500tps 이상의 입찰API)
+- 객체 지향적 코드 작성 및 개발 생산성을 위한 JPA 연동
+- 고가용성 애플리케이션 처리를 위한 MQ 연동
+- 조회 성능을 높이기 위한 Elasticsearch 연동
+- 대용량 트래픽을 고려한 어플리케이션(초당 500tps 이상의 상품 검색API)
 - 객체지향적으로 접근하여 유지보수할때 클린 코드구현을 통해 가독성을 높이는 목적
 - 단위테스트를 통한 검증가능한 코드
+
 ---
 # 사용기술
-- JAVA11, Spring Boot, JPA, Redis, MySQL
+- JAVA11, Spring Boot, JPA, Redis, MySQL, Rabbit-MQ, Elasticsearch, Docker, Locust
 ---
 # 프로그램 주요 기능
+<details><summary>Auctino-server 주요 기능</summary>
 - 회원관리
     - 회원가입 기능, 회원 수정, 회원탈퇴
     - 아이디 중복 체크
@@ -73,9 +78,12 @@
     - 결제 이력 정보 조회 API
     - 유효성 체크
         - 가격, 물품 상태 확인
+    
+</details>
+
 ---
 # ERD(Entity Relationship Diagram)
-![image](https://github.com/gamsayeon/Auction-Server/assets/75170367/702e5de8-6714-4f92-97ef-62d357e902d0)
+![image](https://github.com/gamsayeon/Auction-Server/assets/75170367/863b5bdf-4e4b-41ef-85d9-4ed6c20e07e1)
 
 ---
 # 시퀀스
