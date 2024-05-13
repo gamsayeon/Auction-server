@@ -18,7 +18,7 @@
 
 ---
 # 사용기술
-- JAVA11, Spring Boot, JPA, Redis, MySQL, Rabbit-MQ, Elasticsearch, Docker, Locust
+- JAVA11, Spring Boot, JPA, Redis, MySQL, Rabbit-MQ, Elasticsearch, Docker, Locust, junit5
 ---
 # 프로그램 주요 기능
 <details><summary>Auctino-server 주요 기능</summary>
@@ -89,17 +89,31 @@
 # 시퀀스
 <details><summary>Sequence Diagram</summary>
     
-## 입찰 시퀀스
-![입찰API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/f16b41a9-5384-47a3-9944-b15803d41ebc)
- 
+## 입찰 API 시퀀스
+![입찰API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/cf699e07-2bb3-4309-8014-3cf574a0f3b9)
 
-## 결제 시퀀스
+
+### 구현 설명
+- Rabbit-MQ가 비동기적으로 동작하기 때문에 입찰이 언제 성공할지 예측하기 어렵습니다. 따라서, 입찰이 성공한 후에 이를 확인하기 위해 AWS SES를 통해 이메일을 회신하는 것을 선택했습니다. 
+이렇게 함으로써, 성공적인 입찰이 이루어진 사실을 사용자에게 자연스럽게 알릴 수 있도록 구성하였습니다.
+
+## 결제 API 시퀀스
 ![결제API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/ca2aa8f7-df41-4c66-b04f-085e32061bb6)
+
+## 검색 API 시퀀스
+![검색 API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/a7a244e8-f00b-4f47-a924-30c43c9973fe)
+
+### 구현 설명
+- Elasitcsearch을 적용하기 전 성능테스트를 통해 현재 성능을 확인 후 Elasticsearch을 도입하였습니다.
+- [경매 서버 성능 최적화: 경매 서버의 Elasticsearch 도입](https://gamsayeon.tistory.com/56)
 
 </details>
 
 ---
 
 # [성능테스트 계획서](https://lean-pen-0eb.notion.site/b25e5f901d9f4bacae7fb39c1a48fea5?pvs=4)
+- 경매 서버의 성능 테스트 계획서를 작성하여 성능 테스트를 진행했습니다. 이번 성능 테스트의 대상은 검색 API, 입찰 API, 경매 조회 API입니다.
+- 경매 프로젝트의 주요 API의 성능 테스트 목표는 상품 검색API는 분당 약 300회, 동시사용자는 100명으로 예상하였습니다. 이를 고려하여 해당 API의 목표 TPS는 500TPS로 설정하였습니다. 입찰 조회API는 분당 약 100회, 동시사용자는 100명으로 예상하였으며, 목표 TPS는 160TPS로 설정하였습니다. 입찰은 분당 약 30회의 요청, 동시 사용자는 30명으로 예상하였으며, 목표 TPS는 15TPS을 목표로 설정하였습니다.
+- [Auction-Server 성능 테스트: 응답 시간 최적화 방법](https://gamsayeon.tistory.com/65)
 
 ---
