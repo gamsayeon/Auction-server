@@ -90,15 +90,14 @@
 <details><summary>Sequence Diagram</summary>
     
 ## 입찰 API 시퀀스
-![입찰API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/cf699e07-2bb3-4309-8014-3cf574a0f3b9)
-
+![입찰 API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/4d0859f8-1783-44ce-97dd-c6fd6696cc65)
 
 ### 구현 설명
 - Rabbit-MQ가 비동기적으로 동작하기 때문에 입찰이 언제 성공할지 예측하기 어렵습니다. 따라서, 입찰이 성공한 후에 이를 확인하기 위해 AWS SES를 통해 이메일을 회신하는 것을 선택했습니다. 
 이렇게 함으로써, 성공적인 입찰이 이루어진 사실을 사용자에게 자연스럽게 알릴 수 있도록 구성하였습니다.
 
 ## 결제 API 시퀀스
-![결제API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/ca2aa8f7-df41-4c66-b04f-085e32061bb6)
+![결제API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/cf699e07-2bb3-4309-8014-3cf574a0f3b9)
 
 ## 검색 API 시퀀스
 ![검색 API 시퀀스](https://github.com/gamsayeon/Auction-Server/assets/75170367/a7a244e8-f00b-4f47-a924-30c43c9973fe)
