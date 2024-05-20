@@ -22,6 +22,7 @@
 ---
 # 프로그램 주요 기능
 <details><summary>Auctino-server 주요 기능</summary>
+    
 - 회원관리
     - 회원가입 기능, 회원 수정, 회원탈퇴
     - 아이디 중복 체크
