@@ -17,7 +17,7 @@
 
 ---
 # 사용기술
-- JAVA11, Spring Boot, JPA, Redis, MySQL, Rabbit-MQ, Elasticsearch, Docker, Locust, junit5
+- JAVA17, Spring-Boot-3.1.1, JPA, Redis, MySQL, Rabbit-MQ, Elasticsearch, Docker, Locust, junit5
 ---
 # 프로그램 주요 기능
 <details><summary>Auctino-server 주요 기능</summary>
