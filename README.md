@@ -83,7 +83,7 @@
 
 ---
 # ERD(Entity Relationship Diagram)
-![image](https://github.com/gamsayeon/Auction-Server/assets/75170367/437f11e2-792f-43d2-8b29-ef23368a1460)
+![image](https://github.com/gamsayeon/Auction-Server/assets/75170367/a13a3df7-ce88-40ea-99ba-3dcfa99c3d78)
 
 
 ---
