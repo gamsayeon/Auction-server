@@ -83,7 +83,8 @@
 
 ---
 # ERD(Entity Relationship Diagram)
-![image](https://github.com/gamsayeon/Auction-Server/assets/75170367/863b5bdf-4e4b-41ef-85d9-4ed6c20e07e1)
+![image](https://github.com/gamsayeon/Auction-Server/assets/75170367/437f11e2-792f-43d2-8b29-ef23368a1460)
+
 
 ---
 # 시퀀스
