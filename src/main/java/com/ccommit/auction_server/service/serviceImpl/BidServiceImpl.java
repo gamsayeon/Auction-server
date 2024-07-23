@@ -35,22 +35,18 @@ public class BidServiceImpl implements BidService {
     @Override
     public BidDTO registerBid(Long buyerId, Long productId, BidDTO bidDTO) {
         Bid bid = null;
-        try {
-            Product product = productRepository.findByProductId(productId);
-            bidPriceValidService.validBidPrice(productId, bidDTO.getPrice());
+        Product product = productRepository.findByProductId(productId);
+        bidPriceValidService.validBidPrice(productId, bidDTO.getPrice());
 
-            if (product.getProductStatus() != ProductStatus.AUCTION_PROCEEDING) {
-                logger.warn("경매가 시작되지 않았습니다.");
-                throw new BidFailedNotStartException("BID_FAILED_NOT_START");
-            } else {
-                bid = bidMapper.convertToEntity(bidDTO, productId, buyerId);
-                bid.setBidTime(LocalDateTime.now());
-                rabbitMQService.enqueueMassage(bid);
+        if (product.getProductStatus() != ProductStatus.AUCTION_PROCEEDING) {
+            logger.warn("경매가 시작되지 않았습니다.");
+            throw new BidFailedNotStartException("BID_FAILED_NOT_START");
+        } else {
+            bid = bidMapper.convertToEntity(bidDTO, productId, buyerId);
+            bid.setBidTime(LocalDateTime.now());
+            rabbitMQService.enqueueMassage(bid);
 //                RabbitMQServiceImpl.multiEnqueueMassageTest(bid);
 
-            }
-        }catch(InputMismatchException e){
-            e.printStackTrace();
         }
         return bidMapper.convertToDTO(bid);
     }

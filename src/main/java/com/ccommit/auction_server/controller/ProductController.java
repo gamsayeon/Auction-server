@@ -119,7 +119,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/withdraw/{productId}")
+    @DeleteMapping("/{productId}/withdraw")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "PRODUCT_UPDATE_FAILED_BY_STATUS : 상품의 상태로 인한 삭제 실패<br>" +
@@ -144,13 +144,13 @@ public class ProductController {
     }
 
     // TODO: 성능테스트시 불필요한 Schedule 이기에 주석 처리 하였습니다.
-        @Scheduled(cron = "${auction.productState.scheduling.updateTime}")
+//    @Scheduled(cron = "${auction.productState.scheduling.updateTime}")
     public void updateProductAuctionStatus() {
         logger.debug("경매상태값을 수정합니다.");
         productService.updateProductStatus();
     }
 
-    @PostMapping("/comments/{productId}")
+    @PostMapping("/{productId}/comments")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "PRODUCT_COMMENT_ADD_FAILED : 상품 댓글 등록 실패", content = @Content),

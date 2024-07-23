@@ -2,6 +2,7 @@ package com.ccommit.auction_server.service.serviceImpl;
 
 import com.ccommit.auction_server.exception.InputMismatchException;
 import com.ccommit.auction_server.model.Bid;
+import com.ccommit.auction_server.model.BidValidationErrorDetails;
 import com.ccommit.auction_server.model.Category;
 import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.repository.BidRepository;
@@ -25,43 +26,32 @@ public class BidPriceValidServiceImpl implements BidPriceValidService {
     private static final Logger logger = LogManager.getLogger(BidPriceValidServiceImpl.class);
 
     @Override
-    public void validBidPrice(Long productId, int price) {
+    public void validBidPrice(Long productId, int newBidPrice) {
         Product product = productRepository.findByProductId(productId);
         Optional<Category> category = categoryRepository.findByCategoryId(product.getCategoryId());
-        int minBidPriceUnit = category.get().getBidMinPrice();
+        int categoryMinimumBidPrice = category.get().getBidMinPrice();
 
-        Bid bid = bidRepository.findTopByProductIdOrderByPriceDesc(productId);
-        if (bid == null) {
-            int startPrice = product.getStartPrice();
-            if(price > product.getHighestPrice()){
-                logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
-                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
-            } else if (startPrice == price) {
-                return;
-            } else if (price - startPrice > minBidPriceUnit) {
-                return;
-            } else if (startPrice > price) {
-                logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
-                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
-            } else if (price - startPrice < minBidPriceUnit) {
-                logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
-                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
+        Bid currentHighestBid = bidRepository.findTopByProductIdOrderByPriceDesc(productId);
+        int productHighestPrice = product.getHighestPrice();
+        if (currentHighestBid == null) {
+            int startingPrice = product.getStartPrice();
+            if (newBidPrice > productHighestPrice || newBidPrice < startingPrice ||
+                    newBidPrice - startingPrice < categoryMinimumBidPrice) {
+                logAndThrowException(newBidPrice, startingPrice, categoryMinimumBidPrice);
             }
         } else {
-            Integer currentPrice = bid.getPrice();
-            System.out.println(currentPrice + " 비교값 : " + price);
-            if(price > product.getHighestPrice()){
-                logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
-                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
-            } else if (price - currentPrice > minBidPriceUnit) {
-                return;
-            } else if (currentPrice >= price) {
-                logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
-                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
-            } else if (currentPrice + minBidPriceUnit > price) {
-                logger.warn("입찰 가격을 잘못 입력하였습니다.", price);
-                throw new InputMismatchException("BID_INPUT_MISMATCH", price);
+            int currentHighestBidPrice = currentHighestBid.getPrice();
+
+            if (newBidPrice > productHighestPrice || newBidPrice <= currentHighestBidPrice ||
+                    newBidPrice - currentHighestBidPrice < categoryMinimumBidPrice) {
+                logAndThrowException(newBidPrice, currentHighestBidPrice, categoryMinimumBidPrice);
             }
         }
+    }
+
+    private void logAndThrowException(int newBidPrice, int currentHighestBidPrice, int categoryMinimumBidPrice) {
+        BidValidationErrorDetails errorDetails = new BidValidationErrorDetails(newBidPrice, currentHighestBidPrice, categoryMinimumBidPrice);
+        logger.warn("입찰 가격을 잘못 입력하였습니다. {}", errorDetails);
+        throw new InputMismatchException("BID_INPUT_MISMATCH", errorDetails);
     }
 }

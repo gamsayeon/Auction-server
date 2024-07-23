@@ -32,7 +32,7 @@ public class BidController {
 
     private final Logger logger = LogManager.getLogger(BidController.class);
 
-    @PostMapping("/{productId}")
+    @PostMapping("/products/{productId}")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "BID_FAILED_NOT_START : 경매가 시작하지 않음<br>" +
@@ -64,7 +64,7 @@ public class BidController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/histories/{productId}")
+    @GetMapping("/histories/products/{productId}")
     public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidByProduct(@PathVariable("productId") Long productId,
                                                                            HttpServletRequest request) {
         logger.info("판매자의 경매 이력을 조회합니다.");
