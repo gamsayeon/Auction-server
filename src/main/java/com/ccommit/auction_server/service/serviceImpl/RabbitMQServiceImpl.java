@@ -83,31 +83,22 @@ public class RabbitMQServiceImpl implements MQService {
     public void enqueueMassage(Bid bid) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            // 락이 걸려 있는 상품은 입찰을 받지 않습니다.
             if (lockService.isProductLocked(bid.getProductId())) {
                 logger.warn(bid.getProductId() + " ID의 상품이 잠겨있습니다.");
-                throw new ProductLockedException("PRODUCT_ID_LOCKED",bid.getProductId());
+                throw new ProductLockedException("PRODUCT_ID_LOCKED", bid.getProductId());
             }
-            //LocalDateTime을 JSON으로 변환하거나 JSON에서 해당 클래스로 역직렬화하기 위해 모듈을 등록하는 코드
             objectMapper.registerModule(new JavaTimeModule());
-
-            // 우선순위 큐에 메시지를 보내기 위해 MessageProperties 객체를 생성하고 우선순위를 설정합니다.
             MessageProperties properties = new MessageProperties();
-            LocalDateTime bidTime = bid.getBidTime();
-            long epochSeconds = bidTime.toEpochSecond(ZoneOffset.UTC); // LocalDateTime을 Epoch 시간(초 단위)으로 변환합니다.
-            long epochMillis = Long.MAX_VALUE - epochSeconds; // 시간이 적은 요청부터 처리하게 우선순위를 높이기 위한 시간 계산
-            // long to int 변환시 해당 범위를 벗어나는 경우 Integer.MIN_VALUE 또는 Integer.MAX_VALUE로 변환합니다.
-            // TODO : 이는 극단적인 값으로만 계산하므로 실제로는 다른 방법을 사용하여 수정하겠습니다.
-            int priority = (epochMillis < Integer.MIN_VALUE) ? Integer.MIN_VALUE :
-                    (epochMillis > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) epochMillis; // 우선순위로 사용하기 위해 정수로 변환합니다.
 
+            LocalDateTime bidTime = bid.getBidTime();
+            long epochSeconds = bidTime.toEpochSecond(ZoneOffset.UTC);
+            int priority = (int) ((Long.MAX_VALUE - epochSeconds) % 255); // 0부터 255까지 우선순위 설정
             properties.setPriority(priority);
+
             String jsonStr = objectMapper.writeValueAsString(bid);
             logger.warn(bid.getPrice() + "시간 : " + bid.getBidTime());
-            // RabbitMQ에 메시지를 보냅니다. 메시지 속성과 함께 보냅니다.
             rabbitTemplate.send(exchangeName, routingKey, new Message(jsonStr.getBytes(), properties));
         } catch (AmqpException e) {
-            // 메시지 전송 실패
             logger.error("Failed to send message: " + e.getMessage());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -228,9 +219,9 @@ public class RabbitMQServiceImpl implements MQService {
     @Override
     @RabbitListener(queues = "${rabbitmq.dlq.queue.name}")
     public void dlqDequeueMessage(Message message, Channel dlqChannel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
-        if(checkDatabaseHealth()){
+        if (checkDatabaseHealth()) {
             Bid deserializedBid = null;
-            try{
+            try {
                 deserializedBid = convertMessageToBid(message);
                 rabbitTemplate.execute(channel -> {
                     rabbitTemplate.send(exchangeName, routingKey, message);
