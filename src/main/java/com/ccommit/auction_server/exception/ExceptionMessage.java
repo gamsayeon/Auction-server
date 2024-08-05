@@ -48,6 +48,7 @@ public class ExceptionMessage {
         exceptionMessages.put("PRODUCT_INPUT_MISMATCH_TIME", "경매 시작시간을 잘못 입력하셨습니다. 다시 입력해주세요.");
         exceptionMessages.put("PRODUCT_INPUT_MISMATCH_PRICE", "경매 시작가가 즉시구매가와 같거나 큽니다. 다시 입력해주세요.");
         exceptionMessages.put("PRODUCT_DELETE_FAILED", "상품을 삭제하지 못했습니다.");
+        exceptionMessages.put("PRODUCT_ID_LOCKED", "해당 상품은 락이 걸려있습니다.");
         //ProductImage
         exceptionMessages.put("PRODUCT_IMAGE_ADD_FAILED", "이미지 등록에 실패 했습니다.");
         exceptionMessages.put("PRODUCT_IMAGE_DELETE_FAILED", "이미지 삭제에 실패했습니다.");

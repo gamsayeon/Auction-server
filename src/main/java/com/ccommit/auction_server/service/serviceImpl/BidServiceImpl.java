@@ -4,12 +4,11 @@ import com.ccommit.auction_server.dto.BidDTO;
 import com.ccommit.auction_server.elasticsearchRepository.BidSelectRepository;
 import com.ccommit.auction_server.enums.ProductStatus;
 import com.ccommit.auction_server.exception.BidFailedNotStartException;
-import com.ccommit.auction_server.exception.InputMismatchException;
 import com.ccommit.auction_server.exception.NotMatchingException;
 import com.ccommit.auction_server.mapper.BidMapper;
 import com.ccommit.auction_server.model.Bid;
-import com.ccommit.auction_server.model.elk.DocumentBid;
 import com.ccommit.auction_server.model.Product;
+import com.ccommit.auction_server.model.elk.DocumentBid;
 import com.ccommit.auction_server.repository.ProductRepository;
 import com.ccommit.auction_server.service.BidPriceValidService;
 import com.ccommit.auction_server.service.BidService;
@@ -45,8 +44,6 @@ public class BidServiceImpl implements BidService {
             bid = bidMapper.convertToEntity(bidDTO, productId, buyerId);
             bid.setBidTime(LocalDateTime.now());
             rabbitMQService.enqueueMassage(bid);
-//                RabbitMQServiceImpl.multiEnqueueMassageTest(bid);
-
         }
         return bidMapper.convertToDTO(bid);
     }
