@@ -51,7 +51,7 @@ public class RabbitMQServiceImpl implements MQService {
     private final ProductRepository productRepository;
     private final BidRepository bidRepository;
     private final PaymentService tossPaymentService;
-    private final LockServiceImpl lockService;
+    private final RedisLockServiceImpl lockService;
     private final DataSource dataSource;
 
     private static final Logger logger = LogManager.getLogger(RabbitMQServiceImpl.class);

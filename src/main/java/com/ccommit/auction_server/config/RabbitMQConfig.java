@@ -1,6 +1,7 @@
 package com.ccommit.auction_server.config;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -107,7 +108,7 @@ public class RabbitMQConfig {
         connectionFactory.setCacheMode(CachingConnectionFactory.CacheMode.CONNECTION);
         connectionFactory.setConnectionCacheSize(30);
         connectionFactory.setConnectionLimit(30);
-        connectionFactory.setChannelCheckoutTimeout(10000); // 채널 체크아웃 시간 (밀리초)
+        connectionFactory.setChannelCheckoutTimeout(3000000); // 채널 체크아웃 시간 (밀리초)
         connectionFactory.setChannelCacheSize(100); // 채널 캐시 크기 (메시지 수)
         connectionFactory.setRequestedHeartBeat(30); // 하트비트 요청 주기 설정 RabbitMQ와의 연결 유지를 위한 하트비트(연결을 주기적으로 확인) 요청 주기 (초)
         return connectionFactory;
@@ -136,5 +137,17 @@ public class RabbitMQConfig {
     @Bean
     public MessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(jackson2JsonMessageConverter());
+        factory.setConcurrentConsumers(1);
+        factory.setMaxConcurrentConsumers(10);
+        factory.setPrefetchCount(10);  // 메시지 프리패치 수를 설정합니다.
+        factory.setMessageConverter(jackson2JsonMessageConverter());
+        return factory;
     }
 }
