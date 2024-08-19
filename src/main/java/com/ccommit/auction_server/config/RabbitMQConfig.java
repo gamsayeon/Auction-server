@@ -146,7 +146,7 @@ public class RabbitMQConfig {
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(jackson2JsonMessageConverter());
         factory.setConcurrentConsumers(1);
-        factory.setMaxConcurrentConsumers(1);
+        factory.setMaxConcurrentConsumers(10);
         factory.setPrefetchCount(10);  // 메시지 프리패치 수를 설정합니다.
         factory.setMessageConverter(jackson2JsonMessageConverter());
         return factory;
