@@ -39,6 +39,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Profile({"dev", "test", "performance"})
 @Service
@@ -79,6 +80,9 @@ public class RabbitMQServiceImpl implements MQService {
 
     private static final int MAX_RETRY_COUNT = 10;
 
+    // Listener의 상태를 추적하는 플래그
+    private AtomicBoolean isListenerProcessing = new AtomicBoolean(false);
+
     @Override
     public void enqueueMassage(Bid bid) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -106,9 +110,11 @@ public class RabbitMQServiceImpl implements MQService {
     }
 
     @Override
-    @RabbitListener(queues = "${rabbitmq.queue.name}")
+    @RabbitListener(queues = "${rabbitmq.queue.name}", ackMode = "MANUAL")
     public void dequeueMassage(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         try {
+            // Listener가 메시지 처리를 시작하면 플래그를 true로 설정
+            isListenerProcessing.set(true);
             Bid deserializedBid = convertMessageToBid(message);
             Product product = productRepository.findByProductId(deserializedBid.getProductId());
 
@@ -120,6 +126,7 @@ public class RabbitMQServiceImpl implements MQService {
                 });
                 return;
             }
+
             bidPriceValidService.validBidPrice(deserializedBid.getProductId(), deserializedBid.getPrice());
             Bid resultBid = bidRepository.save(deserializedBid);
 
@@ -137,7 +144,7 @@ public class RabbitMQServiceImpl implements MQService {
                 recipientEmail = userRepository.findUserProjectionById(product.getSaleId());
                 emailService.notifyAuction(recipientEmail.getEmail(), "경매 입찰", product.getProductName() + "경매에 입찰하였습니다.");
             }
-
+            channel.basicReject(tag, false);
         } catch (InputMismatchException ex) {
             //유효성 검사 실패로 인한 exception 발생시 큐에 메세지가 남아있어 해당 메세지 재처리안함(flase)
             channel.basicReject(tag, false);
@@ -153,7 +160,6 @@ public class RabbitMQServiceImpl implements MQService {
             });
             // 필요한 경우, 새로운 채널을 생성하거나 다른 조치를 취합니다.
         } catch (Exception ex) {
-            Bid deserializedBid = convertMessageToBid(message);
             rabbitTemplate.execute(enqueueChannel -> {
                 enqueueDLQ(message);
                 // DLQ에 메시지를 전송하였으니 auction.queue에 재처리 하지 않도록 false로 설정
@@ -161,8 +167,10 @@ public class RabbitMQServiceImpl implements MQService {
                 channel.basicReject(tag, false);
                 return null;
             });
-            lockService.lockProduct(deserializedBid.getProductId());
             logger.error("Handled Critical exception: " + ex.getMessage());
+        } finally {
+            // Listener가 메시지 처리를 완료하면 플래그를 false로 설정
+            isListenerProcessing.set(false);
         }
     }
 
@@ -186,14 +194,15 @@ public class RabbitMQServiceImpl implements MQService {
     private void enqueueDLQ(Message message) {
         try {
             Message newMessage = incrementRetryCount(message);
-            MessageProperties properties = newMessage.getMessageProperties();
-            Integer retryCount = (Integer) properties.getHeaders().get("x-retry-count");
+            Integer retryCount = getRetryCount(newMessage);
 
             if (retryCount >= MAX_RETRY_COUNT) {
-                // 최대 재시도 횟수를 초과한 경우, 메시지를 DLQ로 전송하지 않고 개발자에게 알림
+                // 최대 재시도 횟수를 초과한 경우, 메시지를 DLQ로 전송 및 관리하며 개발자에게 알림
+                rabbitTemplate.send(dlqExchangeName, dlqRoutingKey, newMessage);
+                lockService.lockProduct(convertMessageToBid(message).getProductId());
+
+                // TODO : 개발자에게 해당 메시지 이메일로 알림
                 sendAlertEmail(message, retryCount);
-                //TODO : 개발자 확인 큐에 저장(해당 큐 생성 후 전송 로직 추가),
-                //      DB에 저장(개발자 체크용 DB 테이블을 생성하여 json 형태로)
             } else {
                 rabbitTemplate.send(dlqExchangeName, dlqRoutingKey, newMessage);
                 lockService.lockProduct(convertMessageToBid(message).getProductId());
@@ -204,10 +213,15 @@ public class RabbitMQServiceImpl implements MQService {
         }
     }
 
+    private Integer getRetryCount(Message message) {
+        MessageProperties properties = message.getMessageProperties();
+        return (Integer) properties.getHeaders().getOrDefault("x-retry-count", 0);
+    }
+
     private Message incrementRetryCount(Message message) {
         MessageProperties properties = message.getMessageProperties();
         Integer retryCount = (Integer) properties.getHeaders().getOrDefault("x-retry-count", 0);
-        // 재시도 횟수를 증가시키고 DLQ로 전송
+        // 재시도 횟수를 증가시키고 메시지 속성에 설정
         MessageProperties newProperties = new MessageProperties();
         newProperties.setHeaders(properties.getHeaders());
         newProperties.getHeaders().put("x-retry-count", retryCount + 1);
@@ -216,12 +230,20 @@ public class RabbitMQServiceImpl implements MQService {
         return new Message(message.getBody(), newProperties);
     }
 
+    public boolean isListenerProcessing() {
+        return isListenerProcessing.get();
+    }
     @Override
-    @RabbitListener(queues = "${rabbitmq.dlq.queue.name}")
+    @RabbitListener(queues = "${rabbitmq.dlq.queue.name}", ackMode = "MANUAL")
     public void dlqDequeueMessage(Message message, Channel dlqChannel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
-        if (checkDatabaseHealth()) {
-            Bid deserializedBid = null;
-            try {
+        Integer retryCount = getRetryCount(message);
+        Bid deserializedBid = null;
+        try {
+            if(isListenerProcessing()){
+                dlqChannel.basicReject(tag, true);
+                Thread.sleep(1000); // 1초 동안 지연
+                return;
+            } else if (checkDatabaseHealth() && retryCount < MAX_RETRY_COUNT) {
                 deserializedBid = convertMessageToBid(message);
                 rabbitTemplate.execute(channel -> {
                     rabbitTemplate.send(exchangeName, routingKey, message);
@@ -229,14 +251,22 @@ public class RabbitMQServiceImpl implements MQService {
                     return null;
                 });
                 lockService.unlockProduct(deserializedBid.getProductId());
-            } catch (AmqpException | IllegalStateException ex) {
-                // 메시지 전송 실패
-                logger.error("Failed to send message: " + ex.getMessage());
-            } catch (Exception ex) {
-                dlqChannel.basicReject(tag, true);
+            } else {
+                deserializedBid = convertMessageToBid(message);
                 lockService.lockProduct(deserializedBid.getProductId());
-                logger.error("Handled Critical exception: " + ex.getMessage());
+                rabbitTemplate.execute(channel -> {
+                    rabbitTemplate.send(exchangeName, routingKey, message);
+                    dlqChannel.basicAck(tag, false);
+                    return null;
+                });
             }
+        } catch (AmqpException | IllegalStateException ex) {
+            // 메시지 전송 실패
+            logger.error("Failed to send message: " + ex.getMessage());
+        } catch (Exception ex) {
+            dlqChannel.basicReject(tag, true);
+            lockService.lockProduct(deserializedBid.getProductId());
+            logger.error("Handled Critical exception: " + ex.getMessage());
         }
     }
 
