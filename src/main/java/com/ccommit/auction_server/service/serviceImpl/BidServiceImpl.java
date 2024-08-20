@@ -10,9 +10,9 @@ import com.ccommit.auction_server.model.Bid;
 import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.model.elk.DocumentBid;
 import com.ccommit.auction_server.repository.ProductRepository;
-import com.ccommit.auction_server.service.BidPriceValidService;
 import com.ccommit.auction_server.service.BidService;
 import com.ccommit.auction_server.service.MQService;
+import com.ccommit.auction_server.validation.BidPriceValidator;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +27,7 @@ public class BidServiceImpl implements BidService {
     private final BidMapper bidMapper;
     private final MQService rabbitMQService;
     private final ProductRepository productRepository;
-    private final BidPriceValidService bidPriceValidService;
+    private final BidPriceValidator bidPriceValidator;
     private final BidSelectRepository bidSelectRepository;
     private static final Logger logger = LogManager.getLogger(BidServiceImpl.class);
 
@@ -35,7 +35,7 @@ public class BidServiceImpl implements BidService {
     public BidDTO registerBid(Long buyerId, Long productId, BidDTO bidDTO) {
         Bid bid = null;
         Product product = productRepository.findByProductId(productId);
-        bidPriceValidService.validBidPrice(productId, bidDTO.getPrice());
+        bidPriceValidator.validBidPrice(productId, bidDTO.getPrice());
 
         if (product.getProductStatus() != ProductStatus.AUCTION_PROCEEDING) {
             logger.warn("경매가 시작되지 않았습니다.");

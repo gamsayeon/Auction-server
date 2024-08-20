@@ -1,4 +1,4 @@
-package com.ccommit.auction_server.service.serviceImpl;
+package com.ccommit.auction_server.validation;
 
 import com.ccommit.auction_server.exception.InputMismatchException;
 import com.ccommit.auction_server.model.Bid;
@@ -8,7 +8,6 @@ import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.repository.BidRepository;
 import com.ccommit.auction_server.repository.CategoryRepository;
 import com.ccommit.auction_server.repository.ProductRepository;
-import com.ccommit.auction_server.service.BidPriceValidService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,14 +17,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class BidPriceValidServiceImpl implements BidPriceValidService {
+public class BidPriceValidator {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final BidRepository bidRepository;
 
-    private static final Logger logger = LogManager.getLogger(BidPriceValidServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(BidPriceValidator.class);
 
-    @Override
     public void validBidPrice(Long productId, int newBidPrice) {
         Product product = productRepository.findByProductId(productId);
         Optional<Category> category = categoryRepository.findByCategoryId(product.getCategoryId());

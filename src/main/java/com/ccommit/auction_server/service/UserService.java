@@ -2,6 +2,7 @@ package com.ccommit.auction_server.service;
 
 import com.ccommit.auction_server.dto.UserDTO;
 import com.ccommit.auction_server.enums.UserType;
+import com.ccommit.auction_server.projection.UserProjection;
 import jakarta.servlet.http.HttpSession;
 
 public interface UserService {
@@ -20,4 +21,6 @@ public interface UserService {
     void withDrawUser(Long id);
 
     void logoutUser(HttpSession session);
+
+    UserProjection findUserProjectionById(Long userId);
 }

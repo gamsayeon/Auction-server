@@ -25,6 +25,7 @@ public class CustomExceptionHandler {
         return ResponseEntity.badRequest().body(commonResponse);
     }
 
+    // Controller의 Valid 어노테이션에서 유효성 검사가 실패시
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
             logger.error(ex.getMessage());
@@ -46,7 +47,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(value = {DuplicateException.class, AddFailedException.class, NotMatchingException.class,
             InputMismatchException.class, UpdateFailedException.class, UserAccessDeniedException.class,
-            DeleteFailedException.class, EnumConvertersException.class})
+            DeleteFailedException.class, EnumConvertersException.class, ProductLockedException.class, ConvertedFailedException.class})
     public ResponseEntity<Object> handleAuctionCommonException(AuctionCommonException ex, HttpServletRequest request) {
         String exceptionCode = ex.getMessage();
         CommonResponse commonResponse = new CommonResponse(exceptionCode,
