@@ -1,12 +1,11 @@
 package com.ccommit.auction_server.service.serviceImpl;
 
-import com.ccommit.auction_server.exception.ConvertedFailedException;
-import com.ccommit.auction_server.exception.InputMismatchException;
-import com.ccommit.auction_server.exception.NotMatchingException;
-import com.ccommit.auction_server.exception.ProductLockedException;
+import com.ccommit.auction_server.dto.BidDTO;
+import com.ccommit.auction_server.enums.ProductStatus;
+import com.ccommit.auction_server.exception.*;
+import com.ccommit.auction_server.mapper.BidMapper;
 import com.ccommit.auction_server.model.Bid;
 import com.ccommit.auction_server.model.Product;
-import com.ccommit.auction_server.repository.BidRepository;
 import com.ccommit.auction_server.service.*;
 import com.ccommit.auction_server.validation.BidPriceValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,6 +22,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
@@ -42,11 +42,13 @@ public class RabbitMQServiceImpl implements MQService {
     private final EmailService emailService;
     private final RabbitTemplate rabbitTemplate;
     private final ProductService productService;
-    private final BidRepository bidRepository;
+    private final BidService bidService;
     private final PaymentService tossPaymentService;
     private final LockService redisLockService;
     private final DataSource MySQLDBDataSource;
+    private final BidMapper bidMapper;
     private static final Logger logger = LogManager.getLogger(RabbitMQServiceImpl.class);
+
 
     @Value("${spring.rabbitmq.host}")
     private String rabbitmqHost;
@@ -69,18 +71,33 @@ public class RabbitMQServiceImpl implements MQService {
     private AtomicBoolean isAuctionQueueListenerProcessing = new AtomicBoolean(false);
 
     @Override
-    public void enqueueMassage(Bid bid) {
+    public BidDTO enqueueMassage(Long buyerId, Long productId, BidDTO bidDTO) {
+        Bid bid = null;
         try {
-            if (redisLockService.isProductLocked(bid.getProductId())) {
-                logger.warn(bid.getProductId() + " ID의 상품이 잠겨있습니다.");
-                throw new ProductLockedException("PRODUCT_ID_LOCKED", bid.getProductId());
-            }
-            MessageProperties properties = setPriorityBidTime(bid);
-            String jsonStr = convertBidToMessage(bid);
+            Product product = productService.findByProductId(productId);
+            bidPriceValidator.validBidPrice(productId, bidDTO.getPrice());
 
-            rabbitTemplate.send(exchangeName, routingKey, new Message(jsonStr.getBytes(), properties));
+            if (product.getProductStatus() != ProductStatus.AUCTION_PROCEEDING) {
+                logger.warn("경매가 시작되지 않았습니다.");
+                throw new BidFailedNotStartException("BID_FAILED_NOT_START");
+            } else {
+                bid = bidMapper.convertToEntity(bidDTO, productId, buyerId);
+                bid.setBidTime(LocalDateTime.now());
+
+                if (redisLockService.isProductLocked(bid.getProductId())) {
+                    logger.warn(bid.getProductId() + " ID의 상품이 잠겨있습니다.");
+                    throw new ProductLockedException("PRODUCT_ID_LOCKED", bid.getProductId());
+                }
+                MessageProperties properties = setPriorityBidTime(bid);
+                String jsonStr = convertBidToMessage(bid);
+
+                rabbitTemplate.send(exchangeName, routingKey, new Message(jsonStr.getBytes(), properties));
+            }
+
         } catch (AmqpException e) {
             logger.error("Failed to send message: " + e.getMessage());
+        } finally {
+            return bidMapper.convertToDTO(bid);
         }
     }
     private String convertBidToMessage(Bid bid){
@@ -121,7 +138,7 @@ public class RabbitMQServiceImpl implements MQService {
             }
 
             bidPriceValidator.validBidPrice(deserializedBid.getProductId(), deserializedBid.getPrice());
-            Bid resultBid = bidRepository.save(deserializedBid);
+            Bid resultBid = bidService.saveBid(deserializedBid);
 
             if (resultBid.getPrice() == product.getHighestPrice()) {
                 productService.saveProduct(product);

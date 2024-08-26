@@ -7,6 +7,7 @@ import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.repository.BidRepository;
 import com.ccommit.auction_server.repository.CategoryRepository;
 import com.ccommit.auction_server.repository.ProductRepository;
+import com.ccommit.auction_server.validation.BidPriceValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,9 +27,9 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 @DisplayName("BidPriceValidServiceImpl Unit 테스트")
 @ExtendWith(MockitoExtension.class)
-class BidPriceValidServiceImplTest {
+class BidPriceValidatorTest {
     @InjectMocks
-    private BidPriceValidServiceImpl bidPriceValidService;
+    private BidPriceValidator bidPriceValidService;
     @Mock
     private BidRepository bidRepository;
     @Mock

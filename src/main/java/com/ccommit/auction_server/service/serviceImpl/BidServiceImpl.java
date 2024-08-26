@@ -2,51 +2,28 @@ package com.ccommit.auction_server.service.serviceImpl;
 
 import com.ccommit.auction_server.dto.BidDTO;
 import com.ccommit.auction_server.elasticsearchRepository.BidSelectRepository;
-import com.ccommit.auction_server.enums.ProductStatus;
-import com.ccommit.auction_server.exception.BidFailedNotStartException;
 import com.ccommit.auction_server.exception.NotMatchingException;
 import com.ccommit.auction_server.mapper.BidMapper;
 import com.ccommit.auction_server.model.Bid;
-import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.model.elk.DocumentBid;
+import com.ccommit.auction_server.repository.BidRepository;
 import com.ccommit.auction_server.repository.ProductRepository;
 import com.ccommit.auction_server.service.BidService;
-import com.ccommit.auction_server.service.MQService;
-import com.ccommit.auction_server.validation.BidPriceValidator;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final BidMapper bidMapper;
-    private final MQService rabbitMQService;
     private final ProductRepository productRepository;
-    private final BidPriceValidator bidPriceValidator;
     private final BidSelectRepository bidSelectRepository;
+    private final BidRepository bidRepository;
     private static final Logger logger = LogManager.getLogger(BidServiceImpl.class);
-
-    @Override
-    public BidDTO registerBid(Long buyerId, Long productId, BidDTO bidDTO) {
-        Bid bid = null;
-        Product product = productRepository.findByProductId(productId);
-        bidPriceValidator.validBidPrice(productId, bidDTO.getPrice());
-
-        if (product.getProductStatus() != ProductStatus.AUCTION_PROCEEDING) {
-            logger.warn("경매가 시작되지 않았습니다.");
-            throw new BidFailedNotStartException("BID_FAILED_NOT_START");
-        } else {
-            bid = bidMapper.convertToEntity(bidDTO, productId, buyerId);
-            bid.setBidTime(LocalDateTime.now());
-            rabbitMQService.enqueueMassage(bid);
-        }
-        return bidMapper.convertToDTO(bid);
-    }
 
     @Override
     public List<BidDTO> selectBidByUserId(Long buyerId, Long productId) {
@@ -72,5 +49,10 @@ public class BidServiceImpl implements BidService {
         List<DocumentBid> bids = bidSelectRepository.findByProductIdOrderByPriceDesc(productId);
 
         return bidMapper.convertToSelectBidDTOList(bids);
+    }
+
+    @Override
+    public Bid saveBid(Bid bid) {
+        return bidRepository.save(bid);
     }
 }

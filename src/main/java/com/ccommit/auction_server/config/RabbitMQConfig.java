@@ -147,7 +147,10 @@ public class RabbitMQConfig {
         factory.setMessageConverter(jackson2JsonMessageConverter());
         factory.setConcurrentConsumers(1);
         factory.setMaxConcurrentConsumers(10);
-        factory.setPrefetchCount(10);  // 메시지 프리패치 수를 설정합니다.
+        // 메시지 프리패치 수를 설정합니다.
+        // Prefetch Count는 RabbitMQ 채널의 메시지 소비자가 한 번에 받아들일 메시지의 최대 수를 정의합니다.
+        // 이 값은 RabbitMQ가 메시지를 소비자에게 전송할 때, 소비자가 한 번에 받아들일 수 있는 메시지의 수를 제한합니다.
+        factory.setPrefetchCount(10);
         factory.setMessageConverter(jackson2JsonMessageConverter());
         return factory;
     }
