@@ -2,9 +2,13 @@ package com.ccommit.auction_server.service.serviceImpl;
 
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
+import com.ccommit.auction_server.model.Bid;
+import com.ccommit.auction_server.model.Product;
+import com.ccommit.auction_server.projection.UserProjection;
 import com.ccommit.auction_server.service.EmailService;
 import com.ccommit.auction_server.exception.CacheTTLOutException;
 import com.ccommit.auction_server.exception.EmailSendFailedException;
+import com.ccommit.auction_server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,9 +22,12 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl implements EmailService {
     @Value("${expireUrl}")
     private String url;
+    @Value("${admin.email}")
+    private String adminEmail;
     private final Logger logger = LogManager.getLogger(EmailServiceImpl.class);
     private final RedisTemplate<String, String> redisTemplate;
     private final AmazonSimpleEmailService amazonSimpleEmailService;
+    private final UserService userService;
 
     @Cacheable(key = "#token", value = "userId")
     public String putCacheToken(String token, String userId) {
@@ -45,7 +52,7 @@ public class EmailServiceImpl implements EmailService {
         SendEmailRequest request = new SendEmailRequest()
                 .withDestination(destination)
                 .withMessage(emailMessage)
-                .withSource("aud4551@naver.com"); // 발신자 이메일 주소
+                .withSource(adminEmail); // 발신자 이메일 주소
 
         SendEmailResult sendEmailResult = amazonSimpleEmailService.sendEmail(request);
         if (sendEmailResult.getSdkHttpMetadata().getHttpStatusCode() == 200) {
@@ -78,6 +85,7 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Override
     public String verifyEmail(String token) {
         String cachedUserId = this.getCachedToken(token);
         if (cachedUserId != null) {
@@ -89,10 +97,18 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    public String getCachedToken(String token) {
+    private String getCachedToken(String token) {
         String key = "userId::" + token;
         String cachedValue = redisTemplate.opsForValue().get(key);
         return cachedValue;
+    }
+
+    @Override
+    public void notifyAuctionSuccess(Bid bid, Product product){
+        UserProjection recipientEmail = userService.findUserProjectionById(bid.getBuyerId());
+        this.notifyAuction(recipientEmail.getEmail(), "경매 입찰", product.getProductName() + "경매에 입찰하였습니다.");
+        recipientEmail = userService.findUserProjectionById(product.getSaleId());
+        this.notifyAuction(recipientEmail.getEmail(), "경매 입찰", product.getProductName() + "경매에 입찰하였습니다.");
     }
 
 }

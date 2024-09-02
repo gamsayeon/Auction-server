@@ -1,6 +1,7 @@
 package com.ccommit.auction_server.config;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -33,6 +34,15 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.routing.key}")
     private String routingKey;
 
+    @Value("${rabbitmq.dlq.queue.name}")
+    private String dlqQueueName;
+
+    @Value("${rabbitmq.dlq.exchange.name}")
+    private String dlqExchangeName;
+
+    @Value("${rabbitmq.dlq.routing.key}")
+    private String dlqRoutingKey;
+
     /**
      * 지정된 큐 이름으로 Queue 빈을 생성
      *
@@ -46,6 +56,11 @@ public class RabbitMQConfig {
                 .build();
     }
 
+    @Bean
+    public Queue deadLetterQueue() {
+        return QueueBuilder.durable(dlqQueueName).build();
+    }
+
     /**
      * 지정된 익스체인지 이름으로 DirectExchange 빈을 생성
      *
@@ -54,6 +69,11 @@ public class RabbitMQConfig {
     @Bean
     public DirectExchange exchange() {
         return new DirectExchange(exchangeName);
+    }
+
+    @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(dlqExchangeName);
     }
 
     /**
@@ -68,6 +88,10 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(queue).to(exchange).with(routingKey);
     }
 
+    @Bean
+    public Binding deadLetterQueueBinding(Queue deadLetterQueue, DirectExchange deadLetterExchange) {
+        return BindingBuilder.bind(deadLetterQueue).to(deadLetterExchange).with(dlqRoutingKey);
+    }
     /**
      * RabbitMQ 연결을 위한 ConnectionFactory 빈을 생성하여 반환
      *
@@ -75,7 +99,7 @@ public class RabbitMQConfig {
      */
     @Bean
     public ConnectionFactory connectionFactory() {
-        CustomCachingConnectionFactory  connectionFactory = new CustomCachingConnectionFactory();
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
         connectionFactory.setHost(rabbitmqHost);
         connectionFactory.setPort(rabbitmqPort);
         connectionFactory.setUsername(rabbitmqUsername);
@@ -84,8 +108,10 @@ public class RabbitMQConfig {
         connectionFactory.setCacheMode(CachingConnectionFactory.CacheMode.CONNECTION);
         connectionFactory.setConnectionCacheSize(30);
         connectionFactory.setConnectionLimit(30);
-        connectionFactory.setChannelCheckoutTimeout(10000); // 채널 체크아웃 시간 (밀리초)
+        connectionFactory.setConnectionTimeout(300000); // 연결 시간 초과 (밀리초)
+        connectionFactory.setChannelCheckoutTimeout(3000000); // 채널 체크아웃 시간 (밀리초)
         connectionFactory.setChannelCacheSize(100); // 채널 캐시 크기 (메시지 수)
+        connectionFactory.setRequestedHeartBeat(30); // 하트비트 요청 주기 설정 RabbitMQ와의 연결 유지를 위한 하트비트(연결을 주기적으로 확인) 요청 주기 (초)
         return connectionFactory;
     }
 
@@ -100,6 +126,7 @@ public class RabbitMQConfig {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         // JSON 형식의 메시지를 직렬화하고 역직렬할 수 있도록 설정
         rabbitTemplate.setMessageConverter(jackson2JsonMessageConverter());
+        rabbitTemplate.setChannelTransacted(true); // 트랜잭션 사용 설정
         return rabbitTemplate;
     }
 
@@ -111,5 +138,20 @@ public class RabbitMQConfig {
     @Bean
     public MessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(jackson2JsonMessageConverter());
+        factory.setConcurrentConsumers(1);
+        factory.setMaxConcurrentConsumers(10);
+        // 메시지 프리패치 수를 설정합니다.
+        // Prefetch Count는 RabbitMQ 채널의 메시지 소비자가 한 번에 받아들일 메시지의 최대 수를 정의합니다.
+        // 이 값은 RabbitMQ가 메시지를 소비자에게 전송할 때, 소비자가 한 번에 받아들일 수 있는 메시지의 수를 제한합니다.
+        factory.setPrefetchCount(10);
+        factory.setMessageConverter(jackson2JsonMessageConverter());
+        return factory;
     }
 }

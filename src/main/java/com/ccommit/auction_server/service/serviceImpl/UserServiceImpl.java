@@ -8,6 +8,7 @@ import com.ccommit.auction_server.exception.AddFailedException;
 import com.ccommit.auction_server.exception.LogoutFailedException;
 import com.ccommit.auction_server.exception.NotMatchingException;
 import com.ccommit.auction_server.exception.UpdateFailedException;
+import com.ccommit.auction_server.projection.UserProjection;
 import com.ccommit.auction_server.repository.UserRepository;
 import com.ccommit.auction_server.service.UserService;
 import com.ccommit.auction_server.util.SessionUtil;
@@ -219,4 +220,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public UserProjection findUserProjectionById(Long userId){
+        return userRepository.findUserProjectionById(userId);
+    }
 }

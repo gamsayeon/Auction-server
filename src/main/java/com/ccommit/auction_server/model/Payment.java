@@ -22,14 +22,22 @@ public class Payment {
     @Column(name = "order_id")
     private String orderId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
+
     @Column(name = "user_id")
     private Long userId;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    private Product product;
 
     @Column(name = "product_id")
     private Long productId;
 
     @Column(name = "payment_date")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime paymentDate;
 
     @Column(name = "payment_status")

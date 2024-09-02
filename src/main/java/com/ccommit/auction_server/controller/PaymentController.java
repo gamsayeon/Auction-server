@@ -51,7 +51,7 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/refunds/{orderNo}")
+    @PatchMapping("/{orderNo}/refunds")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     public ResponseEntity<CommonResponse<PaymentRefundsResponse>> refundsPayment(Long loginId,
                                                                                  @RequestBody String payToken,

@@ -32,27 +32,6 @@ public class BidController {
 
     private final Logger logger = LogManager.getLogger(BidController.class);
 
-    @PostMapping("/{productId}")
-    @LoginCheck(types = {LoginCheck.LoginType.USER})
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "BID_FAILED_NOT_START : 경매가 시작하지 않음<br>" +
-                    "BID_INPUT_MISMATCH : 입찰 값을 잘못입력시", content = @Content),
-            @ApiResponse(responseCode = "200", description = "입찰 등록 성공", content = @Content(schema = @Schema(implementation = BidDTO.class)))
-    })
-    @Operation(summary = "Bid 등록",
-            description = "구매자가 입찰을 합니다. 하단의 BidDTO 참고",
-            method = "POST",
-            tags = "Bid API",
-            operationId = "Register Bid")
-    @Parameter(name = "productId", description = "입찰할 상품 식별자", example = "1")
-    public ResponseEntity<CommonResponse<BidDTO>> registerBid(@Parameter(hidden = true) Long loginId, @PathVariable("productId") Long productId,
-                                                              @RequestBody @Valid BidDTO bidDTO, HttpServletRequest request) {
-        logger.info("경매에 입찰합니다.");
-        CommonResponse<BidDTO> response = new CommonResponse<>("SUCCESS", "경매에 입찰했습니다.",
-                request.getRequestURI(), bidService.registerBid(loginId, productId, bidDTO));
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/histories")
     @LoginCheck(types = LoginCheck.LoginType.USER)
     public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidByUser(@Parameter(hidden = true) Long loginId,
@@ -64,7 +43,7 @@ public class BidController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/histories/{productId}")
+    @GetMapping("/histories/products/{productId}")
     public ResponseEntity<CommonResponse<List<BidDTO>>> selectBidByProduct(@PathVariable("productId") Long productId,
                                                                            HttpServletRequest request) {
         logger.info("판매자의 경매 이력을 조회합니다.");

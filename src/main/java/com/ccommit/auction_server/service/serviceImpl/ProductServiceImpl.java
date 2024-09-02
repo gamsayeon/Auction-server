@@ -9,7 +9,6 @@ import com.ccommit.auction_server.enums.ProductStatus;
 import com.ccommit.auction_server.exception.*;
 import com.ccommit.auction_server.mapper.ProductImageMapper;
 import com.ccommit.auction_server.mapper.ProductMapper;
-import com.ccommit.auction_server.model.Bid;
 import com.ccommit.auction_server.model.elk.DocumentProduct;
 import com.ccommit.auction_server.model.Product;
 import com.ccommit.auction_server.model.ProductImage;
@@ -213,8 +212,8 @@ public class ProductServiceImpl implements ProductService {
                         } else {
                             logger.info("경매 상태를 성공적으로 변경했습니다.");
                             UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
-//                            emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
-//                                    resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
+                            emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
+                                    resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
                         }
                     }
                     break;
@@ -228,8 +227,8 @@ public class ProductServiceImpl implements ProductService {
                         } else {
                             logger.info("경매 상태를 성공적으로 변경했습니다.");
                             UserProjection recipientEmail = userRepository.findUserProjectionById(resultProduct.getSaleId());
-//                            emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
-//                                    resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
+                            emailService.notifyAuction(recipientEmail.getEmail(), resultProduct.getProductStatus().toString(),
+                                    resultProduct.getProductName() + "의 경매상태가 변경되었습니다.");
 
                             int price = bidRepository.findTopByProductIdOrderByPriceDesc(product.getProductId()).getPrice();
                             tossPaymentService.createPayment(price, product.getProductName(), resultProduct.getProductId());
@@ -261,7 +260,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    public void deleteProductImage(Long productId) {
+    private void deleteProductImage(Long productId) {
         List<ProductImage> productImages = productImageRepository.findByProductId(productId);
         if (!productImages.isEmpty()) {
             if (productImageRepository.deleteAllByProductId(productId) != productImages.size()) {
@@ -300,15 +299,20 @@ public class ProductServiceImpl implements ProductService {
         return searchProductDTD;
     }
 
-    public Integer currentBid(Long productId) {
-        Bid bid = bidRepository.findTopByProductIdOrderByPriceDesc(productId);
-        Integer maxPriceProductId;
-        if (bid == null) {
-            Product product = productRepository.findByProductId(productId);
-            maxPriceProductId = product.getStartPrice();
-        } else maxPriceProductId = bid.getPrice();
-
-        return maxPriceProductId;
+    @Override
+    public Product findByProductId(Long productId) {
+        Product product = productRepository.findByProductId(productId);
+        if(product != null)
+            return product;
+        else {
+            logger.warn("해당 상품을 찾지 못했습니다.");
+            throw new NotMatchingException("PRODUCT_NOT_MATCH_ID", productId);
+        }
+    }
+    @Override
+    public void saveProduct(Product product) {
+        product.setProductStatus(ProductStatus.AUCTION_END);
+        productRepository.save(product);
     }
 
 }

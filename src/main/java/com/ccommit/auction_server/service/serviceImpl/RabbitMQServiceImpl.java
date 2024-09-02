@@ -1,176 +1,274 @@
 package com.ccommit.auction_server.service.serviceImpl;
 
+import com.ccommit.auction_server.dto.BidDTO;
 import com.ccommit.auction_server.enums.ProductStatus;
-import com.ccommit.auction_server.exception.AddFailedException;
-import com.ccommit.auction_server.exception.InputMismatchException;
+import com.ccommit.auction_server.exception.*;
+import com.ccommit.auction_server.mapper.BidMapper;
 import com.ccommit.auction_server.model.Bid;
 import com.ccommit.auction_server.model.Product;
-import com.ccommit.auction_server.projection.UserProjection;
-import com.ccommit.auction_server.repository.BidRepository;
-import com.ccommit.auction_server.repository.ProductRepository;
-import com.ccommit.auction_server.repository.UserRepository;
-import com.ccommit.auction_server.service.EmailService;
-import com.ccommit.auction_server.service.MQService;
-import com.ccommit.auction_server.service.PaymentService;
+import com.ccommit.auction_server.service.*;
+import com.ccommit.auction_server.validation.BidPriceValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.amqp.AmqpIOException;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.io.IOException;
-import java.time.Instant;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-@Profile({"dev", "test", "performance"})
 @Service
 @RequiredArgsConstructor
 public class RabbitMQServiceImpl implements MQService {
-    private final BidPriceValidServiceImpl bidPriceValidService;
-    private final UserRepository userRepository;
     private final EmailService emailService;
     private final RabbitTemplate rabbitTemplate;
-    private final ProductRepository productRepository;
-    private final BidRepository bidRepository;
-
+    private final ProductService productService;
+    private final BidService bidService;
     private final PaymentService tossPaymentService;
+    private final LockService redisLockService;
+    private final DataSource MySQLDBDataSource;
+    private final BidMapper bidMapper;
     private static final Logger logger = LogManager.getLogger(RabbitMQServiceImpl.class);
 
+
+    @Value("${spring.rabbitmq.host}")
+    private String rabbitmqHost;
+    @Value("${rabbitmq.queue.name}")
+    private String queueName;
     @Value("${rabbitmq.exchange.name}")
     private String exchangeName;
-
     @Value("${rabbitmq.routing.key}")
     private String routingKey;
+    @Value("${rabbitmq.dlq.queue.name}")
+    private String dlqQueueName;
+    @Value("${rabbitmq.dlq.exchange.name}")
+    private String dlqExchangeName;
+    @Value("${rabbitmq.dlq.routing.key}")
+    private String dlqRoutingKey;
 
-    private final static String QUEUE_NAME_1 = "auction_server_multi_test1";
-    private final static String QUEUE_NAME_2 = "auction_server_multi_test2";
+    private static final int MAX_RETRY_COUNT = 10;
+
+    // Listener가 메시지 처리를 시작하면 플래그를 true로 설정하여 다른 Listener에서 동시에 메시지를 처리되지 않도록 함
+    private AtomicBoolean isAuctionQueueListenerProcessing = new AtomicBoolean(false);
+
     @Override
-    public void enqueueMassage(Bid bid) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public BidDTO enqueueMassage(Long buyerId, Long productId, BidDTO bidDTO) {
+        Bid bid = null;
         try {
-            //LocalDateTime을 JSON으로 변환하거나 JSON에서 해당 클래스로 역직렬화하기 위해 모듈을 등록하는 코드
-            objectMapper.registerModule(new JavaTimeModule());
+            Product product = productService.findByProductId(productId);
+            bidService.validBidPrice(productId, bidDTO.getPrice());
 
-            // 우선순위 큐에 메시지를 보내기 위해 MessageProperties 객체를 생성하고 우선순위를 설정합니다.
-            MessageProperties properties = new MessageProperties();
-            LocalDateTime bidTime = bid.getBidTime();
-            long epochSeconds = bidTime.toEpochSecond(ZoneOffset.UTC); // LocalDateTime을 Epoch 시간(초 단위)으로 변환합니다.
-            long epochMillis = (Long.MAX_VALUE - epochSeconds) * 100000;
-            int priority = (int) epochMillis; // 우선순위로 사용할 정수로 변환합니다.
-            properties.setPriority(priority);
-            String jsonStr = objectMapper.writeValueAsString(bid);
-            logger.warn(bid.getPrice() + "시간 : " + bid.getBidTime());
-            // RabbitMQ에 메시지를 보냅니다. 메시지 속성과 함께 보냅니다.
-            rabbitTemplate.send(exchangeName, routingKey, new Message(jsonStr.getBytes(), properties));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void multiEnqueueMassageTest(Bid bid){
-        ConnectionFactory factory = new ConnectionFactory();
-        ObjectMapper objectMapper = new ObjectMapper();
-        try (Connection connection = factory.newConnection();
-             Channel channel = connection.createChannel()) {
-            // Declare the queues
-            channel.queueDeclare(QUEUE_NAME_1, false, false, false, null);
-            channel.queueDeclare(QUEUE_NAME_2, false, false, false, null);
-            // Determine the queue with the fewest messages
-            int queue1MessageCount = getMessageCount(channel, QUEUE_NAME_1);
-            int queue2MessageCount = getMessageCount(channel, QUEUE_NAME_2);
-            String targetQueue;
-            if (queue1MessageCount <= queue2MessageCount) {
-                targetQueue = QUEUE_NAME_1;
+            if (product.getProductStatus() != ProductStatus.AUCTION_PROCEEDING) {
+                logger.warn("경매가 시작되지 않았습니다.");
+                throw new BidFailedNotStartException("BID_FAILED_NOT_START");
             } else {
-                targetQueue = QUEUE_NAME_2;
+                bid = bidMapper.convertToEntity(bidDTO, productId, buyerId);
+                bid.setBidTime(LocalDateTime.now());
+
+                if (redisLockService.isProductLocked(bid.getProductId())) {
+                    logger.warn(bid.getProductId() + " ID의 상품이 잠겨있습니다.");
+                    throw new ProductLockedException("PRODUCT_ID_LOCKED", bid.getProductId());
+                }
+                MessageProperties properties = setPriorityBidTime(bid);
+                String jsonStr = convertBidToMessage(bid);
+
+                rabbitTemplate.send(exchangeName, routingKey, new Message(jsonStr.getBytes(), properties));
             }
-            //LocalDateTime을 JSON으로 변환하거나 JSON에서 해당 클래스로 역직렬화하기 위해 모듈을 등록하는 코드
-            objectMapper.registerModule(new JavaTimeModule());
 
-            // 우선순위 큐에 메시지를 보내기 위해 MessageProperties 객체를 생성하고 우선순위를 설정합니다.
-            MessageProperties properties = new MessageProperties();
-            LocalDateTime bidTime = bid.getBidTime();
-            long epochSeconds = bidTime.toEpochSecond(ZoneOffset.UTC); // LocalDateTime을 Epoch 시간(초 단위)으로 변환합니다.
-            long epochMillis = (Long.MAX_VALUE - epochSeconds) * 100000;
-            int priority = (int) epochMillis; // 우선순위로 사용할 정수로 변환합니다.
-            properties.setPriority(priority);
+        } catch (AmqpException e) {
+            logger.error("Failed to send message: " + e.getMessage());
+        } finally {
+            return bidDTO;
+        }
+    }
+    private String convertBidToMessage(Bid bid){
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        try {
             String jsonStr = objectMapper.writeValueAsString(bid);
-            logger.warn(bid.getPrice() + "시간 : " + bid.getBidTime());
-
-            channel.basicPublish("", targetQueue, null, jsonStr.getBytes());
-            // RabbitMQ에 메시지를 보냅니다. 메시지 속성과 함께 보냅니다.
-//            rabbitTemplate.send(exchangeName, routingKey, new Message(jsonStr.getBytes(), properties));
+            return jsonStr;
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
+            throw new ConvertedFailedException("CONVERTED_FAILED", bid);
         }
     }
 
-    private static int getMessageCount(Channel channel, String queueName) throws IOException {
-        AMQP.Queue.DeclareOk result = channel.queueDeclarePassive(queueName);
-        return result.getMessageCount();
+    private MessageProperties setPriorityBidTime(Bid bid){
+        MessageProperties properties = new MessageProperties();
+        LocalDateTime bidTime = bid.getBidTime();
+        long epochSeconds = bidTime.toEpochSecond(ZoneOffset.UTC);
+        int priority = (int) ((Long.MAX_VALUE - epochSeconds) % 255); // 0부터 255까지 우선순위 설정
+        properties.setPriority(priority);
+        return properties;
     }
 
-//    @Override
-//    @RabbitListener(queues = "${rabbitmq.queue.name}")
-//    public void dequeueMassage(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        try {
-//            objectMapper.registerModule(new JavaTimeModule());
-//            String jsonStr = new String(message.getBody());
-//            Bid deserializedBid = objectMapper.readValue(jsonStr, Bid.class);
-//            bidPriceValidService.validBidPrice(deserializedBid.getProductId(), deserializedBid.getPrice());
-//
-//            logger.warn(deserializedBid.getPrice() + " 시간 : " + deserializedBid.getBidTime());
-//            Bid resultBid = bidRepository.save(deserializedBid);
-//            Product product = productRepository.findByProductId(resultBid.getProductId());
-//            if (resultBid == null) {
-//                logger.warn("입찰이 되지 않았습니다.");
-//                throw new AddFailedException("BID_ADD_FAILED", deserializedBid);
-//            } else if (resultBid.getPrice() == product.getHighestPrice()) {
-//                product.setProductStatus(ProductStatus.AUCTION_END);
-//                productRepository.save(product);
-//                tossPaymentService.createPayment(resultBid.getPrice(), product.getProductName(), resultBid.getProductId());
-//            } else {
-//                logger.info("정상적으로 입찰 되었습니다." + deserializedBid.getPrice());
-//                UserProjection recipientEmail = userRepository.findUserProjectionById(resultBid.getBuyerId());
-//                //emailService.notifyAuction(recipientEmail.getEmail(), "경매 입찰", product.getProductName() + "경매에 입찰하였습니다.");
-//                recipientEmail = userRepository.findUserProjectionById(product.getSaleId());
-//                //emailService.notifyAuction(recipientEmail.getEmail(), "경매 입찰", product.getProductName() + "경매에 입찰하였습니다.");
-//            }
-//
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        } catch (InputMismatchException e) {
-//            //유효성 검사 실패로 인한 exception 발생시 큐에 메세지가 남아있어 해당 메세지 재처리안함(flase)
-//            channel.basicReject(tag, false);
-//            //channel.basicNack(tag, false, true);
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
-//    }
+    @Override
+    @RabbitListener(queues = "${rabbitmq.queue.name}", ackMode = "MANUAL")
+    public void dequeueMassage(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+        try {
+            isAuctionQueueListenerProcessing.set(true);
+            Bid deserializedBid = this.convertMessageToBid(message);
+            Product product = productService.findByProductId(deserializedBid.getProductId());
 
+            if (redisLockService.isProductLocked(deserializedBid.getProductId())) {
+                rabbitTemplate.execute(enqueueChannel -> {
+                    enqueueDLQ(message);
+                    channel.basicReject(tag, false);
+                    return null;
+                });
+                return;
+            }
 
+            bidService.validBidPrice(deserializedBid.getProductId(), deserializedBid.getPrice());
+            Bid resultBid = bidService.saveBid(deserializedBid);
+
+            if (resultBid.getPrice() == product.getHighestPrice()) {
+                productService.saveProduct(product);
+                tossPaymentService.createPayment(resultBid.getPrice(), product.getProductName(), resultBid.getProductId());
+            } else {
+                logger.info("정상적으로 입찰 되었습니다." + deserializedBid.getPrice());
+                emailService.notifyAuctionSuccess(resultBid, product);
+            }
+            channel.basicReject(tag, false);
+        } catch (InputMismatchException ex) {
+            //유효성 검사 실패로 인한 exception 발생시 큐에 메세지가 남아있어 해당 메세지 재처리안함(flase)
+            channel.basicReject(tag, false);
+        } catch (ListenerExecutionFailedException ex) {
+            // 재처리 가능한 예외 처리(auction.queue 재처리)
+            channel.basicReject(tag, true);
+        } catch (IllegalStateException ex) {
+            // 채널이 닫혔을 때의 처리 로직
+            logger.error("Channel is closed. Exception: " + ex.getMessage());
+            rabbitTemplate.execute(retryChannel -> {
+                channel.basicReject(tag, true);
+                return null;
+            });
+        } catch (Exception ex) {
+            rabbitTemplate.execute(enqueueChannel -> {
+                enqueueDLQ(message);
+                // DLQ에 메시지를 전송하였으니 auction.queue에 재처리 하지 않도록 false로 설정
+                // ex)DBConnectionException 등이 해당
+                channel.basicReject(tag, false);
+                redisLockService.lockProduct(this.convertMessageToBid(message).getProductId());
+                return null;
+            });
+            logger.error("Handled Critical exception: " + ex.getMessage());
+        } finally {
+            // Listener가 메시지 처리를 완료하면 플래그를 false로 설정
+            isAuctionQueueListenerProcessing.set(false);
+        }
+    }
+
+    private Bid convertMessageToBid(Message message) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        try {
+            String jsonStr = new String(message.getBody());
+            Bid deserializedBid = objectMapper.readValue(jsonStr, Bid.class);
+            if (deserializedBid != null) { // Bid로 변환 가능한 경우에만 처리
+                return deserializedBid;
+            } else {
+                throw new NotMatchingException("BID_NOT_MATCHING", "Invalid Bid data format");
+            }
+        } catch (IOException e) {
+            throw new NotMatchingException("BID_NOT_MATCHING", "Failed to process bid data. Please check the format and try again.");
+        }
+    }
+
+    private void enqueueDLQ(Message message) {
+        try {
+            Message newMessage = this.incrementRetryCount(message);
+            Integer retryCount = this.getRetryCount(newMessage);
+            rabbitTemplate.send(dlqExchangeName, dlqRoutingKey, newMessage);
+            if (retryCount >= MAX_RETRY_COUNT)
+                this.sendAlertAdminEmail(message, retryCount);
+        } catch (AmqpException | IllegalStateException ex) {
+            logger.error("Failed to send message: " + ex.getMessage());
+        }
+    }
+
+    private Integer getRetryCount(Message message) {
+        MessageProperties properties = message.getMessageProperties();
+        return (Integer) properties.getHeaders().getOrDefault("x-retry-count", 0);
+    }
+
+    private Message incrementRetryCount(Message message) {
+        MessageProperties properties = message.getMessageProperties();
+        Integer retryCount = (Integer) properties.getHeaders().getOrDefault("x-retry-count", 0);
+        // 재시도 횟수를 증가시키고 메시지 속성에 설정
+        MessageProperties newProperties = new MessageProperties();
+        newProperties.setHeaders(properties.getHeaders());
+        newProperties.getHeaders().put("x-retry-count", retryCount + 1);
+
+        return new Message(message.getBody(), newProperties);
+    }
+
+    @Override
+    @RabbitListener(queues = "${rabbitmq.dlq.queue.name}", ackMode = "MANUAL")
+    public void dlqDequeueMessage(Message message, Channel dlqChannel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+        Integer retryCount = this.getRetryCount(message);
+        Bid deserializedBid = null;
+        try {
+            deserializedBid = this.convertMessageToBid(message);
+            if(isAuctionQueueListenerProcessing.get()){
+                dlqChannel.basicReject(tag, true);
+            } else if (this.checkDatabaseHealth() && retryCount < MAX_RETRY_COUNT) {
+                this.retryEnqueueMessage(dlqChannel, tag, message);
+                redisLockService.unlockProduct(deserializedBid.getProductId());
+            } else if(retryCount >= MAX_RETRY_COUNT) {
+                this.resendToDLQAtEnd(dlqChannel, tag, message);
+                redisLockService.lockProduct(deserializedBid.getProductId());
+            }
+        } catch (AmqpException | IllegalStateException ex) {
+            logger.error("Failed to send message: " + ex.getMessage());
+        } catch (Exception ex) {
+            dlqChannel.basicReject(tag, true);
+            redisLockService.lockProduct(deserializedBid.getProductId());
+            logger.error("Handled Critical exception: " + ex.getMessage());
+        }
+    }
+
+    private void retryEnqueueMessage(Channel dlqChannel, long tag, Message message){
+        rabbitTemplate.execute(channel -> {
+            rabbitTemplate.send(exchangeName, routingKey, message);
+            dlqChannel.basicAck(tag, false);
+            return null;
+        });
+    }
+
+    private void resendToDLQAtEnd(Channel dlqChannel, long tag, Message message){
+        rabbitTemplate.execute(channel -> {
+            rabbitTemplate.send(dlqExchangeName, dlqRoutingKey, message);
+            dlqChannel.basicAck(tag, false);
+            return null;
+        });
+    }
+
+    private boolean checkDatabaseHealth() {
+        try (Connection connection = MySQLDBDataSource.getConnection()) {
+            return connection.isValid(1000);    // 1초(1000 ms)안에 응답이 오는지 확인
+        } catch (SQLException ex) {
+            return false;
+        }
+    }
+
+    private void sendAlertAdminEmail(Message message, int retryCount) {
+        // TODO: 개발자에게 이메일 전송 로직 추가 및 개발자가 확인하여 수동으로 처리할 수 있도록 안내
+    }
 }

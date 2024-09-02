@@ -1,5 +1,6 @@
 package com.ccommit.auction_server.service.serviceImpl;
 
+import com.ccommit.auction_server.dto.BidDTO;
 import com.ccommit.auction_server.model.Bid;
 import com.ccommit.auction_server.model.Category;
 import com.ccommit.auction_server.model.Product;
@@ -68,16 +69,11 @@ public class PerformanceBidServiceImpl implements PerformanceBidService {
                 generatedStartPrice = generatedStartPrice + bid.getPrice();
             }
 
-            Bid registerBid = Bid.builder()
-                    .buyerId(generatedBuyerId)
-                    .productId(generatedProductId)
-                    .bidTime(LocalDateTime.now())
-                    .price(generatedStartPrice)
+            BidDTO registerBidDTO = BidDTO.builder()
                     .build();
 
             Instant startInstant = Instant.now();
-
-            rabbitMQService.enqueueMassage(registerBid);
+            rabbitMQService.enqueueMassage(bid.getBuyerId(), bid.getProductId(), registerBidDTO);
 
             Instant endInstant = Instant.now();
             Duration duration = Duration.between(startInstant, endInstant);

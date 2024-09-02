@@ -62,14 +62,11 @@ public class User {
     private UserType userType;
 
     @Column(name = "create_time")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createTime;
 
     @Column(name = "update_time")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updateTime;
 
     @Column(name = "last_login_time")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime lastLoginTime;
 }

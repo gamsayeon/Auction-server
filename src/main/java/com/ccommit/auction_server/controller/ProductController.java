@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
@@ -119,7 +120,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/withdraw/{productId}")
+    @DeleteMapping("/{productId}/withdraw")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "PRODUCT_UPDATE_FAILED_BY_STATUS : 상품의 상태로 인한 삭제 실패<br>" +
@@ -143,14 +144,14 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    // TODO: 성능테스트시 불필요한 Schedule 이기에 주석 처리 하였습니다.
-        @Scheduled(cron = "${auction.productState.scheduling.updateTime}")
+    @Profile("live")
+    @Scheduled(cron = "${auction.productState.scheduling.updateTime}")
     public void updateProductAuctionStatus() {
         logger.debug("경매상태값을 수정합니다.");
         productService.updateProductStatus();
     }
 
-    @PostMapping("/comments/{productId}")
+    @PostMapping("/{productId}/comments")
     @LoginCheck(types = {LoginCheck.LoginType.USER})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "PRODUCT_COMMENT_ADD_FAILED : 상품 댓글 등록 실패", content = @Content),

@@ -3,6 +3,7 @@ package com.ccommit.auction_server.service;
 import com.ccommit.auction_server.dto.ProductDTO;
 import com.ccommit.auction_server.dto.SearchProductDTO;
 import com.ccommit.auction_server.enums.ProductSortOrder;
+import com.ccommit.auction_server.model.Product;
 
 import java.util.List;
 
@@ -21,4 +22,8 @@ public interface ProductService {
 
     SearchProductDTO findByKeywordELK(String productName, Long saleId, Long categoryId,
                                       String explanation, int page, int pageSize, ProductSortOrder sortOrder);
+
+    Product findByProductId(Long productId);
+
+    void saveProduct(Product product);
 }
