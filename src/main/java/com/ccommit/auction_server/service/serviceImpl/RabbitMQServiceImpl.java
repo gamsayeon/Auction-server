@@ -22,7 +22,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.support.AmqpHeaders;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
@@ -38,7 +37,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 @RequiredArgsConstructor
 public class RabbitMQServiceImpl implements MQService {
-    private final BidPriceValidator bidPriceValidator;
     private final EmailService emailService;
     private final RabbitTemplate rabbitTemplate;
     private final ProductService productService;
@@ -75,7 +73,7 @@ public class RabbitMQServiceImpl implements MQService {
         Bid bid = null;
         try {
             Product product = productService.findByProductId(productId);
-            bidPriceValidator.validBidPrice(productId, bidDTO.getPrice());
+            bidService.validBidPrice(productId, bidDTO.getPrice());
 
             if (product.getProductStatus() != ProductStatus.AUCTION_PROCEEDING) {
                 logger.warn("경매가 시작되지 않았습니다.");
@@ -97,7 +95,7 @@ public class RabbitMQServiceImpl implements MQService {
         } catch (AmqpException e) {
             logger.error("Failed to send message: " + e.getMessage());
         } finally {
-            return bidMapper.convertToDTO(bid);
+            return bidDTO;
         }
     }
     private String convertBidToMessage(Bid bid){
@@ -137,7 +135,7 @@ public class RabbitMQServiceImpl implements MQService {
                 return;
             }
 
-            bidPriceValidator.validBidPrice(deserializedBid.getProductId(), deserializedBid.getPrice());
+            bidService.validBidPrice(deserializedBid.getProductId(), deserializedBid.getPrice());
             Bid resultBid = bidService.saveBid(deserializedBid);
 
             if (resultBid.getPrice() == product.getHighestPrice()) {

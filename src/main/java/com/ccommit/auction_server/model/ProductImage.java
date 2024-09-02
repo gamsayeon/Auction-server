@@ -16,8 +16,12 @@ public class ProductImage {
     @Column(name = "image_id")
     private Long imageId;
 
-    @Column(name = "product_id")
+    @Column(name = "product_id", insertable = false, updatable = false)
     private Long productId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    private Product product;
 
     @Column(name = "image_path")
     private String imagePath;

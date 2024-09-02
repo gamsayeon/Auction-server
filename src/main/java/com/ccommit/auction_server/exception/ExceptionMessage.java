@@ -70,7 +70,11 @@ public class ExceptionMessage {
         exceptionMessages.put("BID_NOT_SELECT_BY_PRODUCT_ID", "아직 경매 이력이 없습니다.");
     }
 
-    public static String getExceptionMessage(String exceptionCode) {
-        return exceptionMessages.getOrDefault(exceptionCode, "알 수 없는 예외입니다.");
+    public static String getExceptionMessage(String exceptionCode, Exception ex) {
+        String message = exceptionMessages.getOrDefault(exceptionCode, "알 수 없는 예외입니다.");
+        if (ex != null) {
+            message += " 상세 내용: " + ex.getMessage();
+        }
+        return message;
     }
 }

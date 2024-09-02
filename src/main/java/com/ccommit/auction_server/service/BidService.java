@@ -11,4 +11,6 @@ public interface BidService {
     List<BidDTO> selectBidByProduct(Long productId);
 
     Bid saveBid(Bid bid);
+
+    void validBidPrice(Long productId, Integer newPrice);
 }

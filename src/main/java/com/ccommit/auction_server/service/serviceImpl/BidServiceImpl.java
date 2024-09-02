@@ -9,6 +9,7 @@ import com.ccommit.auction_server.model.elk.DocumentBid;
 import com.ccommit.auction_server.repository.BidRepository;
 import com.ccommit.auction_server.repository.ProductRepository;
 import com.ccommit.auction_server.service.BidService;
+import com.ccommit.auction_server.validation.BidPriceValidator;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +24,7 @@ public class BidServiceImpl implements BidService {
     private final ProductRepository productRepository;
     private final BidSelectRepository bidSelectRepository;
     private final BidRepository bidRepository;
+    private final BidPriceValidator bidPriceValidator;
     private static final Logger logger = LogManager.getLogger(BidServiceImpl.class);
 
     @Override
@@ -54,5 +56,10 @@ public class BidServiceImpl implements BidService {
     @Override
     public Bid saveBid(Bid bid) {
         return bidRepository.save(bid);
+    }
+
+    @Override
+    public void validBidPrice(Long productId, Integer newPrice){
+        bidPriceValidator.validBidPrice(productId, newPrice);
     }
 }

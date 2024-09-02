@@ -11,5 +11,4 @@ public class BidValidationErrorDetails {
     private int newBidPrice;
     private int currentHighestBidPrice;
     private int categoryMinimumBidPrice;
-
 }

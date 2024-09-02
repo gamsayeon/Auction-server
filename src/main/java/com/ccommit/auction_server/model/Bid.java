@@ -21,8 +21,16 @@ public class Bid {
     @Column(name = "buyer_id")
     private Long buyerId;
 
-    @Column(name = "productId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer_id", insertable = false, updatable = false)
+    private User buyer;
+
+    @Column(name = "product_id")
     private Long productId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    private Product product;
 
     @Column(name = "bid_time")
     private LocalDateTime bidTime;

@@ -20,7 +20,7 @@ public class CustomExceptionHandler {
     public ResponseEntity<Object> handleException(RuntimeException ex, HttpServletRequest request) {
         String exceptionCode = ex.getMessage();
         CommonResponse commonResponse = new CommonResponse(exceptionCode,
-                ExceptionMessage.getExceptionMessage(exceptionCode), request.getServletPath());
+                ExceptionMessage.getExceptionMessage(exceptionCode, ex), request.getServletPath());
         logger.error(commonResponse.toString());
         return ResponseEntity.badRequest().body(commonResponse);
     }
@@ -40,7 +40,7 @@ public class CustomExceptionHandler {
         String exceptionCode = ex.getCause().getMessage();
         AuctionCommonException commonException = (AuctionCommonException) ex.getCause();
         CommonResponse commonResponse = new CommonResponse(exceptionCode,
-                ExceptionMessage.getExceptionMessage(exceptionCode), request.getServletPath(), commonException.getResponseBody());
+                ExceptionMessage.getExceptionMessage(exceptionCode, ex), request.getServletPath(), commonException.getResponseBody());
         logger.error(commonResponse.toString());
         return ResponseEntity.badRequest().body(commonResponse);
     }
@@ -51,7 +51,7 @@ public class CustomExceptionHandler {
     public ResponseEntity<Object> handleAuctionCommonException(AuctionCommonException ex, HttpServletRequest request) {
         String exceptionCode = ex.getMessage();
         CommonResponse commonResponse = new CommonResponse(exceptionCode,
-                ExceptionMessage.getExceptionMessage(exceptionCode), request.getServletPath(), ex.getResponseBody());
+                ExceptionMessage.getExceptionMessage(exceptionCode,ex), request.getServletPath(), ex.getResponseBody());
         logger.error(commonResponse.toString());
         return ResponseEntity.badRequest().body(commonResponse);
     }
