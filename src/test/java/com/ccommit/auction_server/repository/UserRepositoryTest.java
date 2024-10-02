@@ -2,17 +2,13 @@ package com.ccommit.auction_server.repository;
 
 import com.ccommit.auction_server.config.TestElasticsearchConfig;
 import com.ccommit.auction_server.model.User;
-import com.ccommit.auction_server.util.Sha256Encrypt;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -24,10 +20,6 @@ class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Qualifier("elasticsearchTemplate")
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
     private User testUser;
     private Long savedUserId;
     private String TEST_USER_ID = "testUserId";
