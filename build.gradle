@@ -51,15 +51,10 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.projectreactor:reactor-test'
-    testImplementation 'org.projectlombok:lombok'
-    testImplementation 'junit:junit'
     testImplementation 'org.testcontainers:junit-jupiter:1.19.1' // Testcontainers JUnit 5 통합
     testImplementation 'org.testcontainers:mysql:1.19.1' // MySQL Testcontainers
-    testImplementation 'org.testcontainers:elasticsearch:1.19.1'
-    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.10.2'
-    implementation 'org.elasticsearch.client:elasticsearch-rest-client:8.1.1'
-
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.24'
+    implementation 'org.elasticsearch.client:elasticsearch-rest-client:7.17.24'
 }
 
 tasks.named('test') {

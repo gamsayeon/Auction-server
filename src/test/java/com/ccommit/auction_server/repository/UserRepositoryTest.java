@@ -1,23 +1,27 @@
 package com.ccommit.auction_server.repository;
 
+import com.ccommit.auction_server.config.TestDatabaseConfig;
 import com.ccommit.auction_server.config.TestElasticsearchConfig;
 import com.ccommit.auction_server.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
-@Import(TestElasticsearchConfig.class)
+@ActiveProfiles("test")
+@Import({TestDatabaseConfig.class, TestElasticsearchConfig.class})
+@DisplayName("UserRepository 단위 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest {
-
     @Autowired
     private UserRepository userRepository;
     private User testUser;
@@ -25,7 +29,6 @@ class UserRepositoryTest {
     private String TEST_USER_ID = "testUserId";
     private String TEST_EMAIL = "test@example.com";
     private String TEST_PASSWORD = "testPassword";
-
 
     @BeforeEach
     void setUp() {
@@ -37,6 +40,7 @@ class UserRepositoryTest {
                 .build();
 
         savedUserId = userRepository.save(testUser).getId();
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test

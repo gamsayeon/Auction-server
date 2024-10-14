@@ -1,10 +1,12 @@
 package com.ccommit.auction_server.repository;
 
+import com.ccommit.auction_server.config.TestDatabaseConfig;
 import com.ccommit.auction_server.config.TestElasticsearchConfig;
 import com.ccommit.auction_server.model.Category;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @ActiveProfiles("test")
 @DisplayName("CategoryRepository Unit 테스트")
-@Import(TestElasticsearchConfig.class)
+@Import({TestDatabaseConfig.class, TestElasticsearchConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class CategoryRepositoryTest {
     @Autowired
@@ -31,6 +33,11 @@ class CategoryRepositoryTest {
     private Long savedCategoryId;
 
     @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @BeforeEach
     public void generateTestCategory() {
         //given
         Category category = Category.builder()
@@ -39,6 +46,7 @@ class CategoryRepositoryTest {
                 .build();
 
         savedCategoryId = categoryRepository.save(category).getCategoryId();
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
