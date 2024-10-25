@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `category` (
   `bid_min_price` int NOT NULL COMMENT '입찰 최저 단위',
   PRIMARY KEY (`category_id`),
   UNIQUE KEY `category_name_UNIQUE` (`category_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='카테고리';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='카테고리';
 
 -- 2. Create the `product` table
 CREATE TABLE IF NOT EXISTS `product` (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   PRIMARY KEY (`product_id`),
   KEY `FK_product_category_id_category_category_id_idx` (`category_id`),
   CONSTRAINT `FK_product_category_id_category_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=100036 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='상품';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='상품';
 
 -- 3. Create the `user` table
 CREATE TABLE IF NOT EXISTS `user` (
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `payment` (
   KEY `FK_auction_payment_user_id_user_id_idx` (`user_id`),
   CONSTRAINT `FK_auction_payment_product_id_product_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`),
   CONSTRAINT `FK_auction_payment_user_id_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- 6. Create the `product_comment` table
 CREATE TABLE IF NOT EXISTS `product_comment` (
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `product_comment` (
   CONSTRAINT `FK_comment_product_id_product_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_comment_user_id_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_product_comment_parent_comment_id_product_comment_comment_id` FOREIGN KEY (`parent_comment_id`) REFERENCES `product_comment` (`comment_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='댓글';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='댓글';
 
 -- 7. Create the `product_image` table
 CREATE TABLE IF NOT EXISTS `product_image` (
@@ -97,4 +97,4 @@ CREATE TABLE IF NOT EXISTS `product_image` (
   PRIMARY KEY (`image_id`),
   KEY `FK_product_image_product_id_product_product_id` (`product_id`),
   CONSTRAINT `FK_product_image_product_id_product_product_id` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='상품이미지';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='상품이미지';

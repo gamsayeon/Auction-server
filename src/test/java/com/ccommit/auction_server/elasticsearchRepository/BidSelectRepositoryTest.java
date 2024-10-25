@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
 @Import({TestDatabaseConfig.class})
-@DisplayName("BidSelectRepository 단위 테스트")
+@DisplayName("BidSelectRepository Unit 테스트")
 @ExtendWith(MockitoExtension.class)
 public class BidSelectRepositoryTest {
     @Mock
@@ -35,14 +35,14 @@ public class BidSelectRepositoryTest {
     }
 
     private DocumentBid createDocumentBid(String id, Long bidId, Long buyerId, Long productId, LocalDateTime bidTime, int price) {
-        DocumentBid bid = new DocumentBid();
-        bid.setId(id);
-        bid.setBidId(bidId);
-        bid.setBuyerId(buyerId);
-        bid.setProductId(productId);
-        bid.setBidTime(bidTime);
-        bid.setPrice(price);
-        return bid;
+        DocumentBid documentBid = new DocumentBid();
+        documentBid.setId(id);
+        documentBid.setBidId(bidId);
+        documentBid.setBuyerId(buyerId);
+        documentBid.setProductId(productId);
+        documentBid.setBidTime(bidTime);
+        documentBid.setPrice(price);
+        return documentBid;
     }
 
     @Test

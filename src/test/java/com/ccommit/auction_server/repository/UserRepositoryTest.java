@@ -2,6 +2,7 @@ package com.ccommit.auction_server.repository;
 
 import com.ccommit.auction_server.config.TestDatabaseConfig;
 import com.ccommit.auction_server.config.TestElasticsearchConfig;
+import com.ccommit.auction_server.config.testDataInitializer.TestDataInitializer;
 import com.ccommit.auction_server.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,79 +19,74 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import({TestDatabaseConfig.class, TestElasticsearchConfig.class})
-@DisplayName("UserRepository 단위 테스트")
+@DisplayName("UserRepository Unit 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({TestDatabaseConfig.class, TestElasticsearchConfig.class, TestDataInitializer.class})
 class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
-    private User testUser;
-    private Long savedUserId;
-    private String TEST_USER_ID = "testUserId";
-    private String TEST_EMAIL = "test@example.com";
-    private String TEST_PASSWORD = "testPassword";
+    @Autowired
+    private TestDataInitializer testDataInitializer;
+
+    private User savedUser;
 
     @BeforeEach
-    void setUp() {
-        testUser = User.builder()
-                .userId("testUserId")
-                .password("testPassword")
-                .name("Test User")
-                .email(TEST_EMAIL)
-                .build();
-
-        savedUserId = userRepository.save(testUser).getId();
+    void generateTestUser() {
+        //given
+        savedUser = testDataInitializer.getSavedUser();
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
     @DisplayName("Test findByUserId")
     void testFindByUserId() {
-        User foundUser = userRepository.findByUserId("testUserId").orElse(null);
+        //when
+        User foundUser = userRepository.findByUserId(testDataInitializer.getTEST_USER_ID()).orElse(null);
 
+        //then
         assertNotNull(foundUser);
-        assertEquals(testUser.getUserId(), foundUser.getUserId());
+        assertEquals(savedUser.getUserId(), foundUser.getUserId());
     }
 
     @Test
     @DisplayName("유저 식별자와 업데이트 시간이 널인 유저 조회")
     void findByIdAndUpdateTimeIsNull() {
         //when
-        User findUser = userRepository.findByIdAndUpdateTimeIsNull(savedUserId).orElse(null);
+        User findUser = userRepository.findByIdAndUpdateTimeIsNull(savedUser.getId()).orElse(null);
 
         //then
         assertNotNull(findUser);
-        assertEquals(savedUserId, findUser.getId());
+        assertEquals(savedUser.getId(), findUser.getId());
     }
 
     @Test
     @DisplayName("유저 ID로 유저 조회")
     void findByUserId() {
         //when
-        User findUser = userRepository.findByUserId(TEST_USER_ID).orElse(null);
+        User findUser = userRepository.findByUserId(testDataInitializer.getTEST_USER_ID()).orElse(null);
 
         //then
         assertNotNull(findUser);
-        assertEquals(TEST_USER_ID, findUser.getUserId());
+        assertEquals(testDataInitializer.getTEST_USER_ID(), findUser.getUserId());
     }
 
     @Test
     @DisplayName("유저 아이디와 비밀번호로 로그인 확인")
     void findByUserIdAndPassword() {
         //when
-        User loginUser = userRepository.findByUserIdAndPassword(TEST_USER_ID, TEST_PASSWORD).orElse(null);
+        User loginUser = userRepository.findByUserIdAndPassword(testDataInitializer.getTEST_USER_ID(), testDataInitializer.getTEST_PASSWORD()).orElse(null);
 
         //then
         assertNotNull(loginUser);
-        assertEquals(TEST_USER_ID, loginUser.getUserId());
-        assertEquals(TEST_PASSWORD, loginUser.getPassword());
+        assertEquals(testDataInitializer.getTEST_USER_ID(), loginUser.getUserId());
+        assertEquals(testDataInitializer.getTEST_PASSWORD(), loginUser.getPassword());
     }
 
     @Test
     @DisplayName("유효한 유저 Email 확인")
     void existsByEmail() {
         //when
-        boolean existsEmail = userRepository.existsByEmail(TEST_EMAIL);
+        boolean existsEmail = userRepository.existsByEmail(testDataInitializer.getTEST_EMAIL());
 
         //then
         assertEquals(true, existsEmail);
@@ -100,7 +96,7 @@ class UserRepositoryTest {
     @DisplayName("유효한 유저 ID 확인")
     void existsByUserId() {
         //when
-        boolean existsUserId = userRepository.existsByUserId(TEST_USER_ID);
+        boolean existsUserId = userRepository.existsByUserId(testDataInitializer.getTEST_USER_ID());
 
         //then
         assertEquals(true, existsUserId);
@@ -110,10 +106,10 @@ class UserRepositoryTest {
     @DisplayName("유저 식별자로 유저 Email 조회")
     void findEmailById() {
         //when
-        String email = userRepository.findUserProjectionById(savedUserId).getEmail();
+        String email = userRepository.findUserProjectionById(savedUser.getId()).getEmail();
 
         //then
         assertNotNull(email);
-        assertEquals(TEST_EMAIL, email);
+        assertEquals(testDataInitializer.getTEST_EMAIL(), email);
     }
 }

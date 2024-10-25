@@ -4,7 +4,6 @@ import com.ccommit.auction_server.elasticsearchRepository.ProductSearchRepositor
 import com.ccommit.auction_server.enums.ProductSortOrder;
 import com.ccommit.auction_server.model.elk.DocumentProduct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,7 +15,6 @@ import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
-
 
 @Repository
 @RequiredArgsConstructor
