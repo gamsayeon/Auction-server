@@ -1,15 +1,21 @@
 package com.ccommit.auction_server.repository;
 
+import com.ccommit.auction_server.config.TestDatabaseConfig;
+import com.ccommit.auction_server.config.TestElasticsearchConfig;
+import com.ccommit.auction_server.config.testDataInitializer.TestDataInitializer;
 import com.ccommit.auction_server.model.Bid;
+import com.ccommit.auction_server.model.Product;
+import com.ccommit.auction_server.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,88 +24,69 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 @DisplayName("BidRepository Unit 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({TestDatabaseConfig.class, TestElasticsearchConfig.class, TestDataInitializer.class})
 class BidRepositoryTest {
     @Autowired
     private BidRepository bidRepository;
-    private Long TEST_BUYER_ID = 500L;
-    private Long TEST_PRODUCT_ID = 500L;
-    private int BID_COUNT = 2;
-    private int TEST_MAX_PRICE = 10000 * BID_COUNT;
+    @Autowired
+    private TestDataInitializer testDataInitializer;
+
+    private Bid savedBid;
+    private Product savedProduct;
+    private User savedUser;
 
     @BeforeEach
-    public void generateTestBid() {
+    void setup() {
         //given
-        for (int i = 1; i <= BID_COUNT; i++) {
-            Bid bid = Bid.builder()
-                    .buyerId(TEST_BUYER_ID)
-                    .productId(TEST_PRODUCT_ID)
-                    .bidTime(LocalDateTime.now())
-                    .price(10000 * i)
-                    .build();
-
-            bidRepository.save(bid);
-        }
+        savedUser = testDataInitializer.getSavedUser();
+        savedProduct = testDataInitializer.getSavedProduct();
+        savedBid = testDataInitializer.getSavedBid();
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    @DisplayName("상품의 입찰 최댓값 조회")
-    void findMaxPriceByProductId() {
+    @DisplayName("Test findTopByProductIdOrderByPriceDesc")
+    void testFindTopByProductIdOrderByPriceDesc() {
         //when
-        Integer findMaxBid = bidRepository.findTopByProductIdOrderByPriceDesc(TEST_BUYER_ID).getPrice();
+        Bid foundBid = bidRepository.findTopByProductIdOrderByPriceDesc(savedProduct.getProductId());
 
         //then
-        assertNotNull(findMaxBid);
-        assertEquals(TEST_MAX_PRICE, findMaxBid);
+        assertNotNull(foundBid);
+        assertEquals(savedBid.getPrice(), foundBid.getPrice());
     }
 
     @Test
-    @DisplayName("상품의 입찰 갯수 조회")
-    void countByProductId() {
+    @DisplayName("Test countByProductId")
+    void testCountByProductId() {
         //when
-        Long findCountBid = bidRepository.countByProductId(TEST_PRODUCT_ID);
+        Long count = bidRepository.countByProductId(savedProduct.getProductId());
 
         //then
-        assertNotNull(findCountBid);
-        assertEquals(BID_COUNT, findCountBid);
+        assertEquals(1, count);
     }
 
     @Test
-    @DisplayName("구매자 식별자로 입찰 조회")
-    void findByBuyerId() {
+    @DisplayName("Test findByBuyerId")
+    void testFindByBuyerId() {
         //when
-        List<Bid> findBids = bidRepository.findByBuyerId(TEST_BUYER_ID);
+        List<Bid> bids = bidRepository.findByBuyerId(savedUser.getId());
 
         //then
-        assertFalse(findBids.isEmpty());
-        for (Bid bid : findBids) {
-            assertEquals(TEST_BUYER_ID, bid.getBuyerId());
-        }
+        assertNotNull(bids);
+        assertFalse(bids.isEmpty());
+        assertEquals(savedUser.getId(), bids.get(0).getBuyerId());
     }
 
     @Test
-    @DisplayName("구매자 식별자와 상품 식별자로 입찰 조회")
-    void findByBuyerIdAndProductId() {
+    @DisplayName("Test findByBuyerIdAndProductId")
+    void testFindByBuyerIdAndProductId() {
         //when
-        List<Bid> findBids = bidRepository.findByBuyerIdAndProductId(TEST_BUYER_ID, TEST_PRODUCT_ID);
+        List<Bid> bids = bidRepository.findByBuyerIdAndProductId(savedUser.getId(), savedProduct.getProductId());
 
         //then
-        assertFalse(findBids.isEmpty());
-        for (Bid bid : findBids) {
-            assertEquals(TEST_BUYER_ID, bid.getBuyerId());
-            assertEquals(TEST_PRODUCT_ID, bid.getProductId());
-        }
-    }
-
-    @Test
-    @DisplayName("판매자의 상품 식별자로 입찰 조회")
-    void findByProductId() {
-        //when
-        List<Bid> findBids = bidRepository.findByProductId(TEST_PRODUCT_ID);
-
-        //then
-        assertFalse(findBids.isEmpty());
-        for (Bid bid : findBids) {
-            assertEquals(TEST_PRODUCT_ID, bid.getProductId());
-        }
+        assertNotNull(bids);
+        assertFalse(bids.isEmpty());
+        assertEquals(savedUser.getId(), bids.get(0).getBuyerId());
+        assertEquals(savedProduct.getProductId(), bids.get(0).getProductId());
     }
 }

@@ -1,16 +1,21 @@
 package com.ccommit.auction_server.repository;
 
+import com.ccommit.auction_server.config.TestDatabaseConfig;
+import com.ccommit.auction_server.config.TestElasticsearchConfig;
+import com.ccommit.auction_server.config.testDataInitializer.TestDataInitializer;
 import com.ccommit.auction_server.enums.ProductStatus;
 import com.ccommit.auction_server.model.Product;
+import com.ccommit.auction_server.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.Assert.assertNull;
@@ -22,34 +27,23 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ActiveProfiles("test")
 @DisplayName("ProductRepository Unit 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({TestDatabaseConfig.class, TestElasticsearchConfig.class, TestDataInitializer.class})
 class ProductRepositoryTest {
     @Autowired
     private ProductRepository productRepository;
-    private Long TEST_SALE_ID = 500L;
-    private Long TEST_CATEGORY_ID = 500L;
-    private int PRODUCT_COUNT = 3;
+    @Autowired
+    private TestDataInitializer testDataInitializer;
+
+    private final int DELETE_SUCCESS = 1;
     private Product savedProduct;
-    private int DELETE_SUCCESS = 1;
+    private User savedUser;
 
     @BeforeEach
     public void generateTestProduct() {
         //given
-        for (int i = 0; i < PRODUCT_COUNT; i++) {
-            Product product = Product.builder()
-                    .saleId(TEST_SALE_ID)
-                    .productName("testProductName")
-                    .categoryId(TEST_CATEGORY_ID)
-                    .explanation("testExplanation")
-                    .productRegisterTime(LocalDateTime.now())
-                    .startPrice(1000)
-                    .startTime(LocalDateTime.now())
-                    .endTime(LocalDateTime.now())
-                    .highestPrice(1000000)
-                    .productStatus(ProductStatus.PRODUCT_REGISTRATION)
-                    .build();
-
-            savedProduct = productRepository.save(product);
-        }
+        savedUser = testDataInitializer.getSavedUser();
+        savedProduct = testDataInitializer.getSavedProduct();
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -67,24 +61,27 @@ class ProductRepositoryTest {
     @DisplayName("판매자 식별자로 상품 조회")
     void findBySaleId() {
         //when
-        List<Product> findProducts = productRepository.findBySaleId(TEST_SALE_ID);
+        List<Product> findProducts = productRepository.findBySaleId(savedUser.getId());
 
         //then
         assertNotNull(findProducts);
         for (Product findProduct : findProducts) {
-            assertEquals(TEST_SALE_ID, findProduct.getSaleId());
+            assertEquals(savedUser.getId(), findProduct.getSaleId());
         }
     }
 
     @Test
     @DisplayName("상품 식별자와 판매자 식별자로 상품 삭제")
     void deleteByProductId() {
+        Product deleteProduct = testDataInitializer.createProduct(savedUser.getId(), savedProduct.getCategoryId(),
+                "deleteProduct", "deleteExplanation");
+
         //when
-        int deleteProduct = productRepository.deleteByProductId(savedProduct.getProductId());
+        int deleteProductCount = productRepository.deleteByProductId(deleteProduct.getProductId());
 
         //then
-        assertNull(productRepository.findByProductId(savedProduct.getProductId()));
-        assertEquals(DELETE_SUCCESS, deleteProduct);
+        assertNull(productRepository.findByProductId(deleteProduct.getProductId()));
+        assertEquals(DELETE_SUCCESS, deleteProductCount);
     }
 
     @Test

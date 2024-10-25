@@ -10,7 +10,6 @@ import java.util.List;
 public interface BidSelectRepository extends ElasticsearchRepository<DocumentBid, String> {
     List<DocumentBid> findByBuyerId(Long buyerId);
     List<DocumentBid> findByBuyerIdAndProductId(Long buyerId, Long productId);
-
     List<DocumentBid> findByProductIdOrderByPriceDesc(Long productId);
 
 }

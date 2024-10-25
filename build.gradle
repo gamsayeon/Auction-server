@@ -31,12 +31,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.projectlombok:lombok'
-    testImplementation 'junit:junit'
     compileOnly 'org.projectlombok:lombok'
     implementation 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.projectreactor:reactor-test'
     implementation 'org.modelmapper:modelmapper:3.1.1'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
@@ -45,18 +42,20 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
-    // AWS SES
     implementation 'com.amazonaws:aws-java-sdk-ses:1.12.472'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'org.mockito:mockito-core'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
     implementation 'org.springframework.retry:spring-retry'
     implementation 'com.github.javafaker:javafaker:1.0.2'
     implementation 'org.redisson:redisson:3.16.7'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-elasticsearch', version: '3.2.1'
-
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    //test
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.testcontainers:junit-jupiter:1.19.1' // Testcontainers JUnit 5 통합
+    testImplementation 'org.testcontainers:mysql:1.19.1' // MySQL Testcontainers
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.24'
+    implementation 'org.elasticsearch.client:elasticsearch-rest-client:7.17.24'
 }
 
 tasks.named('test') {

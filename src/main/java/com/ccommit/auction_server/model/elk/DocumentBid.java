@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Document(indexName = "bid_index")
 @Getter
 @Setter
-//@Setting(settingPath = "/static/elastic/elastic-settings.json")
-//@Mapping(mappingPath = "/static/elastic/bid-mappings.json")
+@Setting(settingPath = "/static/elastic/elastic-settings.json")
+@Mapping(mappingPath = "/static/elastic/bid-mappings.json")
 public class DocumentBid {
     @Id
     private String id;

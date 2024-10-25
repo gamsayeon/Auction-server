@@ -16,7 +16,6 @@ import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-
 @Repository
 @RequiredArgsConstructor
 public class ProductSearchRepositoryImplElk implements ProductSearchRepository {
